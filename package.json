@@ -1,21 +1,23 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "i18n-action",
+  "description": "This action checks for translation issues within your PRs.",
   "version": "0.0.0",
   "author": "",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://inlang.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/opral/i18n-action.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/opral/i18n-action/issues"
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "i18n",
+    "localization",
+    "inlang",
+    "node"
   ],
   "exports": {
     ".": "./dist/index.js"
