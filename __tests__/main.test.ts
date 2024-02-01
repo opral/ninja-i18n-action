@@ -8,6 +8,7 @@
 
 import * as core from '@actions/core'
 import * as main from '../src/main'
+import "dotenv/config";
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -37,8 +38,14 @@ describe('action', () => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case 'milliseconds':
-          return '500'
+        case 'owner':
+          return 'nilsjacobsen'
+        case 'repo':
+          return 'test-repo-for-action'
+        case 'pr_number':
+          return '1'
+        case 'token':
+          return process.env.GITHUB_TOKEN || ''
         default:
           return ''
       }
