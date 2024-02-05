@@ -1,6 +1,6 @@
 # Inlang Action -> Under construction
 
-This action checks for translation issues within your PRs. This is a test.
+This action checks for translation issues within your PRs. This is another test.
 
 ## Initial Setup
 
