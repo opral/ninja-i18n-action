@@ -50828,6 +50828,7 @@ async function run() {
             pull_number: pr_number,
         });
         core.debug(`I got changed files: ${changedFiles}`);
+        core.debug(`I got changed files: ${changedFiles}`);
         let diffData = {
             additions: 0,
             deletions: 0,
