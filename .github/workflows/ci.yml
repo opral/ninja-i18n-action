@@ -46,3 +46,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             Release ${{ steps.version.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}
