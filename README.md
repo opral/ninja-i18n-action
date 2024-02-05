@@ -43,7 +43,6 @@ need to perform some initial setup steps before you can develop your action.
    ...
    ```
 
-
 ## Update the Action Metadata
 
 The [`action.yml`](action.yml) file defines metadata about your action, such as
