@@ -36,6 +36,7 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@v0.7
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
 
       - name: Create GitHub release
