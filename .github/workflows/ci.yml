@@ -1,62 +1,47 @@
-name: Continuous Integration
+name: Release Workflow
 
 on:
-  pull_request:
   push:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
-  test-typescript:
-    name: TypeScript Tests
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version-file: .node-version
-          cache: npm
+          node-version: '14'
 
-      - name: Install Dependencies
-        id: npm-ci
-        run: npm ci
+      - name: Get version from commit message
+        id: version
+        run: echo "::set-output name=version::$(git log -1 --pretty=%B | grep -oP 'v \K\d+\.\d+\.\d+')"
 
-      - name: Check Format
-        id: npm-format-check
-        run: npm run format:check
+      - name: Update package.json
+        run: |
+          sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.version.outputs.version }}\"/" package.json
 
-      - name: Lint
-        id: npm-lint
-        run: npm run lint
-
-      - name: Test
-        id: npm-ci-test
-        run: npm run ci-test
-
-  test-action:
-    name: GitHub Actions Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
-
-      - name: Test Local Action
-        id: test-action
-        uses: ./
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "Bump version to ${{ steps.version.outputs.version }}"
+        
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.7
         with:
-          milliseconds: 2000
+          branch: ${{ github.ref }}
 
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'dist/*'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            Release ${{ steps.version.outputs.version }}
