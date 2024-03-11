@@ -3,7 +3,7 @@ name: Release Workflow
 on:
   push:
     paths:
-      - "dist/index.js"
+      - "dist/index.cjs"
     branches:
       - main
 
