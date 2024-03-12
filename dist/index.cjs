@@ -58847,7 +58847,7 @@ ${error?.cause.stack}`;
 | lint rule | new reports | link |
 |-----------|-------------|------|
 ${lintSummary.map(
-        (lintSummary2) => `| ${lintSummary2.name} | ${lintSummary2.count} | [contribute (via Fink \u{1F426})](https://fink.inlang.com/github.com/${headMeta.owner}/${headMeta.repo}?branch=${headMeta.branch}&project=${result.projectPath}&lint=${lintSummary2.id}&${result.changedIds.map((id) => `id=${id}`).join("&")}&ref=ninja-${prNumber}) |`
+        (lintSummary2) => `| ${lintSummary2.name} | ${lintSummary2.count} | [contribute (via Fink \u{1F426})](https://fink.inlang.com/github.com/${headMeta.owner}/${headMeta.repo}?branch=${headMeta.branch}&project=${result.projectPath}&lint=${lintSummary2.id}&${result.changedIds.map((id) => `id=${id}`).join("&")}&ref=ninja-${baseMeta.owner}/${baseMeta.repo}/pull/${prNumber}) |`
       ).join("\n")}
 `;
       result.commentContent = commentContent2;
