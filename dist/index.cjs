@@ -61323,13 +61323,6 @@ async function run() {
           return result.projectPath;
         }
       };
-      if (projectListHead.some(
-        (project) => project.projectPath.replace(process.cwd(), "") === result.projectPath
-      ) === false) {
-        result.commentContent = `#### \u2757\uFE0F Project \`${shortenedProjectPath()}\` not found in head repo.
-If you have not intentionally deleted the project, check whether the head repository is up to date with the base repository.`;
-        continue;
-      }
       if (result.errorsBase.length === 0 && result.errorsHead.length > 0) {
         result.commentContent = `#### \u2757\uFE0F New errors in setup of project \`${shortenedProjectPath()}\` found
 ${result.errorsHead.map((error) => {
