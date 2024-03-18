@@ -61278,6 +61278,12 @@ async function run() {
       });
     }
     for (const result of results) {
+      if (projectListHead.some(
+        (project) => project.projectPath.replace(process.cwd(), "") === result.projectPath
+      ) === false) {
+        console.debug(`Project ${result.projectPath} not found in head repo`);
+        continue;
+      }
       const projectHead = await loadProject({
         projectPath: process.cwd() + result.projectPath,
         repo: repoHead,
@@ -61288,6 +61294,12 @@ async function run() {
           result.errorsHead = projectHead.errors();
         console.debug("Skip project ", result.projectPath, " in head repo because of errors");
         continue;
+      }
+      const newInstalledRules = projectHead.installed.messageLintRules();
+      for (const newRule of newInstalledRules) {
+        if (!result.installedRules.some((rule) => rule.id === newRule.id)) {
+          result.installedRules.push(newRule);
+        }
       }
       result?.reportsHead.push(...projectHead.query.messageLintReports.getAll());
     }
@@ -61303,9 +61315,6 @@ async function run() {
       result.changedIds = LintSummary.changedIds;
     }
     for (const result of results) {
-      if (result.errorsBase.length > 0 && result.errorsHead.length === 0) {
-        console.debug(`#### \u2705 Setup of project \`${result.projectPath}\` fixed`);
-      }
       const shortenedProjectPath = () => {
         const parts = result.projectPath.split("/");
         if (parts.length > 2) {
@@ -61314,6 +61323,13 @@ async function run() {
           return result.projectPath;
         }
       };
+      if (projectListHead.some(
+        (project) => project.projectPath.replace(process.cwd(), "") === result.projectPath
+      ) === false) {
+        result.commentContent = `#### \u2757\uFE0F Project \`${shortenedProjectPath()}\` not found in head repo.
+If you have not intentionally deleted the project, check whether the head repository is up to date with the base repository.`;
+        continue;
+      }
       if (result.errorsBase.length === 0 && result.errorsHead.length > 0) {
         result.commentContent = `#### \u2757\uFE0F New errors in setup of project \`${shortenedProjectPath()}\` found
 ${result.errorsHead.map((error) => {
@@ -61336,6 +61352,9 @@ ${error?.cause.stack}`;
           return errorLog;
         }).join("\n")}`;
         continue;
+      }
+      if (result.errorsBase.length > 0 && result.errorsHead.length === 0) {
+        console.debug(`#### \u2705 Setup of project \`${result.projectPath}\` fixed`);
       }
       if (result.errorsBase.length > 0 || result.errorsHead.length > 0)
         continue;
