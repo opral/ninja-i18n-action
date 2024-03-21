@@ -60686,7 +60686,8 @@ Valid examples:
         description: rule.description,
         module: resolvedModules()?.meta.find((m) => m.id.includes(rule.id))?.module ?? "Unknown module. You stumbled on a bug in inlang's source code. Please open an issue.",
         // default to warning, see https://github.com/opral/monorepo/issues/1254
-        level: settingsValue["messageLintRuleLevels"]?.[rule.id] ?? "warning"
+        level: settingsValue["messageLintRuleLevels"]?.[rule.id] ?? "warning",
+        settingsSchema: rule.settingsSchema
       }));
     };
     const installedPlugins = () => {
@@ -60696,7 +60697,8 @@ Valid examples:
         id: plugin.id,
         displayName: plugin.displayName,
         description: plugin.description,
-        module: resolvedModules()?.meta.find((m) => m.id.includes(plugin.id))?.module ?? "Unknown module. You stumbled on a bug in inlang's source code. Please open an issue."
+        module: resolvedModules()?.meta.find((m) => m.id.includes(plugin.id))?.module ?? "Unknown module. You stumbled on a bug in inlang's source code. Please open an issue.",
+        settingsSchema: plugin.settingsSchema
       }));
     };
     const initializeError = await initialized.catch((error) => error);
