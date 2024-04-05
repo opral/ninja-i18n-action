@@ -723,7 +723,7 @@ var require_tunnel = __commonJS({
         connectOptions.headers = connectOptions.headers || {};
         connectOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(connectOptions.proxyAuth).toString("base64");
       }
-      debug3("making CONNECT request");
+      debug4("making CONNECT request");
       var connectReq = self2.request(connectOptions);
       connectReq.useChunkedEncodingByDefault = false;
       connectReq.once("response", onResponse);
@@ -743,7 +743,7 @@ var require_tunnel = __commonJS({
         connectReq.removeAllListeners();
         socket.removeAllListeners();
         if (res.statusCode !== 200) {
-          debug3(
+          debug4(
             "tunneling socket could not be established, statusCode=%d",
             res.statusCode
           );
@@ -755,7 +755,7 @@ var require_tunnel = __commonJS({
           return;
         }
         if (head.length > 0) {
-          debug3("got illegal response body from proxy");
+          debug4("got illegal response body from proxy");
           socket.destroy();
           var error = new Error("got illegal response body from proxy");
           error.code = "ECONNRESET";
@@ -763,13 +763,13 @@ var require_tunnel = __commonJS({
           self2.removeSocket(placeholder);
           return;
         }
-        debug3("tunneling connection has established");
+        debug4("tunneling connection has established");
         self2.sockets[self2.sockets.indexOf(placeholder)] = socket;
         return cb(socket);
       }
       function onError(cause) {
         connectReq.removeAllListeners();
-        debug3(
+        debug4(
           "tunneling socket could not be established, cause=%s\n",
           cause.message,
           cause.stack
@@ -831,9 +831,9 @@ var require_tunnel = __commonJS({
       }
       return target;
     }
-    var debug3;
+    var debug4;
     if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-      debug3 = function() {
+      debug4 = function() {
         var args = Array.prototype.slice.call(arguments);
         if (typeof args[0] === "string") {
           args[0] = "TUNNEL: " + args[0];
@@ -843,10 +843,10 @@ var require_tunnel = __commonJS({
         console.error.apply(console, args);
       };
     } else {
-      debug3 = function() {
+      debug4 = function() {
       };
     }
-    exports2.debug = debug3;
+    exports2.debug = debug4;
   }
 });
 
@@ -1216,7 +1216,7 @@ var require_util = __commonJS({
       }
       return url;
     }
-    function parseOrigin(url) {
+    function parseOrigin2(url) {
       url = parseURL(url);
       if (url.pathname !== "/" || url.search || url.hash) {
         throw new InvalidArgumentError("invalid url");
@@ -1493,7 +1493,7 @@ var require_util = __commonJS({
       toUSVString,
       isReadableAborted,
       isBlobLike,
-      parseOrigin,
+      parseOrigin: parseOrigin2,
       parseURL,
       getServerName,
       isStream,
@@ -9070,7 +9070,7 @@ var require_balanced_pool = __commonJS({
     } = require_pool_base();
     var Pool = require_pool();
     var { kUrl, kInterceptors } = require_symbols();
-    var { parseOrigin } = require_util();
+    var { parseOrigin: parseOrigin2 } = require_util();
     var kFactory = Symbol("factory");
     var kOptions = Symbol("options");
     var kGreatestCommonDivisor = Symbol("kGreatestCommonDivisor");
@@ -9109,7 +9109,7 @@ var require_balanced_pool = __commonJS({
         this._updateBalancedPoolStats();
       }
       addUpstream(upstream) {
-        const upstreamOrigin = parseOrigin(upstream).origin;
+        const upstreamOrigin = parseOrigin2(upstream).origin;
         if (this[kClients].find((pool2) => pool2[kUrl].origin === upstreamOrigin && pool2.closed !== true && pool2.destroyed !== true)) {
           return this;
         }
@@ -9139,7 +9139,7 @@ var require_balanced_pool = __commonJS({
         this[kGreatestCommonDivisor] = this[kClients].map((p) => p[kWeight]).reduce(getGreatestCommonDivisor, 0);
       }
       removeUpstream(upstream) {
-        const upstreamOrigin = parseOrigin(upstream).origin;
+        const upstreamOrigin = parseOrigin2(upstream).origin;
         const pool = this[kClients].find((pool2) => pool2[kUrl].origin === upstreamOrigin && pool2.closed !== true && pool2.destroyed !== true);
         if (pool) {
           this[kRemoveClient](pool);
@@ -18772,10 +18772,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       return process.env["RUNNER_DEBUG"] === "1";
     }
     exports2.isDebug = isDebug;
-    function debug3(message) {
+    function debug4(message) {
       command_1.issueCommand("debug", {}, message);
     }
-    exports2.debug = debug3;
+    exports2.debug = debug4;
     function error(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -26712,9 +26712,9 @@ var require_constants5 = __commonJS({
 // ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js
 var require_debug = __commonJS({
   "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js"(exports2, module2) {
-    var debug3 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
+    var debug4 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
     };
-    module2.exports = debug3;
+    module2.exports = debug4;
   }
 });
 
@@ -26726,7 +26726,7 @@ var require_re = __commonJS({
       MAX_SAFE_BUILD_LENGTH,
       MAX_LENGTH
     } = require_constants5();
-    var debug3 = require_debug();
+    var debug4 = require_debug();
     exports2 = module2.exports = {};
     var re = exports2.re = [];
     var safeRe = exports2.safeRe = [];
@@ -26748,7 +26748,7 @@ var require_re = __commonJS({
     var createToken = (name, value, isGlobal) => {
       const safe = makeSafeRegex(value);
       const index2 = R++;
-      debug3(name, index2, value);
+      debug4(name, index2, value);
       t[name] = index2;
       src[index2] = value;
       re[index2] = new RegExp(value, isGlobal ? "g" : void 0);
@@ -26845,7 +26845,7 @@ var require_identifiers = __commonJS({
 // ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js
 var require_semver = __commonJS({
   "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js"(exports2, module2) {
-    var debug3 = require_debug();
+    var debug4 = require_debug();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants5();
     var { safeRe: re, t } = require_re();
     var parseOptions = require_parse_options();
@@ -26867,7 +26867,7 @@ var require_semver = __commonJS({
             `version is longer than ${MAX_LENGTH} characters`
           );
         }
-        debug3("SemVer", version3, options);
+        debug4("SemVer", version3, options);
         this.options = options;
         this.loose = !!options.loose;
         this.includePrerelease = !!options.includePrerelease;
@@ -26915,7 +26915,7 @@ var require_semver = __commonJS({
         return this.version;
       }
       compare(other) {
-        debug3("SemVer.compare", this.version, this.options, other);
+        debug4("SemVer.compare", this.version, this.options, other);
         if (!(other instanceof _SemVer)) {
           if (typeof other === "string" && other === this.version) {
             return 0;
@@ -26948,7 +26948,7 @@ var require_semver = __commonJS({
         do {
           const a = this.prerelease[i];
           const b = other.prerelease[i];
-          debug3("prerelease compare", i, a, b);
+          debug4("prerelease compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -26970,7 +26970,7 @@ var require_semver = __commonJS({
         do {
           const a = this.build[i];
           const b = other.build[i];
-          debug3("prerelease compare", i, a, b);
+          debug4("prerelease compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -28154,21 +28154,21 @@ var require_range = __commonJS({
         const loose = this.options.loose;
         const hr = loose ? re[t.HYPHENRANGELOOSE] : re[t.HYPHENRANGE];
         range = range.replace(hr, hyphenReplace(this.options.includePrerelease));
-        debug3("hyphen replace", range);
+        debug4("hyphen replace", range);
         range = range.replace(re[t.COMPARATORTRIM], comparatorTrimReplace);
-        debug3("comparator trim", range);
+        debug4("comparator trim", range);
         range = range.replace(re[t.TILDETRIM], tildeTrimReplace);
-        debug3("tilde trim", range);
+        debug4("tilde trim", range);
         range = range.replace(re[t.CARETTRIM], caretTrimReplace);
-        debug3("caret trim", range);
+        debug4("caret trim", range);
         let rangeList = range.split(" ").map((comp) => parseComparator(comp, this.options)).join(" ").split(/\s+/).map((comp) => replaceGTE0(comp, this.options));
         if (loose) {
           rangeList = rangeList.filter((comp) => {
-            debug3("loose invalid filter", comp, this.options);
+            debug4("loose invalid filter", comp, this.options);
             return !!comp.match(re[t.COMPARATORLOOSE]);
           });
         }
-        debug3("range list", rangeList);
+        debug4("range list", rangeList);
         const rangeMap = /* @__PURE__ */ new Map();
         const comparators = rangeList.map((comp) => new Comparator(comp, this.options));
         for (const comp of comparators) {
@@ -28223,7 +28223,7 @@ var require_range = __commonJS({
     var cache = new LRU({ max: 1e3 });
     var parseOptions = require_parse_options();
     var Comparator = require_comparator();
-    var debug3 = require_debug();
+    var debug4 = require_debug();
     var SemVer = require_semver();
     var {
       safeRe: re,
@@ -28248,15 +28248,15 @@ var require_range = __commonJS({
       return result;
     };
     var parseComparator = (comp, options) => {
-      debug3("comp", comp, options);
+      debug4("comp", comp, options);
       comp = replaceCarets(comp, options);
-      debug3("caret", comp);
+      debug4("caret", comp);
       comp = replaceTildes(comp, options);
-      debug3("tildes", comp);
+      debug4("tildes", comp);
       comp = replaceXRanges(comp, options);
-      debug3("xrange", comp);
+      debug4("xrange", comp);
       comp = replaceStars(comp, options);
-      debug3("stars", comp);
+      debug4("stars", comp);
       return comp;
     };
     var isX = (id) => !id || id.toLowerCase() === "x" || id === "*";
@@ -28266,7 +28266,7 @@ var require_range = __commonJS({
     var replaceTilde = (comp, options) => {
       const r = options.loose ? re[t.TILDELOOSE] : re[t.TILDE];
       return comp.replace(r, (_, M, m, p, pr) => {
-        debug3("tilde", comp, _, M, m, p, pr);
+        debug4("tilde", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
@@ -28275,12 +28275,12 @@ var require_range = __commonJS({
         } else if (isX(p)) {
           ret = `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`;
         } else if (pr) {
-          debug3("replaceTilde pr", pr);
+          debug4("replaceTilde pr", pr);
           ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
         } else {
           ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
         }
-        debug3("tilde return", ret);
+        debug4("tilde return", ret);
         return ret;
       });
     };
@@ -28288,11 +28288,11 @@ var require_range = __commonJS({
       return comp.trim().split(/\s+/).map((c) => replaceCaret(c, options)).join(" ");
     };
     var replaceCaret = (comp, options) => {
-      debug3("caret", comp, options);
+      debug4("caret", comp, options);
       const r = options.loose ? re[t.CARETLOOSE] : re[t.CARET];
       const z = options.includePrerelease ? "-0" : "";
       return comp.replace(r, (_, M, m, p, pr) => {
-        debug3("caret", comp, _, M, m, p, pr);
+        debug4("caret", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
@@ -28305,7 +28305,7 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
           }
         } else if (pr) {
-          debug3("replaceCaret pr", pr);
+          debug4("replaceCaret pr", pr);
           if (M === "0") {
             if (m === "0") {
               ret = `>=${M}.${m}.${p}-${pr} <${M}.${m}.${+p + 1}-0`;
@@ -28316,7 +28316,7 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.${p}-${pr} <${+M + 1}.0.0-0`;
           }
         } else {
-          debug3("no pr");
+          debug4("no pr");
           if (M === "0") {
             if (m === "0") {
               ret = `>=${M}.${m}.${p}${z} <${M}.${m}.${+p + 1}-0`;
@@ -28327,19 +28327,19 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
           }
         }
-        debug3("caret return", ret);
+        debug4("caret return", ret);
         return ret;
       });
     };
     var replaceXRanges = (comp, options) => {
-      debug3("replaceXRanges", comp, options);
+      debug4("replaceXRanges", comp, options);
       return comp.split(/\s+/).map((c) => replaceXRange(c, options)).join(" ");
     };
     var replaceXRange = (comp, options) => {
       comp = comp.trim();
       const r = options.loose ? re[t.XRANGELOOSE] : re[t.XRANGE];
       return comp.replace(r, (ret, gtlt, M, m, p, pr) => {
-        debug3("xRange", comp, ret, gtlt, M, m, p, pr);
+        debug4("xRange", comp, ret, gtlt, M, m, p, pr);
         const xM = isX(M);
         const xm = xM || isX(m);
         const xp = xm || isX(p);
@@ -28386,16 +28386,16 @@ var require_range = __commonJS({
         } else if (xp) {
           ret = `>=${M}.${m}.0${pr} <${M}.${+m + 1}.0-0`;
         }
-        debug3("xRange return", ret);
+        debug4("xRange return", ret);
         return ret;
       });
     };
     var replaceStars = (comp, options) => {
-      debug3("replaceStars", comp, options);
+      debug4("replaceStars", comp, options);
       return comp.trim().replace(re[t.STAR], "");
     };
     var replaceGTE0 = (comp, options) => {
-      debug3("replaceGTE0", comp, options);
+      debug4("replaceGTE0", comp, options);
       return comp.trim().replace(re[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
     };
     var hyphenReplace = (incPr) => ($0, from3, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) => {
@@ -28433,7 +28433,7 @@ var require_range = __commonJS({
       }
       if (version3.prerelease.length && !options.includePrerelease) {
         for (let i = 0; i < set.length; i++) {
-          debug3(set[i].semver);
+          debug4(set[i].semver);
           if (set[i].semver === Comparator.ANY) {
             continue;
           }
@@ -28469,7 +28469,7 @@ var require_comparator = __commonJS({
           }
         }
         comp = comp.trim().split(/\s+/).join(" ");
-        debug3("comparator", comp, options);
+        debug4("comparator", comp, options);
         this.options = options;
         this.loose = !!options.loose;
         this.parse(comp);
@@ -28478,7 +28478,7 @@ var require_comparator = __commonJS({
         } else {
           this.value = this.operator + this.semver.version;
         }
-        debug3("comp", this);
+        debug4("comp", this);
       }
       parse(comp) {
         const r = this.options.loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR];
@@ -28500,7 +28500,7 @@ var require_comparator = __commonJS({
         return this.value;
       }
       test(version3) {
-        debug3("Comparator.test", version3, this.options.loose);
+        debug4("Comparator.test", version3, this.options.loose);
         if (this.semver === ANY || version3 === ANY) {
           return true;
         }
@@ -28557,7 +28557,7 @@ var require_comparator = __commonJS({
     var parseOptions = require_parse_options();
     var { safeRe: re, t } = require_re();
     var cmp = require_cmp();
-    var debug3 = require_debug();
+    var debug4 = require_debug();
     var SemVer = require_semver();
     var Range = require_range();
   }
@@ -29585,8 +29585,8 @@ var require_lodash = __commonJS({
         return value === 0 ? value : +value;
       }
       value = value.replace(reTrim, "");
-      var isBinary = reIsBinary.test(value);
-      return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+      var isBinary2 = reIsBinary.test(value);
+      return isBinary2 || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary2 ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
     }
     function keys(object) {
       return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
@@ -29671,8 +29671,8 @@ var require_lodash3 = __commonJS({
         return value === 0 ? value : +value;
       }
       value = value.replace(reTrim, "");
-      var isBinary = reIsBinary.test(value);
-      return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+      var isBinary2 = reIsBinary.test(value);
+      return isBinary2 || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary2 ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
     }
     module2.exports = isInteger;
   }
@@ -29829,8 +29829,8 @@ var require_lodash7 = __commonJS({
         return value === 0 ? value : +value;
       }
       value = value.replace(reTrim, "");
-      var isBinary = reIsBinary.test(value);
-      return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+      var isBinary2 = reIsBinary.test(value);
+      return isBinary2 || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary2 ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
     }
     module2.exports = once;
   }
@@ -32914,9 +32914,9 @@ var require_dist_node23 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+webhooks@12.1.2/node_modules/@octokit/webhooks/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+webhooks@12.2.0/node_modules/@octokit/webhooks/dist-node/index.js
 var require_dist_node24 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+webhooks@12.1.2/node_modules/@octokit/webhooks/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+webhooks@12.2.0/node_modules/@octokit/webhooks/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -32963,6 +32963,9 @@ var require_dist_node24 = __commonJS({
       ...logger
     });
     var emitterEventNames = [
+      "branch_protection_configuration",
+      "branch_protection_rule.disabled",
+      "branch_protection_rule.enabled",
       "branch_protection_rule",
       "branch_protection_rule.created",
       "branch_protection_rule.deleted",
@@ -32986,6 +32989,11 @@ var require_dist_node24 = __commonJS({
       "commit_comment",
       "commit_comment.created",
       "create",
+      "custom_property",
+      "custom_property.created",
+      "custom_property.deleted",
+      "custom_property_values",
+      "custom_property_values.updated",
       "delete",
       "dependabot_alert",
       "dependabot_alert.created",
@@ -39434,10 +39442,10 @@ var require_diff3 = __commonJS({
   }
 });
 
-// ../../../lix/source-code/fs/dist/errors/FilesystemError.js
+// ../../../lix/packages/fs/dist/errors/FilesystemError.js
 var FilesystemError;
 var init_FilesystemError = __esm({
-  "../../../lix/source-code/fs/dist/errors/FilesystemError.js"() {
+  "../../../lix/packages/fs/dist/errors/FilesystemError.js"() {
     "use strict";
     FilesystemError = class extends Error {
       code;
@@ -39479,7 +39487,7 @@ var init_FilesystemError = __esm({
   }
 });
 
-// ../../../lix/source-code/fs/dist/utilities/helpers.js
+// ../../../lix/packages/fs/dist/utilities/helpers.js
 function assertIsAbsolutePath(path) {
   if ((path.startsWith("/") || /^[A-Za-z]:[\\/]/.test(path)) === false) {
     {
@@ -39535,12 +39543,12 @@ function getBasename(path) {
   return path.split("/").filter((x) => x).at(-1) ?? path;
 }
 var init_helpers = __esm({
-  "../../../lix/source-code/fs/dist/utilities/helpers.js"() {
+  "../../../lix/packages/fs/dist/utilities/helpers.js"() {
     "use strict";
   }
 });
 
-// ../../../lix/source-code/fs/dist/memoryFs.js
+// ../../../lix/packages/fs/dist/memoryFs.js
 function toSnapshot(fs2) {
   return {
     fsMap: Object.fromEntries([...fs2._state.fsMap].map(([path, content]) => {
@@ -39946,14 +39954,14 @@ function createNodeishMemoryFs() {
   }
 }
 var init_memoryFs = __esm({
-  "../../../lix/source-code/fs/dist/memoryFs.js"() {
+  "../../../lix/packages/fs/dist/memoryFs.js"() {
     "use strict";
     init_FilesystemError();
     init_helpers();
   }
 });
 
-// ../../../lix/source-code/fs/dist/index.js
+// ../../../lix/packages/fs/dist/index.js
 var dist_exports = {};
 __export(dist_exports, {
   assertIsAbsolutePath: () => assertIsAbsolutePath,
@@ -39966,7 +39974,7 @@ __export(dist_exports, {
   toSnapshot: () => toSnapshot
 });
 var init_dist = __esm({
-  "../../../lix/source-code/fs/dist/index.js"() {
+  "../../../lix/packages/fs/dist/index.js"() {
     "use strict";
     init_memoryFs();
     init_helpers();
@@ -45434,376 +45442,6 @@ var require_compiler2 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/lib/murmurHash3js.js
-var require_murmurHash3js = __commonJS({
-  "../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/lib/murmurHash3js.js"(exports2, module2) {
-    (function(root, undefined2) {
-      "use strict";
-      var library = {
-        "version": "3.0.1",
-        "x86": {},
-        "x64": {}
-      };
-      function _x86Multiply(m, n) {
-        return (m & 65535) * n + (((m >>> 16) * n & 65535) << 16);
-      }
-      function _x86Rotl(m, n) {
-        return m << n | m >>> 32 - n;
-      }
-      function _x86Fmix(h) {
-        h ^= h >>> 16;
-        h = _x86Multiply(h, 2246822507);
-        h ^= h >>> 13;
-        h = _x86Multiply(h, 3266489909);
-        h ^= h >>> 16;
-        return h;
-      }
-      function _x64Add(m, n) {
-        m = [m[0] >>> 16, m[0] & 65535, m[1] >>> 16, m[1] & 65535];
-        n = [n[0] >>> 16, n[0] & 65535, n[1] >>> 16, n[1] & 65535];
-        var o = [0, 0, 0, 0];
-        o[3] += m[3] + n[3];
-        o[2] += o[3] >>> 16;
-        o[3] &= 65535;
-        o[2] += m[2] + n[2];
-        o[1] += o[2] >>> 16;
-        o[2] &= 65535;
-        o[1] += m[1] + n[1];
-        o[0] += o[1] >>> 16;
-        o[1] &= 65535;
-        o[0] += m[0] + n[0];
-        o[0] &= 65535;
-        return [o[0] << 16 | o[1], o[2] << 16 | o[3]];
-      }
-      function _x64Multiply(m, n) {
-        m = [m[0] >>> 16, m[0] & 65535, m[1] >>> 16, m[1] & 65535];
-        n = [n[0] >>> 16, n[0] & 65535, n[1] >>> 16, n[1] & 65535];
-        var o = [0, 0, 0, 0];
-        o[3] += m[3] * n[3];
-        o[2] += o[3] >>> 16;
-        o[3] &= 65535;
-        o[2] += m[2] * n[3];
-        o[1] += o[2] >>> 16;
-        o[2] &= 65535;
-        o[2] += m[3] * n[2];
-        o[1] += o[2] >>> 16;
-        o[2] &= 65535;
-        o[1] += m[1] * n[3];
-        o[0] += o[1] >>> 16;
-        o[1] &= 65535;
-        o[1] += m[2] * n[2];
-        o[0] += o[1] >>> 16;
-        o[1] &= 65535;
-        o[1] += m[3] * n[1];
-        o[0] += o[1] >>> 16;
-        o[1] &= 65535;
-        o[0] += m[0] * n[3] + m[1] * n[2] + m[2] * n[1] + m[3] * n[0];
-        o[0] &= 65535;
-        return [o[0] << 16 | o[1], o[2] << 16 | o[3]];
-      }
-      function _x64Rotl(m, n) {
-        n %= 64;
-        if (n === 32) {
-          return [m[1], m[0]];
-        } else if (n < 32) {
-          return [m[0] << n | m[1] >>> 32 - n, m[1] << n | m[0] >>> 32 - n];
-        } else {
-          n -= 32;
-          return [m[1] << n | m[0] >>> 32 - n, m[0] << n | m[1] >>> 32 - n];
-        }
-      }
-      function _x64LeftShift(m, n) {
-        n %= 64;
-        if (n === 0) {
-          return m;
-        } else if (n < 32) {
-          return [m[0] << n | m[1] >>> 32 - n, m[1] << n];
-        } else {
-          return [m[1] << n - 32, 0];
-        }
-      }
-      function _x64Xor(m, n) {
-        return [m[0] ^ n[0], m[1] ^ n[1]];
-      }
-      function _x64Fmix(h) {
-        h = _x64Xor(h, [0, h[0] >>> 1]);
-        h = _x64Multiply(h, [4283543511, 3981806797]);
-        h = _x64Xor(h, [0, h[0] >>> 1]);
-        h = _x64Multiply(h, [3301882366, 444984403]);
-        h = _x64Xor(h, [0, h[0] >>> 1]);
-        return h;
-      }
-      library.x86.hash32 = function(key, seed) {
-        key = key || "";
-        seed = seed || 0;
-        var remainder = key.length % 4;
-        var bytes = key.length - remainder;
-        var h1 = seed;
-        var k1 = 0;
-        var c1 = 3432918353;
-        var c2 = 461845907;
-        for (var i = 0; i < bytes; i = i + 4) {
-          k1 = key.charCodeAt(i) & 255 | (key.charCodeAt(i + 1) & 255) << 8 | (key.charCodeAt(i + 2) & 255) << 16 | (key.charCodeAt(i + 3) & 255) << 24;
-          k1 = _x86Multiply(k1, c1);
-          k1 = _x86Rotl(k1, 15);
-          k1 = _x86Multiply(k1, c2);
-          h1 ^= k1;
-          h1 = _x86Rotl(h1, 13);
-          h1 = _x86Multiply(h1, 5) + 3864292196;
-        }
-        k1 = 0;
-        switch (remainder) {
-          case 3:
-            k1 ^= (key.charCodeAt(i + 2) & 255) << 16;
-          case 2:
-            k1 ^= (key.charCodeAt(i + 1) & 255) << 8;
-          case 1:
-            k1 ^= key.charCodeAt(i) & 255;
-            k1 = _x86Multiply(k1, c1);
-            k1 = _x86Rotl(k1, 15);
-            k1 = _x86Multiply(k1, c2);
-            h1 ^= k1;
-        }
-        h1 ^= key.length;
-        h1 = _x86Fmix(h1);
-        return h1 >>> 0;
-      };
-      library.x86.hash128 = function(key, seed) {
-        key = key || "";
-        seed = seed || 0;
-        var remainder = key.length % 16;
-        var bytes = key.length - remainder;
-        var h1 = seed;
-        var h2 = seed;
-        var h3 = seed;
-        var h4 = seed;
-        var k1 = 0;
-        var k2 = 0;
-        var k3 = 0;
-        var k4 = 0;
-        var c1 = 597399067;
-        var c2 = 2869860233;
-        var c3 = 951274213;
-        var c4 = 2716044179;
-        for (var i = 0; i < bytes; i = i + 16) {
-          k1 = key.charCodeAt(i) & 255 | (key.charCodeAt(i + 1) & 255) << 8 | (key.charCodeAt(i + 2) & 255) << 16 | (key.charCodeAt(i + 3) & 255) << 24;
-          k2 = key.charCodeAt(i + 4) & 255 | (key.charCodeAt(i + 5) & 255) << 8 | (key.charCodeAt(i + 6) & 255) << 16 | (key.charCodeAt(i + 7) & 255) << 24;
-          k3 = key.charCodeAt(i + 8) & 255 | (key.charCodeAt(i + 9) & 255) << 8 | (key.charCodeAt(i + 10) & 255) << 16 | (key.charCodeAt(i + 11) & 255) << 24;
-          k4 = key.charCodeAt(i + 12) & 255 | (key.charCodeAt(i + 13) & 255) << 8 | (key.charCodeAt(i + 14) & 255) << 16 | (key.charCodeAt(i + 15) & 255) << 24;
-          k1 = _x86Multiply(k1, c1);
-          k1 = _x86Rotl(k1, 15);
-          k1 = _x86Multiply(k1, c2);
-          h1 ^= k1;
-          h1 = _x86Rotl(h1, 19);
-          h1 += h2;
-          h1 = _x86Multiply(h1, 5) + 1444728091;
-          k2 = _x86Multiply(k2, c2);
-          k2 = _x86Rotl(k2, 16);
-          k2 = _x86Multiply(k2, c3);
-          h2 ^= k2;
-          h2 = _x86Rotl(h2, 17);
-          h2 += h3;
-          h2 = _x86Multiply(h2, 5) + 197830471;
-          k3 = _x86Multiply(k3, c3);
-          k3 = _x86Rotl(k3, 17);
-          k3 = _x86Multiply(k3, c4);
-          h3 ^= k3;
-          h3 = _x86Rotl(h3, 15);
-          h3 += h4;
-          h3 = _x86Multiply(h3, 5) + 2530024501;
-          k4 = _x86Multiply(k4, c4);
-          k4 = _x86Rotl(k4, 18);
-          k4 = _x86Multiply(k4, c1);
-          h4 ^= k4;
-          h4 = _x86Rotl(h4, 13);
-          h4 += h1;
-          h4 = _x86Multiply(h4, 5) + 850148119;
-        }
-        k1 = 0;
-        k2 = 0;
-        k3 = 0;
-        k4 = 0;
-        switch (remainder) {
-          case 15:
-            k4 ^= key.charCodeAt(i + 14) << 16;
-          case 14:
-            k4 ^= key.charCodeAt(i + 13) << 8;
-          case 13:
-            k4 ^= key.charCodeAt(i + 12);
-            k4 = _x86Multiply(k4, c4);
-            k4 = _x86Rotl(k4, 18);
-            k4 = _x86Multiply(k4, c1);
-            h4 ^= k4;
-          case 12:
-            k3 ^= key.charCodeAt(i + 11) << 24;
-          case 11:
-            k3 ^= key.charCodeAt(i + 10) << 16;
-          case 10:
-            k3 ^= key.charCodeAt(i + 9) << 8;
-          case 9:
-            k3 ^= key.charCodeAt(i + 8);
-            k3 = _x86Multiply(k3, c3);
-            k3 = _x86Rotl(k3, 17);
-            k3 = _x86Multiply(k3, c4);
-            h3 ^= k3;
-          case 8:
-            k2 ^= key.charCodeAt(i + 7) << 24;
-          case 7:
-            k2 ^= key.charCodeAt(i + 6) << 16;
-          case 6:
-            k2 ^= key.charCodeAt(i + 5) << 8;
-          case 5:
-            k2 ^= key.charCodeAt(i + 4);
-            k2 = _x86Multiply(k2, c2);
-            k2 = _x86Rotl(k2, 16);
-            k2 = _x86Multiply(k2, c3);
-            h2 ^= k2;
-          case 4:
-            k1 ^= key.charCodeAt(i + 3) << 24;
-          case 3:
-            k1 ^= key.charCodeAt(i + 2) << 16;
-          case 2:
-            k1 ^= key.charCodeAt(i + 1) << 8;
-          case 1:
-            k1 ^= key.charCodeAt(i);
-            k1 = _x86Multiply(k1, c1);
-            k1 = _x86Rotl(k1, 15);
-            k1 = _x86Multiply(k1, c2);
-            h1 ^= k1;
-        }
-        h1 ^= key.length;
-        h2 ^= key.length;
-        h3 ^= key.length;
-        h4 ^= key.length;
-        h1 += h2;
-        h1 += h3;
-        h1 += h4;
-        h2 += h1;
-        h3 += h1;
-        h4 += h1;
-        h1 = _x86Fmix(h1);
-        h2 = _x86Fmix(h2);
-        h3 = _x86Fmix(h3);
-        h4 = _x86Fmix(h4);
-        h1 += h2;
-        h1 += h3;
-        h1 += h4;
-        h2 += h1;
-        h3 += h1;
-        h4 += h1;
-        return ("00000000" + (h1 >>> 0).toString(16)).slice(-8) + ("00000000" + (h2 >>> 0).toString(16)).slice(-8) + ("00000000" + (h3 >>> 0).toString(16)).slice(-8) + ("00000000" + (h4 >>> 0).toString(16)).slice(-8);
-      };
-      library.x64.hash128 = function(key, seed) {
-        key = key || "";
-        seed = seed || 0;
-        var remainder = key.length % 16;
-        var bytes = key.length - remainder;
-        var h1 = [0, seed];
-        var h2 = [0, seed];
-        var k1 = [0, 0];
-        var k2 = [0, 0];
-        var c1 = [2277735313, 289559509];
-        var c2 = [1291169091, 658871167];
-        for (var i = 0; i < bytes; i = i + 16) {
-          k1 = [key.charCodeAt(i + 4) & 255 | (key.charCodeAt(i + 5) & 255) << 8 | (key.charCodeAt(i + 6) & 255) << 16 | (key.charCodeAt(i + 7) & 255) << 24, key.charCodeAt(i) & 255 | (key.charCodeAt(i + 1) & 255) << 8 | (key.charCodeAt(i + 2) & 255) << 16 | (key.charCodeAt(i + 3) & 255) << 24];
-          k2 = [key.charCodeAt(i + 12) & 255 | (key.charCodeAt(i + 13) & 255) << 8 | (key.charCodeAt(i + 14) & 255) << 16 | (key.charCodeAt(i + 15) & 255) << 24, key.charCodeAt(i + 8) & 255 | (key.charCodeAt(i + 9) & 255) << 8 | (key.charCodeAt(i + 10) & 255) << 16 | (key.charCodeAt(i + 11) & 255) << 24];
-          k1 = _x64Multiply(k1, c1);
-          k1 = _x64Rotl(k1, 31);
-          k1 = _x64Multiply(k1, c2);
-          h1 = _x64Xor(h1, k1);
-          h1 = _x64Rotl(h1, 27);
-          h1 = _x64Add(h1, h2);
-          h1 = _x64Add(_x64Multiply(h1, [0, 5]), [0, 1390208809]);
-          k2 = _x64Multiply(k2, c2);
-          k2 = _x64Rotl(k2, 33);
-          k2 = _x64Multiply(k2, c1);
-          h2 = _x64Xor(h2, k2);
-          h2 = _x64Rotl(h2, 31);
-          h2 = _x64Add(h2, h1);
-          h2 = _x64Add(_x64Multiply(h2, [0, 5]), [0, 944331445]);
-        }
-        k1 = [0, 0];
-        k2 = [0, 0];
-        switch (remainder) {
-          case 15:
-            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 14)], 48));
-          case 14:
-            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 13)], 40));
-          case 13:
-            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 12)], 32));
-          case 12:
-            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 11)], 24));
-          case 11:
-            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 10)], 16));
-          case 10:
-            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 9)], 8));
-          case 9:
-            k2 = _x64Xor(k2, [0, key.charCodeAt(i + 8)]);
-            k2 = _x64Multiply(k2, c2);
-            k2 = _x64Rotl(k2, 33);
-            k2 = _x64Multiply(k2, c1);
-            h2 = _x64Xor(h2, k2);
-          case 8:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 7)], 56));
-          case 7:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 6)], 48));
-          case 6:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 5)], 40));
-          case 5:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 4)], 32));
-          case 4:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 3)], 24));
-          case 3:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 2)], 16));
-          case 2:
-            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 1)], 8));
-          case 1:
-            k1 = _x64Xor(k1, [0, key.charCodeAt(i)]);
-            k1 = _x64Multiply(k1, c1);
-            k1 = _x64Rotl(k1, 31);
-            k1 = _x64Multiply(k1, c2);
-            h1 = _x64Xor(h1, k1);
-        }
-        h1 = _x64Xor(h1, [0, key.length]);
-        h2 = _x64Xor(h2, [0, key.length]);
-        h1 = _x64Add(h1, h2);
-        h2 = _x64Add(h2, h1);
-        h1 = _x64Fmix(h1);
-        h2 = _x64Fmix(h2);
-        h1 = _x64Add(h1, h2);
-        h2 = _x64Add(h2, h1);
-        return ("00000000" + (h1[0] >>> 0).toString(16)).slice(-8) + ("00000000" + (h1[1] >>> 0).toString(16)).slice(-8) + ("00000000" + (h2[0] >>> 0).toString(16)).slice(-8) + ("00000000" + (h2[1] >>> 0).toString(16)).slice(-8);
-      };
-      if (typeof exports2 !== "undefined") {
-        if (typeof module2 !== "undefined" && module2.exports) {
-          exports2 = module2.exports = library;
-        }
-        exports2.murmurHash3 = library;
-      } else if (typeof define === "function" && define.amd) {
-        define([], function() {
-          return library;
-        });
-      } else {
-        library._murmurHash3 = root.murmurHash3;
-        library.noConflict = function() {
-          root.murmurHash3 = library._murmurHash3;
-          library._murmurHash3 = undefined2;
-          library.noConflict = undefined2;
-          return library;
-        };
-        root.murmurHash3 = library;
-      }
-    })(exports2);
-  }
-});
-
-// ../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/index.js
-var require_murmurhash3js = __commonJS({
-  "../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/index.js"(exports2, module2) {
-    module2.exports = require_murmurHash3js();
-  }
-});
-
 // ../../../node_modules/.pnpm/ms@2.1.2/node_modules/ms/index.js
 var require_ms2 = __commonJS({
   "../../../node_modules/.pnpm/ms@2.1.2/node_modules/ms/index.js"(exports2, module2) {
@@ -45952,11 +45590,11 @@ var require_common2 = __commonJS({
         let enableOverride = null;
         let namespacesCache;
         let enabledCache;
-        function debug3(...args) {
-          if (!debug3.enabled) {
+        function debug4(...args) {
+          if (!debug4.enabled) {
             return;
           }
-          const self2 = debug3;
+          const self2 = debug4;
           const curr = Number(/* @__PURE__ */ new Date());
           const ms = curr - (prevTime || curr);
           self2.diff = ms;
@@ -45986,12 +45624,12 @@ var require_common2 = __commonJS({
           const logFn = self2.log || createDebug.log;
           logFn.apply(self2, args);
         }
-        debug3.namespace = namespace;
-        debug3.useColors = createDebug.useColors();
-        debug3.color = createDebug.selectColor(namespace);
-        debug3.extend = extend;
-        debug3.destroy = createDebug.destroy;
-        Object.defineProperty(debug3, "enabled", {
+        debug4.namespace = namespace;
+        debug4.useColors = createDebug.useColors();
+        debug4.color = createDebug.selectColor(namespace);
+        debug4.extend = extend;
+        debug4.destroy = createDebug.destroy;
+        Object.defineProperty(debug4, "enabled", {
           enumerable: true,
           configurable: false,
           get: () => {
@@ -46009,9 +45647,9 @@ var require_common2 = __commonJS({
           }
         });
         if (typeof createDebug.init === "function") {
-          createDebug.init(debug3);
+          createDebug.init(debug4);
         }
-        return debug3;
+        return debug4;
       }
       function extend(namespace, delimiter) {
         const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
@@ -46533,11 +46171,11 @@ var require_node = __commonJS({
     function load() {
       return process.env.DEBUG;
     }
-    function init2(debug3) {
-      debug3.inspectOpts = {};
+    function init2(debug4) {
+      debug4.inspectOpts = {};
       const keys = Object.keys(exports2.inspectOpts);
       for (let i = 0; i < keys.length; i++) {
-        debug3.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
+        debug4.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
       }
     }
     module2.exports = require_common2()(exports2);
@@ -46564,12 +46202,382 @@ var require_src = __commonJS({
   }
 });
 
+// ../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/lib/murmurHash3js.js
+var require_murmurHash3js = __commonJS({
+  "../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/lib/murmurHash3js.js"(exports2, module2) {
+    (function(root, undefined2) {
+      "use strict";
+      var library = {
+        "version": "3.0.1",
+        "x86": {},
+        "x64": {}
+      };
+      function _x86Multiply(m, n) {
+        return (m & 65535) * n + (((m >>> 16) * n & 65535) << 16);
+      }
+      function _x86Rotl(m, n) {
+        return m << n | m >>> 32 - n;
+      }
+      function _x86Fmix(h) {
+        h ^= h >>> 16;
+        h = _x86Multiply(h, 2246822507);
+        h ^= h >>> 13;
+        h = _x86Multiply(h, 3266489909);
+        h ^= h >>> 16;
+        return h;
+      }
+      function _x64Add(m, n) {
+        m = [m[0] >>> 16, m[0] & 65535, m[1] >>> 16, m[1] & 65535];
+        n = [n[0] >>> 16, n[0] & 65535, n[1] >>> 16, n[1] & 65535];
+        var o = [0, 0, 0, 0];
+        o[3] += m[3] + n[3];
+        o[2] += o[3] >>> 16;
+        o[3] &= 65535;
+        o[2] += m[2] + n[2];
+        o[1] += o[2] >>> 16;
+        o[2] &= 65535;
+        o[1] += m[1] + n[1];
+        o[0] += o[1] >>> 16;
+        o[1] &= 65535;
+        o[0] += m[0] + n[0];
+        o[0] &= 65535;
+        return [o[0] << 16 | o[1], o[2] << 16 | o[3]];
+      }
+      function _x64Multiply(m, n) {
+        m = [m[0] >>> 16, m[0] & 65535, m[1] >>> 16, m[1] & 65535];
+        n = [n[0] >>> 16, n[0] & 65535, n[1] >>> 16, n[1] & 65535];
+        var o = [0, 0, 0, 0];
+        o[3] += m[3] * n[3];
+        o[2] += o[3] >>> 16;
+        o[3] &= 65535;
+        o[2] += m[2] * n[3];
+        o[1] += o[2] >>> 16;
+        o[2] &= 65535;
+        o[2] += m[3] * n[2];
+        o[1] += o[2] >>> 16;
+        o[2] &= 65535;
+        o[1] += m[1] * n[3];
+        o[0] += o[1] >>> 16;
+        o[1] &= 65535;
+        o[1] += m[2] * n[2];
+        o[0] += o[1] >>> 16;
+        o[1] &= 65535;
+        o[1] += m[3] * n[1];
+        o[0] += o[1] >>> 16;
+        o[1] &= 65535;
+        o[0] += m[0] * n[3] + m[1] * n[2] + m[2] * n[1] + m[3] * n[0];
+        o[0] &= 65535;
+        return [o[0] << 16 | o[1], o[2] << 16 | o[3]];
+      }
+      function _x64Rotl(m, n) {
+        n %= 64;
+        if (n === 32) {
+          return [m[1], m[0]];
+        } else if (n < 32) {
+          return [m[0] << n | m[1] >>> 32 - n, m[1] << n | m[0] >>> 32 - n];
+        } else {
+          n -= 32;
+          return [m[1] << n | m[0] >>> 32 - n, m[0] << n | m[1] >>> 32 - n];
+        }
+      }
+      function _x64LeftShift(m, n) {
+        n %= 64;
+        if (n === 0) {
+          return m;
+        } else if (n < 32) {
+          return [m[0] << n | m[1] >>> 32 - n, m[1] << n];
+        } else {
+          return [m[1] << n - 32, 0];
+        }
+      }
+      function _x64Xor(m, n) {
+        return [m[0] ^ n[0], m[1] ^ n[1]];
+      }
+      function _x64Fmix(h) {
+        h = _x64Xor(h, [0, h[0] >>> 1]);
+        h = _x64Multiply(h, [4283543511, 3981806797]);
+        h = _x64Xor(h, [0, h[0] >>> 1]);
+        h = _x64Multiply(h, [3301882366, 444984403]);
+        h = _x64Xor(h, [0, h[0] >>> 1]);
+        return h;
+      }
+      library.x86.hash32 = function(key, seed) {
+        key = key || "";
+        seed = seed || 0;
+        var remainder = key.length % 4;
+        var bytes = key.length - remainder;
+        var h1 = seed;
+        var k1 = 0;
+        var c1 = 3432918353;
+        var c2 = 461845907;
+        for (var i = 0; i < bytes; i = i + 4) {
+          k1 = key.charCodeAt(i) & 255 | (key.charCodeAt(i + 1) & 255) << 8 | (key.charCodeAt(i + 2) & 255) << 16 | (key.charCodeAt(i + 3) & 255) << 24;
+          k1 = _x86Multiply(k1, c1);
+          k1 = _x86Rotl(k1, 15);
+          k1 = _x86Multiply(k1, c2);
+          h1 ^= k1;
+          h1 = _x86Rotl(h1, 13);
+          h1 = _x86Multiply(h1, 5) + 3864292196;
+        }
+        k1 = 0;
+        switch (remainder) {
+          case 3:
+            k1 ^= (key.charCodeAt(i + 2) & 255) << 16;
+          case 2:
+            k1 ^= (key.charCodeAt(i + 1) & 255) << 8;
+          case 1:
+            k1 ^= key.charCodeAt(i) & 255;
+            k1 = _x86Multiply(k1, c1);
+            k1 = _x86Rotl(k1, 15);
+            k1 = _x86Multiply(k1, c2);
+            h1 ^= k1;
+        }
+        h1 ^= key.length;
+        h1 = _x86Fmix(h1);
+        return h1 >>> 0;
+      };
+      library.x86.hash128 = function(key, seed) {
+        key = key || "";
+        seed = seed || 0;
+        var remainder = key.length % 16;
+        var bytes = key.length - remainder;
+        var h1 = seed;
+        var h2 = seed;
+        var h3 = seed;
+        var h4 = seed;
+        var k1 = 0;
+        var k2 = 0;
+        var k3 = 0;
+        var k4 = 0;
+        var c1 = 597399067;
+        var c2 = 2869860233;
+        var c3 = 951274213;
+        var c4 = 2716044179;
+        for (var i = 0; i < bytes; i = i + 16) {
+          k1 = key.charCodeAt(i) & 255 | (key.charCodeAt(i + 1) & 255) << 8 | (key.charCodeAt(i + 2) & 255) << 16 | (key.charCodeAt(i + 3) & 255) << 24;
+          k2 = key.charCodeAt(i + 4) & 255 | (key.charCodeAt(i + 5) & 255) << 8 | (key.charCodeAt(i + 6) & 255) << 16 | (key.charCodeAt(i + 7) & 255) << 24;
+          k3 = key.charCodeAt(i + 8) & 255 | (key.charCodeAt(i + 9) & 255) << 8 | (key.charCodeAt(i + 10) & 255) << 16 | (key.charCodeAt(i + 11) & 255) << 24;
+          k4 = key.charCodeAt(i + 12) & 255 | (key.charCodeAt(i + 13) & 255) << 8 | (key.charCodeAt(i + 14) & 255) << 16 | (key.charCodeAt(i + 15) & 255) << 24;
+          k1 = _x86Multiply(k1, c1);
+          k1 = _x86Rotl(k1, 15);
+          k1 = _x86Multiply(k1, c2);
+          h1 ^= k1;
+          h1 = _x86Rotl(h1, 19);
+          h1 += h2;
+          h1 = _x86Multiply(h1, 5) + 1444728091;
+          k2 = _x86Multiply(k2, c2);
+          k2 = _x86Rotl(k2, 16);
+          k2 = _x86Multiply(k2, c3);
+          h2 ^= k2;
+          h2 = _x86Rotl(h2, 17);
+          h2 += h3;
+          h2 = _x86Multiply(h2, 5) + 197830471;
+          k3 = _x86Multiply(k3, c3);
+          k3 = _x86Rotl(k3, 17);
+          k3 = _x86Multiply(k3, c4);
+          h3 ^= k3;
+          h3 = _x86Rotl(h3, 15);
+          h3 += h4;
+          h3 = _x86Multiply(h3, 5) + 2530024501;
+          k4 = _x86Multiply(k4, c4);
+          k4 = _x86Rotl(k4, 18);
+          k4 = _x86Multiply(k4, c1);
+          h4 ^= k4;
+          h4 = _x86Rotl(h4, 13);
+          h4 += h1;
+          h4 = _x86Multiply(h4, 5) + 850148119;
+        }
+        k1 = 0;
+        k2 = 0;
+        k3 = 0;
+        k4 = 0;
+        switch (remainder) {
+          case 15:
+            k4 ^= key.charCodeAt(i + 14) << 16;
+          case 14:
+            k4 ^= key.charCodeAt(i + 13) << 8;
+          case 13:
+            k4 ^= key.charCodeAt(i + 12);
+            k4 = _x86Multiply(k4, c4);
+            k4 = _x86Rotl(k4, 18);
+            k4 = _x86Multiply(k4, c1);
+            h4 ^= k4;
+          case 12:
+            k3 ^= key.charCodeAt(i + 11) << 24;
+          case 11:
+            k3 ^= key.charCodeAt(i + 10) << 16;
+          case 10:
+            k3 ^= key.charCodeAt(i + 9) << 8;
+          case 9:
+            k3 ^= key.charCodeAt(i + 8);
+            k3 = _x86Multiply(k3, c3);
+            k3 = _x86Rotl(k3, 17);
+            k3 = _x86Multiply(k3, c4);
+            h3 ^= k3;
+          case 8:
+            k2 ^= key.charCodeAt(i + 7) << 24;
+          case 7:
+            k2 ^= key.charCodeAt(i + 6) << 16;
+          case 6:
+            k2 ^= key.charCodeAt(i + 5) << 8;
+          case 5:
+            k2 ^= key.charCodeAt(i + 4);
+            k2 = _x86Multiply(k2, c2);
+            k2 = _x86Rotl(k2, 16);
+            k2 = _x86Multiply(k2, c3);
+            h2 ^= k2;
+          case 4:
+            k1 ^= key.charCodeAt(i + 3) << 24;
+          case 3:
+            k1 ^= key.charCodeAt(i + 2) << 16;
+          case 2:
+            k1 ^= key.charCodeAt(i + 1) << 8;
+          case 1:
+            k1 ^= key.charCodeAt(i);
+            k1 = _x86Multiply(k1, c1);
+            k1 = _x86Rotl(k1, 15);
+            k1 = _x86Multiply(k1, c2);
+            h1 ^= k1;
+        }
+        h1 ^= key.length;
+        h2 ^= key.length;
+        h3 ^= key.length;
+        h4 ^= key.length;
+        h1 += h2;
+        h1 += h3;
+        h1 += h4;
+        h2 += h1;
+        h3 += h1;
+        h4 += h1;
+        h1 = _x86Fmix(h1);
+        h2 = _x86Fmix(h2);
+        h3 = _x86Fmix(h3);
+        h4 = _x86Fmix(h4);
+        h1 += h2;
+        h1 += h3;
+        h1 += h4;
+        h2 += h1;
+        h3 += h1;
+        h4 += h1;
+        return ("00000000" + (h1 >>> 0).toString(16)).slice(-8) + ("00000000" + (h2 >>> 0).toString(16)).slice(-8) + ("00000000" + (h3 >>> 0).toString(16)).slice(-8) + ("00000000" + (h4 >>> 0).toString(16)).slice(-8);
+      };
+      library.x64.hash128 = function(key, seed) {
+        key = key || "";
+        seed = seed || 0;
+        var remainder = key.length % 16;
+        var bytes = key.length - remainder;
+        var h1 = [0, seed];
+        var h2 = [0, seed];
+        var k1 = [0, 0];
+        var k2 = [0, 0];
+        var c1 = [2277735313, 289559509];
+        var c2 = [1291169091, 658871167];
+        for (var i = 0; i < bytes; i = i + 16) {
+          k1 = [key.charCodeAt(i + 4) & 255 | (key.charCodeAt(i + 5) & 255) << 8 | (key.charCodeAt(i + 6) & 255) << 16 | (key.charCodeAt(i + 7) & 255) << 24, key.charCodeAt(i) & 255 | (key.charCodeAt(i + 1) & 255) << 8 | (key.charCodeAt(i + 2) & 255) << 16 | (key.charCodeAt(i + 3) & 255) << 24];
+          k2 = [key.charCodeAt(i + 12) & 255 | (key.charCodeAt(i + 13) & 255) << 8 | (key.charCodeAt(i + 14) & 255) << 16 | (key.charCodeAt(i + 15) & 255) << 24, key.charCodeAt(i + 8) & 255 | (key.charCodeAt(i + 9) & 255) << 8 | (key.charCodeAt(i + 10) & 255) << 16 | (key.charCodeAt(i + 11) & 255) << 24];
+          k1 = _x64Multiply(k1, c1);
+          k1 = _x64Rotl(k1, 31);
+          k1 = _x64Multiply(k1, c2);
+          h1 = _x64Xor(h1, k1);
+          h1 = _x64Rotl(h1, 27);
+          h1 = _x64Add(h1, h2);
+          h1 = _x64Add(_x64Multiply(h1, [0, 5]), [0, 1390208809]);
+          k2 = _x64Multiply(k2, c2);
+          k2 = _x64Rotl(k2, 33);
+          k2 = _x64Multiply(k2, c1);
+          h2 = _x64Xor(h2, k2);
+          h2 = _x64Rotl(h2, 31);
+          h2 = _x64Add(h2, h1);
+          h2 = _x64Add(_x64Multiply(h2, [0, 5]), [0, 944331445]);
+        }
+        k1 = [0, 0];
+        k2 = [0, 0];
+        switch (remainder) {
+          case 15:
+            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 14)], 48));
+          case 14:
+            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 13)], 40));
+          case 13:
+            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 12)], 32));
+          case 12:
+            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 11)], 24));
+          case 11:
+            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 10)], 16));
+          case 10:
+            k2 = _x64Xor(k2, _x64LeftShift([0, key.charCodeAt(i + 9)], 8));
+          case 9:
+            k2 = _x64Xor(k2, [0, key.charCodeAt(i + 8)]);
+            k2 = _x64Multiply(k2, c2);
+            k2 = _x64Rotl(k2, 33);
+            k2 = _x64Multiply(k2, c1);
+            h2 = _x64Xor(h2, k2);
+          case 8:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 7)], 56));
+          case 7:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 6)], 48));
+          case 6:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 5)], 40));
+          case 5:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 4)], 32));
+          case 4:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 3)], 24));
+          case 3:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 2)], 16));
+          case 2:
+            k1 = _x64Xor(k1, _x64LeftShift([0, key.charCodeAt(i + 1)], 8));
+          case 1:
+            k1 = _x64Xor(k1, [0, key.charCodeAt(i)]);
+            k1 = _x64Multiply(k1, c1);
+            k1 = _x64Rotl(k1, 31);
+            k1 = _x64Multiply(k1, c2);
+            h1 = _x64Xor(h1, k1);
+        }
+        h1 = _x64Xor(h1, [0, key.length]);
+        h2 = _x64Xor(h2, [0, key.length]);
+        h1 = _x64Add(h1, h2);
+        h2 = _x64Add(h2, h1);
+        h1 = _x64Fmix(h1);
+        h2 = _x64Fmix(h2);
+        h1 = _x64Add(h1, h2);
+        h2 = _x64Add(h2, h1);
+        return ("00000000" + (h1[0] >>> 0).toString(16)).slice(-8) + ("00000000" + (h1[1] >>> 0).toString(16)).slice(-8) + ("00000000" + (h2[0] >>> 0).toString(16)).slice(-8) + ("00000000" + (h2[1] >>> 0).toString(16)).slice(-8);
+      };
+      if (typeof exports2 !== "undefined") {
+        if (typeof module2 !== "undefined" && module2.exports) {
+          exports2 = module2.exports = library;
+        }
+        exports2.murmurHash3 = library;
+      } else if (typeof define === "function" && define.amd) {
+        define([], function() {
+          return library;
+        });
+      } else {
+        library._murmurHash3 = root.murmurHash3;
+        library.noConflict = function() {
+          root.murmurHash3 = library._murmurHash3;
+          library._murmurHash3 = undefined2;
+          library.noConflict = undefined2;
+          return library;
+        };
+        root.murmurHash3 = library;
+      }
+    })(exports2);
+  }
+});
+
+// ../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/index.js
+var require_murmurhash3js = __commonJS({
+  "../../../node_modules/.pnpm/murmurhash3js@3.0.1/node_modules/murmurhash3js/index.js"(exports2, module2) {
+    module2.exports = require_murmurHash3js();
+  }
+});
+
 // src/main.ts
 var fs = __toESM(require("node:fs/promises"), 1);
 var core = __toESM(require_core(), 1);
 var github = __toESM(require_github(), 1);
 
-// ../../../lix/source-code/client/dist/helpers.js
+// ../../../lix/packages/client/dist/helpers.js
 var withProxy = ({ nodeishFs, verbose = false, description, intercept }) => {
   return new Proxy(nodeishFs, {
     get(getTarget, prop, receiver) {
@@ -46588,16 +46596,28 @@ var withProxy = ({ nodeishFs, verbose = false, description, intercept }) => {
     }
   });
 };
+function parseOrigin({ remotes }) {
+  const origin = remotes?.find((elements) => elements.remote === "origin");
+  if (origin === void 0) {
+    return void 0;
+  }
+  let result = origin.url;
+  if (result.endsWith(".git") === false) {
+    result += ".git";
+  }
+  return transformRemote(result);
+}
 function transformRemote(remote) {
   const regex = /(?:https:\/\/|@|git:\/\/)([^/]+)\/(.+?)(?:\.git)?$/;
   const matches = remote.match(regex);
   if (matches && matches[1] && matches[2]) {
     let host = matches[1].replace(/:/g, "/");
     const repo = matches[2];
-    host = host.replace(/ghp_[\w]+@/, "");
+    const hostRegex = /(ghp_|ghs_)[\w]+@/;
+    host = host.replace(hostRegex, "");
     return `${host}/${repo}.git`;
   }
-  return "unknown";
+  return void 0;
 }
 function parseLixUri(uriText) {
   let url;
@@ -46672,7 +46692,7 @@ function parseLixUri(uriText) {
   };
 }
 
-// ../../../lix/source-code/client/dist/git-http/client.js
+// ../../../lix/packages/client/dist/git-http/client.js
 function fromValue(value) {
   let queue = [value];
   return {
@@ -46795,7 +46815,7 @@ function makeHttpClient({ verbose, description, onReq, onRes }) {
   return { request };
 }
 
-// ../../../lix/source-code/client/dist/git-http/helpers.js
+// ../../../lix/packages/client/dist/git-http/helpers.js
 function padHex(pad, n) {
   const s = n.toString(16);
   return "0".repeat(pad - s.length) + s;
@@ -46832,7 +46852,7 @@ function decodeGitPackLines(concatenatedUint8Array) {
   return strings;
 }
 
-// ../../../lix/source-code/client/dist/git-http/optimize-refs.js
+// ../../../lix/packages/client/dist/git-http/optimize-refs.js
 async function optimizedRefsReq({ url, addRef }) {
   if (!url.endsWith("info/refs?service=git-upload-pack")) {
     return;
@@ -46892,7 +46912,7 @@ async function optimizedRefsRes({ origUrl, resBody, statusCode, resHeaders }) {
   }
 }
 
-// ../../../lix/source-code/client/dist/openRepository.js
+// ../../../lix/packages/client/dist/openRepository.js
 var import_octokit = __toESM(require_dist_node26(), 1);
 
 // ../../../node_modules/.pnpm/solid-js@1.7.11/node_modules/solid-js/dist/solid.js
@@ -47517,11 +47537,11 @@ function createProvider(id, options) {
 var FALLBACK = Symbol("fallback");
 var SuspenseListContext = createContext();
 
-// ../../../lix/source-code/client/dist/solid.js
+// ../../../lix/packages/client/dist/solid.js
 var createSignal2 = createSignal;
 var createEffect2 = createEffect;
 
-// ../../../lix/source-code/client/vendored/isomorphic-git/index.js
+// ../../../lix/packages/client/vendored/isomorphic-git/index.js
 var import_async_lock = __toESM(require_async_lock(), 1);
 var import_sha12 = __toESM(require_sha1(), 1);
 var import_crc_32 = __toESM(require_crc32(), 1);
@@ -48707,6 +48727,12 @@ var refpaths = (ref) => [
   `refs/remotes/${ref}/HEAD`
 ];
 var GIT_FILES = ["config", "description", "index", "shallow", "commondir"];
+var lock$1;
+async function acquireLock(ref, callback) {
+  if (lock$1 === void 0)
+    lock$1 = new import_async_lock.default();
+  return lock$1.acquire(ref, callback);
+}
 var GitRefManager = class _GitRefManager {
   static async updateRemoteRefs({
     fs: fs2,
@@ -48788,8 +48814,11 @@ var GitRefManager = class _GitRefManager {
       }
     }
     for (const [key, value] of actualRefsToWrite) {
-      await fs2.write(join(gitdir, key), `${value.trim()}
-`, "utf8");
+      await acquireLock(
+        key,
+        async () => fs2.write(join(gitdir, key), `${value.trim()}
+`, "utf8")
+      );
     }
     return { pruned };
   }
@@ -48798,19 +48827,28 @@ var GitRefManager = class _GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value);
     }
-    await fs2.write(join(gitdir, ref), `${value.trim()}
-`, "utf8");
+    await acquireLock(
+      ref,
+      async () => fs2.write(join(gitdir, ref), `${value.trim()}
+`, "utf8")
+    );
   }
   static async writeSymbolicRef({ fs: fs2, gitdir, ref, value }) {
-    await fs2.write(join(gitdir, ref), `ref: ${value.trim()}
-`, "utf8");
+    await acquireLock(
+      ref,
+      async () => fs2.write(join(gitdir, ref), `ref: ${value.trim()}
+`, "utf8")
+    );
   }
   static async deleteRef({ fs: fs2, gitdir, ref }) {
     return _GitRefManager.deleteRefs({ fs: fs2, gitdir, refs: [ref] });
   }
   static async deleteRefs({ fs: fs2, gitdir, refs }) {
     await Promise.all(refs.map((ref) => fs2.rm(join(gitdir, ref))));
-    let text = await fs2.read(`${gitdir}/packed-refs`, { encoding: "utf8" });
+    let text = await acquireLock(
+      "packed-refs",
+      async () => fs2.read(`${gitdir}/packed-refs`, { encoding: "utf8" })
+    );
     const packed = GitPackedRefs.from(text);
     const beforeSize = packed.refs.size;
     for (const ref of refs) {
@@ -48820,7 +48858,10 @@ var GitRefManager = class _GitRefManager {
     }
     if (packed.refs.size < beforeSize) {
       text = packed.toString();
-      await fs2.write(`${gitdir}/packed-refs`, text, { encoding: "utf8" });
+      await acquireLock(
+        "packed-refs",
+        async () => fs2.write(`${gitdir}/packed-refs`, text, { encoding: "utf8" })
+      );
     }
   }
   /**
@@ -48838,7 +48879,6 @@ var GitRefManager = class _GitRefManager {
         return ref;
       }
     }
-    let sha;
     if (ref.startsWith("ref: ")) {
       ref = ref.slice("ref: ".length);
       return _GitRefManager.resolve({ fs: fs2, gitdir, ref, depth });
@@ -48849,7 +48889,10 @@ var GitRefManager = class _GitRefManager {
     const packedMap = await _GitRefManager.packedRefs({ fs: fs2, gitdir });
     const allpaths = refpaths(ref).filter((p) => !GIT_FILES.includes(p));
     for (const ref2 of allpaths) {
-      sha = await fs2.read(`${gitdir}/${ref2}`, { encoding: "utf8" }) || packedMap.get(ref2);
+      const sha = await acquireLock(
+        ref2,
+        async () => await fs2.read(`${gitdir}/${ref2}`, { encoding: "utf8" }) || packedMap.get(ref2)
+      );
       if (sha) {
         return _GitRefManager.resolve({ fs: fs2, gitdir, ref: sha.trim(), depth });
       }
@@ -48871,7 +48914,11 @@ var GitRefManager = class _GitRefManager {
     const packedMap = await _GitRefManager.packedRefs({ fs: fs2, gitdir });
     const allpaths = refpaths(ref);
     for (const ref2 of allpaths) {
-      if (await fs2.exists(`${gitdir}/${ref2}`))
+      const refExists = await acquireLock(
+        ref2,
+        async () => fs2.exists(`${gitdir}/${ref2}`)
+      );
+      if (refExists)
         return ref2;
       if (packedMap.has(ref2))
         return ref2;
@@ -48915,7 +48962,10 @@ var GitRefManager = class _GitRefManager {
     throw new NotFoundError(ref);
   }
   static async packedRefs({ fs: fs2, gitdir }) {
-    const text = await fs2.read(`${gitdir}/packed-refs`, { encoding: "utf8" });
+    const text = await acquireLock(
+      "packed-refs",
+      async () => fs2.read(`${gitdir}/packed-refs`, { encoding: "utf8" })
+    );
     const packed = GitPackedRefs.from(text);
     return packed.refs;
   }
@@ -51883,7 +51933,7 @@ async function _branch({
   gitdir,
   ref,
   object,
-  checkout: checkout2 = false,
+  checkout: checkout4 = false,
   force = false
 }) {
   if (ref !== import_clean_git_ref.default.clean(ref)) {
@@ -51904,7 +51954,7 @@ async function _branch({
   if (oid) {
     await GitRefManager.writeRef({ fs: fs2, gitdir, ref: fullref, value: oid });
   }
-  if (checkout2) {
+  if (checkout4) {
     await GitRefManager.writeSymbolicRef({
       fs: fs2,
       gitdir,
@@ -51919,7 +51969,7 @@ async function branch({
   gitdir = join(dir, ".git"),
   ref,
   object,
-  checkout: checkout2 = false,
+  checkout: checkout4 = false,
   force = false
 }) {
   try {
@@ -51931,7 +51981,7 @@ async function branch({
       gitdir,
       ref,
       object,
-      checkout: checkout2,
+      checkout: checkout4,
       force
     });
   } catch (err) {
@@ -52820,14 +52870,14 @@ var GitRemoteManager = class {
     );
   }
 };
-var lock$1 = null;
+var lock$2 = null;
 var GitShallowManager = class {
   static async read({ fs: fs2, gitdir }) {
-    if (lock$1 === null)
-      lock$1 = new import_async_lock.default();
+    if (lock$2 === null)
+      lock$2 = new import_async_lock.default();
     const filepath = join(gitdir, "shallow");
     const oids = /* @__PURE__ */ new Set();
-    await lock$1.acquire(filepath, async function() {
+    await lock$2.acquire(filepath, async function() {
       const text = await fs2.read(filepath, { encoding: "utf8" });
       if (text === null)
         return oids;
@@ -52838,18 +52888,18 @@ var GitShallowManager = class {
     return oids;
   }
   static async write({ fs: fs2, gitdir, oids }) {
-    if (lock$1 === null)
-      lock$1 = new import_async_lock.default();
+    if (lock$2 === null)
+      lock$2 = new import_async_lock.default();
     const filepath = join(gitdir, "shallow");
     if (oids.size > 0) {
       const text = [...oids].join("\n") + "\n";
-      await lock$1.acquire(filepath, async function() {
+      await lock$2.acquire(filepath, async function() {
         await fs2.write(filepath, text, {
           encoding: "utf8"
         });
       });
     } else {
-      await lock$1.acquire(filepath, async function() {
+      await lock$2.acquire(filepath, async function() {
         await fs2.rm(filepath);
       });
     }
@@ -56406,7 +56456,7 @@ async function _renameBranch({
   gitdir,
   oldref,
   ref,
-  checkout: checkout2 = false
+  checkout: checkout4 = false
 }) {
   if (ref !== import_clean_git_ref.default.clean(ref)) {
     throw new InvalidRefNameError(ref, import_clean_git_ref.default.clean(ref));
@@ -56434,7 +56484,7 @@ async function _renameBranch({
     fullname: true
   });
   const isCurrentBranch = fullCurrentBranchRef === fulloldref;
-  if (checkout2 || isCurrentBranch) {
+  if (checkout4 || isCurrentBranch) {
     await GitRefManager.writeSymbolicRef({
       fs: fs2,
       gitdir,
@@ -56449,7 +56499,7 @@ async function renameBranch({
   gitdir = join(dir, ".git"),
   ref,
   oldref,
-  checkout: checkout2 = false
+  checkout: checkout4 = false
 }) {
   try {
     assertParameter("fs", fs2);
@@ -56461,7 +56511,7 @@ async function renameBranch({
       gitdir,
       ref,
       oldref,
-      checkout: checkout2
+      checkout: checkout4
     });
   } catch (err) {
     err.caller = "git.renameBranch";
@@ -57133,6 +57183,241 @@ async function writeTree({ fs: fs2, dir, gitdir = join(dir, ".git"), tree }) {
     throw err;
   }
 }
+async function writeRefsAdResponse({ capabilities, refs, symrefs }) {
+  const stream = [];
+  let syms = "";
+  for (const [key, value] of Object.entries(symrefs)) {
+    syms += `symref=${key}:${value} `;
+  }
+  let caps = `\0${[...capabilities].join(" ")} ${syms}agent=${pkg.agent}`;
+  for (const [key, value] of Object.entries(refs)) {
+    stream.push(GitPktLine.encode(`${value} ${key}${caps}
+`));
+    caps = "";
+  }
+  stream.push(GitPktLine.flush());
+  return stream;
+}
+async function uploadPack({
+  fs: fs2,
+  dir,
+  gitdir = join(dir, ".git"),
+  advertiseRefs = false
+}) {
+  try {
+    if (advertiseRefs) {
+      const capabilities = [
+        "thin-pack",
+        "side-band",
+        "side-band-64k",
+        "shallow",
+        "deepen-since",
+        "deepen-not",
+        "allow-tip-sha1-in-want",
+        "allow-reachable-sha1-in-want"
+      ];
+      let keys = await GitRefManager.listRefs({
+        fs: fs2,
+        gitdir,
+        filepath: "refs"
+      });
+      keys = keys.map((ref) => `refs/${ref}`);
+      const refs = {};
+      keys.unshift("HEAD");
+      for (const key of keys) {
+        refs[key] = await GitRefManager.resolve({ fs: fs2, gitdir, ref: key });
+      }
+      const symrefs = {};
+      symrefs.HEAD = await GitRefManager.resolve({
+        fs: fs2,
+        gitdir,
+        ref: "HEAD",
+        depth: 2
+      });
+      return writeRefsAdResponse({
+        capabilities,
+        refs,
+        symrefs
+      });
+    }
+  } catch (err) {
+    err.caller = "git.uploadPack";
+    throw err;
+  }
+}
+var deepget = (keys, map) => {
+  for (const key of keys) {
+    if (!map.has(key))
+      map.set(key, /* @__PURE__ */ new Map());
+    map = map.get(key);
+  }
+  return map;
+};
+var DeepMap = class {
+  constructor() {
+    this._root = /* @__PURE__ */ new Map();
+  }
+  set(keys, value) {
+    const lastKey = keys.pop();
+    const lastMap = deepget(keys, this._root);
+    lastMap.set(lastKey, value);
+  }
+  get(keys) {
+    const lastKey = keys.pop();
+    const lastMap = deepget(keys, this._root);
+    return lastMap.get(lastKey);
+  }
+  has(keys) {
+    const lastKey = keys.pop();
+    const lastMap = deepget(keys, this._root);
+    return lastMap.has(lastKey);
+  }
+};
+function fromEntries(map) {
+  const o = {};
+  for (const [key, value] of map) {
+    o[key] = value;
+  }
+  return o;
+}
+function fromNodeStream(stream) {
+  const asyncIterator = Object.getOwnPropertyDescriptor(
+    stream,
+    Symbol.asyncIterator
+  );
+  if (asyncIterator && asyncIterator.enumerable) {
+    return stream;
+  }
+  let ended = false;
+  const queue = [];
+  let defer = {};
+  stream.on("data", (chunk) => {
+    queue.push(chunk);
+    if (defer.resolve) {
+      defer.resolve({ value: queue.shift(), done: false });
+      defer = {};
+    }
+  });
+  stream.on("error", (err) => {
+    if (defer.reject) {
+      defer.reject(err);
+      defer = {};
+    }
+  });
+  stream.on("end", () => {
+    ended = true;
+    if (defer.resolve) {
+      defer.resolve({ done: true });
+      defer = {};
+    }
+  });
+  return {
+    next() {
+      return new Promise((resolve, reject) => {
+        if (queue.length === 0 && ended) {
+          return resolve({ done: true });
+        } else if (queue.length > 0) {
+          return resolve({ value: queue.shift(), done: false });
+        } else if (queue.length === 0 && !ended) {
+          defer = { resolve, reject };
+        }
+      });
+    },
+    return() {
+      stream.removeAllListeners();
+      if (stream.destroy)
+        stream.destroy();
+    },
+    [Symbol.asyncIterator]() {
+      return this;
+    }
+  };
+}
+function fromStream2(stream) {
+  if (stream[Symbol.asyncIterator])
+    return stream;
+  const reader = stream.getReader();
+  return {
+    next() {
+      return reader.read();
+    },
+    return() {
+      reader.releaseLock();
+      return {};
+    },
+    [Symbol.asyncIterator]() {
+      return this;
+    }
+  };
+}
+function isBinary(buffer) {
+  const MAX_XDIFF_SIZE = 1024 * 1024 * 1023;
+  if (buffer.length > MAX_XDIFF_SIZE)
+    return true;
+  return buffer.slice(0, 8e3).some((value) => value === 0);
+}
+async function sleep(ms) {
+  return new Promise((resolve, reject) => setTimeout(resolve, ms));
+}
+async function parseUploadPackRequest(stream) {
+  const read = GitPktLine.streamReader(stream);
+  let done = false;
+  let capabilities = null;
+  const wants = [];
+  const haves = [];
+  const shallows = [];
+  let depth;
+  let since;
+  const exclude = [];
+  let relative = false;
+  while (!done) {
+    const line = await read();
+    if (line === true)
+      break;
+    if (line === null)
+      continue;
+    const [key, value, ...rest] = line.toString("utf8").trim().split(" ");
+    if (!capabilities)
+      capabilities = rest;
+    switch (key) {
+      case "want":
+        wants.push(value);
+        break;
+      case "have":
+        haves.push(value);
+        break;
+      case "shallow":
+        shallows.push(value);
+        break;
+      case "deepen":
+        depth = parseInt(value);
+        break;
+      case "deepen-since":
+        since = parseInt(value);
+        break;
+      case "deepen-not":
+        exclude.push(value);
+        break;
+      case "deepen-relative":
+        relative = true;
+        break;
+      case "done":
+        done = true;
+        break;
+    }
+  }
+  return {
+    capabilities,
+    wants,
+    haves,
+    shallows,
+    depth,
+    since,
+    exclude,
+    relative,
+    done
+  };
+}
 var index = {
   Errors,
   STAGE,
@@ -57196,16 +57481,134 @@ var index = {
   tag,
   version: version2,
   walk,
+  _walk,
   writeBlob,
   writeCommit,
   writeObject,
   writeRef,
   writeTag,
-  writeTree
+  writeTree,
+  _listObjects: listObjects,
+  _pack,
+  _uploadPack: uploadPack,
+  _GitConfigManager: GitConfigManager,
+  _GitIgnoreManager: GitIgnoreManager,
+  _GitIndexManager: GitIndexManager,
+  _GitRefManager: GitRefManager,
+  _GitRemoteHTTP: GitRemoteHTTP,
+  _GitRemoteManager: GitRemoteManager,
+  _GitShallowManager: GitShallowManager,
+  _FileSystem: FileSystem,
+  _GitAnnotatedTag: GitAnnotatedTag,
+  _GitCommit: GitCommit,
+  _GitConfig: GitConfig,
+  _GitIndex: GitIndex,
+  _GitObject: GitObject,
+  _GitPackIndex: GitPackIndex,
+  _GitPktLine: GitPktLine,
+  _GitRefSpec: GitRefSpec,
+  _GitRefSpecSet: GitRefSpecSet,
+  _GitSideBand: GitSideBand,
+  _GitTree: GitTree,
+  _GitWalkerFs: GitWalkerFs,
+  _GitWalkerIndex: GitWalkerIndex,
+  _GitWalkerRepo: GitWalkerRepo,
+  _RunningMinimum: RunningMinimum,
+  _expandOid,
+  _expandOidLoose: expandOidLoose,
+  _expandOidPacked: expandOidPacked,
+  _hasObject: hasObject,
+  _hasObjectLoose: hasObjectLoose,
+  _hasObjectPacked: hasObjectPacked,
+  _hashObject: hashObject,
+  _readObject,
+  _readObjectLoose: readObjectLoose,
+  _readObjectPacked: readObjectPacked,
+  _readPackIndex: readPackIndex,
+  _writeObject,
+  _writeObjectLoose: writeObjectLoose,
+  _BufferCursor: BufferCursor,
+  _DeepMap: DeepMap,
+  _FIFO: FIFO,
+  _StreamReader: StreamReader,
+  _abbreviateRef: abbreviateRef,
+  _applyDelta: applyDelta,
+  _arrayRange: arrayRange,
+  _assertParameter: assertParameter,
+  // _asyncIteratorToStream,
+  _basename: basename,
+  _calculateBasicAuthHeader: calculateBasicAuthHeader,
+  _collect: collect2,
+  _compareAge: compareAge,
+  _comparePath: comparePath,
+  _compareRefNames: compareRefNames,
+  _compareStats: compareStats,
+  _compareStrings: compareStrings,
+  _compareTreeEntryPath: compareTreeEntryPath,
+  _deflate: deflate,
+  _dirname: dirname,
+  _emptyPackfile: emptyPackfile,
+  _extractAuthFromUrl: extractAuthFromUrl,
+  _filterCapabilities: filterCapabilities,
+  _flat: flat,
+  _flatFileListToDirectoryStructure: flatFileListToDirectoryStructure,
+  _forAwait: forAwait2,
+  _formatAuthor: formatAuthor,
+  _formatInfoRefs: formatInfoRefs,
+  _fromEntries: fromEntries,
+  _fromNodeStream: fromNodeStream,
+  _fromStream: fromStream2,
+  _fromValue: fromValue2,
+  _getIterator: getIterator2,
+  _listpack: listpack,
+  _utils_hashObject: hashObject$1,
+  _indent: indent,
+  _inflate: inflate,
+  _isBinary: isBinary,
+  _join: join,
+  _mergeFile: mergeFile,
+  _mergeTree: mergeTree,
+  _mode2type: mode2type,
+  _modified: modified,
+  _normalizeAuthorObject: normalizeAuthorObject,
+  _normalizeCommitterObject: normalizeCommitterObject,
+  _normalizeMode: normalizeMode,
+  _normalizeNewlines: normalizeNewlines,
+  _normalizePath: normalizePath,
+  _normalizeStats: normalizeStats,
+  _outdent: outdent,
+  _padHex: padHex2,
+  _parseAuthor: parseAuthor,
+  _pkg: pkg,
+  _posixifyPathBuffer: posixifyPathBuffer,
+  _resolveBlob: resolveBlob,
+  _resolveCommit: resolveCommit,
+  _resolveFileIdInTree: resolveFileIdInTree,
+  _resolveFilepath: resolveFilepath,
+  _resolveTree: resolveTree,
+  _rmRecursive: rmRecursive,
+  _shasum: shasum,
+  _sleep: sleep,
+  _splitLines: splitLines,
+  // _symbols,
+  _toHex: toHex,
+  _translateSSHtoHTTP: translateSSHtoHTTP,
+  _unionOfIterators: unionOfIterators,
+  _worthWalking: worthWalking,
+  _parseCapabilitiesV2: parseCapabilitiesV2,
+  _parseListRefsResponse: parseListRefsResponse,
+  _parseReceivePackResponse: parseReceivePackResponse,
+  _parseRefsAdResponse: parseRefsAdResponse,
+  _parseUploadPackRequest: parseUploadPackRequest,
+  _parseUploadPackResponse: parseUploadPackResponse,
+  _writeListRefsRequest: writeListRefsRequest,
+  _writeReceivePackRequest: writeReceivePackRequest,
+  _writeRefsAdResponse: writeRefsAdResponse,
+  _writeUploadPackRequest: writeUploadPackRequest
 };
 var isomorphic_git_default = index;
 
-// ../../../lix/source-code/client/dist/git/commit.js
+// ../../../lix/packages/client/dist/git/commit.js
 init_dist();
 async function commit2({ cache, fs: fs2, dir, ref, author, message }) {
   const fileStates = {};
@@ -57310,7 +57713,7 @@ async function commit2({ cache, fs: fs2, dir, ref, author, message }) {
   });
 }
 
-// ../../../lix/source-code/client/dist/git/helpers.js
+// ../../../lix/packages/client/dist/git/helpers.js
 var fileModeTypeMapping = {
   "40": "folder",
   "10": "file",
@@ -57321,18 +57724,8 @@ function modeToFileType(mode) {
   return fileModeTypeMapping[fileMode] || "unknown";
 }
 
-// ../../../lix/source-code/client/dist/git/status-list.js
+// ../../../lix/packages/client/dist/git/status-list.js
 var { walk: walk2, TREE: TREE2, WORKDIR: WORKDIR2, STAGE: STAGE2, isIgnored: isIgnored2 } = isomorphic_git_default;
-var worthWalking2 = (filepath, root) => {
-  if (filepath === "." || root == void 0 || root.length === 0 || root === "." || root === filepath) {
-    return true;
-  }
-  if (root.length > filepath.length) {
-    return root.startsWith(filepath + "/");
-  } else {
-    return filepath.startsWith(root + "/");
-  }
-};
 function normalizePath3(path) {
   return path.replace(/\/\.\//g, "/").replace(/\/{2,}/g, "/").replace(/^\/\.$/, "/").replace(/^\.\/$/, ".").replace(/^\.\//, "").replace(/\/\.$/, "").replace(/(.+)\/$/, "$1").replace(/^$/, ".");
 }
@@ -57380,7 +57773,7 @@ async function statusList({
             return null;
           }
         }
-        if (!filepaths.some((base) => worthWalking2(filepath, base))) {
+        if (!filepaths.some((base) => worthWalking(filepath, base))) {
           return null;
         }
         if (filter && !filter(filepath)) {
@@ -57499,7 +57892,426 @@ async function statusList({
   }
 }
 
-// ../../../lix/source-code/client/dist/openRepository.js
+// ../../../lix/packages/client/dist/git/_checkout.js
+async function _checkout2({ fs: fs2, cache, onProgress, dir, gitdir, remote, ref, filepaths, noCheckout, noUpdateHead, dryRun, force, track = true }) {
+  let oid;
+  try {
+    oid = await GitRefManager.resolve({ fs: fs2, gitdir, ref });
+  } catch (err) {
+    if (ref === "HEAD")
+      throw err;
+    const remoteRef = `${remote}/${ref}`;
+    oid = await GitRefManager.resolve({
+      fs: fs2,
+      gitdir,
+      ref: remoteRef
+    });
+    if (track) {
+      const config = await GitConfigManager.get({ fs: fs2, gitdir });
+      await config.set(`branch.${ref}.remote`, remote);
+      await config.set(`branch.${ref}.merge`, `refs/heads/${ref}`);
+      await GitConfigManager.save({ fs: fs2, gitdir, config });
+    }
+    await GitRefManager.writeRef({
+      fs: fs2,
+      gitdir,
+      ref: `refs/heads/${ref}`,
+      value: oid
+    });
+  }
+  if (!noCheckout) {
+    let ops;
+    try {
+      ops = await analyze2({
+        fs: fs2,
+        cache,
+        onProgress,
+        dir,
+        gitdir,
+        ref,
+        force,
+        filepaths
+      });
+    } catch (err) {
+      if (err instanceof Errors.NotFoundError && err.data.what === oid) {
+        throw new Errors.CommitNotFetchedError(ref, oid);
+      } else {
+        throw err;
+      }
+    }
+    const conflicts = ops.filter(([method]) => method === "conflict").map(([method, fullpath]) => fullpath);
+    if (conflicts.length > 0) {
+      throw new Errors.CheckoutConflictError(conflicts);
+    }
+    const errors = ops.filter(([method]) => method === "error").map(([method, fullpath]) => fullpath);
+    if (errors.length > 0) {
+      throw new Errors.InternalError(errors.join(", "));
+    }
+    if (dryRun) {
+      return;
+    }
+    let count = 0;
+    const total = ops.length;
+    await GitIndexManager.acquire({ fs: fs2, gitdir, cache }, async function(index2) {
+      await Promise.all(
+        // @ts-ignore
+        ops.filter(([method]) => method === "delete" || method === "delete-index").map(async function([method, fullpath]) {
+          const filepath = `${dir}/${fullpath}`;
+          if (method === "delete") {
+            await fs2.rm(filepath);
+          }
+          index2.delete({ filepath: fullpath });
+          if (onProgress) {
+            await onProgress({
+              phase: "Updating workdir",
+              loaded: ++count,
+              total
+            });
+          }
+        })
+      );
+    });
+    await GitIndexManager.acquire({ fs: fs2, gitdir, cache }, async function(index2) {
+      for (const [method, fullpath] of ops) {
+        if (method === "rmdir" || method === "rmdir-index") {
+          const filepath = `${dir}/${fullpath}`;
+          try {
+            if (method === "rmdir-index") {
+              index2.delete({ filepath: fullpath });
+            }
+            await fs2.rmdir(filepath);
+            if (onProgress) {
+              await onProgress({
+                phase: "Updating workdir",
+                loaded: ++count,
+                total
+              });
+            }
+          } catch (e) {
+            if (e.code === "ENOTEMPTY") {
+              console.log(`Did not delete ${fullpath} because directory is not empty`);
+            } else {
+              throw e;
+            }
+          }
+        }
+      }
+    });
+    await Promise.all(ops.filter(([method]) => method === "mkdir" || method === "mkdir-index").map(async function([_, fullpath]) {
+      const filepath = `${dir}/${fullpath}`;
+      await fs2.mkdir(filepath);
+      if (onProgress) {
+        await onProgress({
+          phase: "Updating workdir",
+          loaded: ++count,
+          total
+        });
+      }
+    }));
+    await GitIndexManager.acquire({ fs: fs2, gitdir, cache }, async function(index2) {
+      await Promise.all(
+        // @ts-ignore
+        ops.filter(
+          // @ts-ignore
+          ([method]) => method === "create" || method === "create-index" || method === "update" || method === "mkdir-index"
+        ).map(async function([method, fullpath, oid2, mode, chmod]) {
+          const filepath = `${dir}/${fullpath}`;
+          try {
+            if (method !== "create-index" && method !== "mkdir-index") {
+              const { object } = await _readObject({ fs: fs2, cache, gitdir, oid: oid2 });
+              if (chmod) {
+                await fs2.rm(filepath);
+              }
+              if (mode === 33188) {
+                await fs2.write(filepath, object);
+              } else if (mode === 33261) {
+                await fs2.write(filepath, object, { mode: 511 });
+              } else if (mode === 40960) {
+                await fs2.writelink(filepath, object);
+              } else {
+                throw new Errors.InternalError(`Invalid mode 0o${mode.toString(8)} detected in blob ${oid2}`);
+              }
+            }
+            const stats = await fs2.lstat(filepath);
+            if (mode === 33261) {
+              stats.mode = 493;
+            }
+            if (method === "mkdir-index") {
+              stats.mode = 57344;
+            }
+            index2.insert({
+              filepath: fullpath,
+              stats,
+              oid: oid2
+            });
+            if (onProgress) {
+              await onProgress({
+                phase: "Updating workdir",
+                loaded: ++count,
+                total
+              });
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        })
+      );
+    });
+  }
+  if (!noUpdateHead) {
+    const fullRef = await GitRefManager.expand({ fs: fs2, gitdir, ref });
+    if (fullRef.startsWith("refs/heads")) {
+      await GitRefManager.writeSymbolicRef({
+        fs: fs2,
+        gitdir,
+        ref: "HEAD",
+        value: fullRef
+      });
+    } else {
+      await GitRefManager.writeRef({ fs: fs2, gitdir, ref: "HEAD", value: oid });
+    }
+  }
+}
+async function analyze2({ fs: fs2, cache, onProgress, dir, gitdir, ref, force, filepaths }) {
+  let count = 0;
+  return _walk({
+    fs: fs2,
+    cache,
+    dir,
+    gitdir,
+    trees: [TREE({ ref }), WORKDIR(), STAGE()],
+    // @ts-ignore
+    map: async function(fullpath, [commit3, workdir, stage]) {
+      if (fullpath === ".")
+        return;
+      if (filepaths && !filepaths.some((base) => worthWalking(fullpath, base))) {
+        return null;
+      }
+      if (onProgress) {
+        await onProgress({ phase: "Analyzing workdir", loaded: ++count });
+      }
+      const key = [!!stage, !!commit3, !!workdir].map(Number).join("");
+      switch (key) {
+        case "000":
+          return;
+        case "001":
+          if (force && filepaths && filepaths.includes(fullpath)) {
+            return ["delete", fullpath];
+          }
+          return;
+        case "010": {
+          switch (await commit3.type()) {
+            case "tree": {
+              return ["mkdir", fullpath];
+            }
+            case "blob": {
+              return ["create", fullpath, await commit3.oid(), await commit3.mode()];
+            }
+            case "commit": {
+              return ["mkdir-index", fullpath, await commit3.oid(), await commit3.mode()];
+            }
+            default: {
+              return ["error", `new entry Unhandled type ${await commit3.type()}`];
+            }
+          }
+        }
+        case "011": {
+          switch (`${await commit3.type()}-${await workdir.type()}`) {
+            case "tree-tree": {
+              return;
+            }
+            case "tree-blob":
+            case "blob-tree": {
+              return ["conflict", fullpath];
+            }
+            case "blob-blob": {
+              if (await commit3.oid() !== await workdir.oid()) {
+                if (force) {
+                  return [
+                    "update",
+                    fullpath,
+                    // @ts-ignore
+                    await commit3.oid(),
+                    // @ts-ignore
+                    await commit3.mode(),
+                    // @ts-ignore
+                    await commit3.mode() !== await workdir.mode()
+                  ];
+                } else {
+                  return ["conflict", fullpath];
+                }
+              } else {
+                if (await commit3.mode() !== await workdir.mode()) {
+                  if (force) {
+                    return ["update", fullpath, await commit3.oid(), await commit3.mode(), true];
+                  } else {
+                    return ["conflict", fullpath];
+                  }
+                } else {
+                  return ["create-index", fullpath, await commit3.oid(), await commit3.mode()];
+                }
+              }
+            }
+            case "commit-tree": {
+              return;
+            }
+            case "commit-blob": {
+              return ["conflict", fullpath];
+            }
+            default: {
+              return ["error", `new entry Unhandled type ${commit3.type}`];
+            }
+          }
+        }
+        case "100": {
+          return ["delete-index", fullpath];
+        }
+        case "101": {
+          switch (await stage.type()) {
+            case "tree": {
+              return ["rmdir", fullpath];
+            }
+            case "blob": {
+              if (await stage.oid() !== await workdir.oid()) {
+                if (force) {
+                  return ["delete", fullpath];
+                } else {
+                  return ["conflict", fullpath];
+                }
+              } else {
+                return ["delete", fullpath];
+              }
+            }
+            case "commit": {
+              return ["rmdir-index", fullpath];
+            }
+            default: {
+              return ["error", `delete entry Unhandled type ${await stage.type()}`];
+            }
+          }
+        }
+        case "110":
+        case "111": {
+          switch (`${await stage.type()}-${await commit3.type()}`) {
+            case "tree-tree": {
+              return;
+            }
+            case "blob-blob": {
+              if (
+                // @ts-ignore
+                await stage.oid() === await commit3.oid() && // @ts-ignore
+                await stage.mode() === await commit3.mode() && !force
+              ) {
+                return;
+              }
+              if (workdir) {
+                if (
+                  // @ts-ignore
+                  await workdir.oid() !== await stage.oid() && // @ts-ignore
+                  await workdir.oid() !== await commit3.oid()
+                ) {
+                  if (force) {
+                    return [
+                      "update",
+                      fullpath,
+                      // @ts-ignore
+                      await commit3.oid(),
+                      // @ts-ignore
+                      await commit3.mode(),
+                      // @ts-ignore
+                      await commit3.mode() !== await workdir.mode()
+                    ];
+                  } else {
+                    return ["conflict", fullpath];
+                  }
+                }
+              } else if (force) {
+                return [
+                  "update",
+                  fullpath,
+                  // @ts-ignore
+                  await commit3.oid(),
+                  // @ts-ignore
+                  await commit3.mode(),
+                  // @ts-ignore
+                  await commit3.mode() !== await stage.mode()
+                ];
+              }
+              if (await commit3.mode() !== await stage.mode()) {
+                return ["update", fullpath, await commit3.oid(), await commit3.mode(), true];
+              }
+              if (await commit3.oid() !== await stage.oid()) {
+                return ["update", fullpath, await commit3.oid(), await commit3.mode(), false];
+              } else {
+                return;
+              }
+            }
+            case "tree-blob": {
+              return ["update-dir-to-blob", fullpath, await commit3.oid()];
+            }
+            case "blob-tree": {
+              return ["update-blob-to-tree", fullpath];
+            }
+            case "commit-commit": {
+              return ["mkdir-index", fullpath, await commit3.oid(), await commit3.mode()];
+            }
+            default: {
+              return [
+                "error",
+                // @ts-ignore
+                `update entry Unhandled type ${await stage.type()}-${await commit3.type()}`
+              ];
+            }
+          }
+        }
+      }
+    },
+    // Modify the default flat mapping
+    reduce: async function(parent, children3) {
+      children3 = flat(children3);
+      if (!parent) {
+        return children3;
+      } else if (parent && parent[0] === "rmdir") {
+        children3.push(parent);
+        return children3;
+      } else {
+        children3.unshift(parent);
+        return children3;
+      }
+    }
+  });
+}
+
+// ../../../lix/packages/client/dist/git/checkout.js
+async function checkout2({ fs: fs2, onProgress, dir, gitdir = join(dir, ".git"), remote = "origin", ref: _ref, filepaths, noCheckout = false, noUpdateHead = _ref === void 0, dryRun = false, force = false, track = true, cache = {} }) {
+  try {
+    assertParameter("fs", fs2);
+    assertParameter("dir", dir);
+    assertParameter("gitdir", gitdir);
+    const ref = _ref || "HEAD";
+    return await _checkout2({
+      fs: new FileSystem(fs2),
+      cache,
+      onProgress,
+      dir,
+      gitdir,
+      remote,
+      ref,
+      filepaths,
+      noCheckout,
+      noUpdateHead,
+      dryRun,
+      force,
+      track
+    });
+  } catch (err) {
+    err.caller = "git.checkout";
+    throw err;
+  }
+}
+
+// ../../../lix/packages/client/dist/openRepository.js
+var checkout3 = checkout2;
 var whitelistedExperimentalRepos = [
   "inlang/example",
   "inlang/ci-test-repo",
@@ -57512,11 +58324,11 @@ var whitelistedExperimentalRepos = [
 async function openRepository(url, args) {
   const rawFs = args.nodeishFs || (await Promise.resolve().then(() => (init_dist(), dist_exports))).createNodeishMemoryFs();
   const author = args.author;
-  let debug3 = args.debug || false;
+  let debug4 = args.debug || false;
   if (!url || !url.startsWith("file://") && !url.startsWith("https://") && !url.startsWith("http://")) {
     throw new Error("repo url is required, use file:// for local repos");
   }
-  if (debug3 && typeof window !== "undefined") {
+  if (debug4 && typeof window !== "undefined") {
     window["rawFs"] = rawFs;
   }
   const [errors, setErrors] = createSignal2([]);
@@ -57541,17 +58353,21 @@ async function openRepository(url, args) {
       freshClone = true;
     }
   }
-  const { protocol, lixHost, repoHost, owner, repoName, username, password } = parseLixUri(url);
-  if (debug3 && (username || password)) {
+  const { protocol, lixHost, repoHost, owner, repoName, username, password, namespace } = parseLixUri(url);
+  if (debug4 && (username || password)) {
     console.warn("username and password and providers other than github are not supported yet. Only local commands will work.");
   }
   const isWhitelistedRepo = whitelistedExperimentalRepos.includes(`${owner}/${repoName}`.toLocaleLowerCase());
   const experimentalFeatures = args.experimentalFeatures || (isWhitelistedRepo ? { lazyClone: true, lixCommit: true } : {});
   const lazyFS = typeof experimentalFeatures.lazyClone === "undefined" ? freshClone : experimentalFeatures.lazyClone;
   const cache = lazyFS ? {} : void 0;
-  const gitProxyUrl = lixHost ? `${protocol}//${lixHost}/git-proxy` : "";
-  const gitHubProxyUrl = lixHost ? `${protocol}//${lixHost}/github-proxy` : "";
-  debug3 && console.info({
+  let gitProxyUrl;
+  let gitHubProxyUrl;
+  if (namespace === "git") {
+    gitProxyUrl = lixHost ? `${protocol}//${lixHost}/git-proxy` : "";
+    gitHubProxyUrl = lixHost ? `${protocol}//${lixHost}/github-proxy` : "";
+  }
+  debug4 && console.info({
     gitProxyUrl,
     gitHubProxyUrl,
     protocol,
@@ -57577,8 +58393,8 @@ async function openRepository(url, args) {
     }
   });
   const gitUrl = repoName ? `https://${repoHost}/${owner}/${repoName}` : "";
-  if (!gitUrl) {
-    console.warn("valid repo url / local repo not found, only limited features will be available.");
+  if (!gitUrl && debug4) {
+    console.warn("valid repo url / local repo not found, only fs features available outside of repo");
   }
   const expFeatures = Object.entries(experimentalFeatures).filter(([_, value]) => value).map(([key]) => key);
   if (expFeatures.length) {
@@ -57593,17 +58409,17 @@ async function openRepository(url, args) {
     }
     const thisBatch = [...nextBatch];
     nextBatch = [];
-    if (debug3) {
+    if (debug4) {
       console.warn("checking out ", thisBatch);
     }
     for (const placeholder of thisBatch.filter((entry) => rawFs._isPlaceholder?.(entry))) {
       await rawFs.rm(placeholder);
     }
-    const res = await isomorphic_git_default.checkout({
+    const res = await checkout3({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
-        description: debug3 ? "checkout: " + JSON.stringify(thisBatch) : "checkout"
+        verbose: debug4,
+        description: debug4 ? "checkout: " + JSON.stringify(thisBatch) : "checkout"
       }),
       dir,
       cache,
@@ -57615,7 +58431,7 @@ async function openRepository(url, args) {
     for (const entry of thisBatch) {
       checkedOut.add(entry);
     }
-    if (debug3) {
+    if (debug4) {
       console.warn("checked out ", thisBatch);
     }
     if (nextBatch.length) {
@@ -57627,10 +58443,10 @@ async function openRepository(url, args) {
     if (!experimentalFeatures.lazyClone) {
       return;
     }
-    await isomorphic_git_default.checkout({
+    await checkout3({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "checkout"
       }),
       cache,
@@ -57638,7 +58454,7 @@ async function openRepository(url, args) {
       ref: branchName,
       filepaths: []
     });
-    const fs2 = withProxy({ nodeishFs: rawFs, verbose: debug3, description: "checkout placeholders" });
+    const fs2 = withProxy({ nodeishFs: rawFs, verbose: debug4, description: "checkout placeholders" });
     const gitignoreFiles = [];
     await isomorphic_git_default.walk({
       fs: fs2,
@@ -57679,10 +58495,10 @@ async function openRepository(url, args) {
       }
     });
     if (gitignoreFiles.length) {
-      await isomorphic_git_default.checkout({
+      await checkout3({
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "checkout gitignores: " + JSON.stringify(gitignoreFiles)
         }),
         dir,
@@ -57700,9 +58516,9 @@ async function openRepository(url, args) {
     }
     console.info("Using lix for cloning repo");
     await isomorphic_git_default.clone({
-      fs: withProxy({ nodeishFs: rawFs, verbose: debug3, description: "clone" }),
+      fs: withProxy({ nodeishFs: rawFs, verbose: debug4, description: "clone" }),
       http: makeHttpClient({
-        debug: debug3,
+        debug: debug4,
         description: "clone",
         onReq: ({ url: url2, body }) => {
           return optimizedRefsReq({ url: url2, body, addRef: branchName });
@@ -57730,7 +58546,7 @@ async function openRepository(url, args) {
     const pathParts = filename?.split("/") || [];
     const rootObject = pathParts[0];
     if (experimentalFeatures.lazyClone && typeof rootObject !== "undefined" && rootObject !== ".git" && ["readFile", "readlink", "writeFile", "readdir"].includes(prop) && !checkedOut.has(rootObject) && !checkedOut.has(filename)) {
-      if (debug3) {
+      if (debug4) {
         console.warn("delayedAction", {
           prop,
           argumentsList,
@@ -57753,7 +58569,7 @@ async function openRepository(url, args) {
     if (pending) {
       return pending.then(execute).finally(() => {
         pending = void 0;
-        if (debug3) {
+        if (debug4) {
           console.warn("executed", filename, prop);
         }
       });
@@ -57762,14 +58578,14 @@ async function openRepository(url, args) {
   }
   const nodeishFs = withProxy({
     nodeishFs: rawFs,
-    verbose: debug3,
+    verbose: debug4,
     description: "app",
     intercept: lazyFS ? delayedAction : void 0
   });
   const add2 = (filepath) => isomorphic_git_default.add({
     fs: withProxy({
       nodeishFs: rawFs,
-      verbose: debug3,
+      verbose: debug4,
       description: "add"
     }),
     parallel: true,
@@ -57780,7 +58596,7 @@ async function openRepository(url, args) {
   const remove2 = (filepath) => isomorphic_git_default.remove({
     fs: withProxy({
       nodeishFs: rawFs,
-      verbose: debug3,
+      verbose: debug4,
       description: "remove"
     }),
     dir,
@@ -57814,7 +58630,7 @@ async function openRepository(url, args) {
     return statusList({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "lixStatusList"
       }),
       dir,
@@ -57832,7 +58648,7 @@ async function openRepository(url, args) {
     const statusList3 = await statusList({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "lixStatus"
       }),
       dir,
@@ -57857,7 +58673,7 @@ async function openRepository(url, args) {
     _isoCommit: ({ author: overrideAuthor, message }) => isomorphic_git_default.commit({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "iso commit"
       }),
       dir,
@@ -57886,7 +58702,7 @@ async function openRepository(url, args) {
       try {
         const withProxypedFS = withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "listRemotes",
           intercept: delayedAction
         });
@@ -57904,10 +58720,10 @@ async function openRepository(url, args) {
       if (lazyFS) {
         throw new Error("not implemented for lazy lix mode yet, use openRepo with different branch instead");
       }
-      await isomorphic_git_default.checkout({
+      await checkout3({
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "checkout"
         }),
         cache,
@@ -57918,6 +58734,9 @@ async function openRepository(url, args) {
     status: status2,
     statusList: statusList2,
     async forkStatus() {
+      if (!gitUrl) {
+        throw new Error("Could not find repo url, only github supported for forkStatus at the moment");
+      }
       const repo = await this;
       const { isFork, parent } = await repo.getMeta();
       if (!isFork) {
@@ -57925,7 +58744,7 @@ async function openRepository(url, args) {
       }
       const forkFs = withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "forkStatus",
         intercept: delayedAction
       });
@@ -57951,7 +58770,7 @@ async function openRepository(url, args) {
           cache,
           ref: useBranchName,
           remote: "upstream",
-          http: makeHttpClient({ debug: debug3, description: "forkStatus" }),
+          http: makeHttpClient({ debug: debug4, description: "forkStatus" }),
           fs: forkFs
         });
       } catch (err) {
@@ -57990,7 +58809,7 @@ async function openRepository(url, args) {
         singleBranch: true,
         dir,
         ref: useBranchName,
-        http: makeHttpClient({ debug: debug3, description: "forkStatus" }),
+        http: makeHttpClient({ debug: debug4, description: "forkStatus" }),
         fs: forkFs
       });
       await isomorphic_git_default.fetch({
@@ -57999,7 +58818,7 @@ async function openRepository(url, args) {
         singleBranch: true,
         ref: useBranchName,
         dir,
-        http: makeHttpClient({ debug: debug3, description: "forkStatus" }),
+        http: makeHttpClient({ debug: debug4, description: "forkStatus" }),
         corsProxy: gitProxyUrl,
         fs: forkFs
       });
@@ -58039,7 +58858,7 @@ async function openRepository(url, args) {
       const commitArgs = {
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "commit",
           intercept: delayedAction
         }),
@@ -58056,24 +58875,30 @@ async function openRepository(url, args) {
       }
     },
     push() {
+      if (!gitUrl) {
+        throw new Error("Could not find repo url, only github supported for push at the moment");
+      }
       return isomorphic_git_default.push({
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "push",
           intercept: delayedAction
         }),
         url: gitUrl,
         cache,
         corsProxy: gitProxyUrl,
-        http: makeHttpClient({ debug: debug3, description: "push" }),
+        http: makeHttpClient({ debug: debug4, description: "push" }),
         dir
       });
     },
     async pull(cmdArgs) {
+      if (!gitUrl) {
+        throw new Error("Could not find repo url, only github supported for pull at the moment");
+      }
       const pullFs = withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "pull",
         intercept: delayedAction
       });
@@ -58081,7 +58906,7 @@ async function openRepository(url, args) {
         depth: 5,
         fs: pullFs,
         cache,
-        http: makeHttpClient({ verbose: debug3, description: "pull" }),
+        http: makeHttpClient({ verbose: debug4, description: "pull" }),
         corsProxy: gitProxyUrl,
         ref: branchName,
         tags: false,
@@ -58114,7 +58939,7 @@ async function openRepository(url, args) {
         await emptyWorkdir();
         experimentalFeatures.lazyClone = false;
         console.info('checking out "HEAD" after pull');
-        await isomorphic_git_default.checkout({
+        await checkout3({
           fs: rawFs,
           cache,
           dir,
@@ -58122,7 +58947,7 @@ async function openRepository(url, args) {
           noCheckout: false
         });
       } else {
-        await isomorphic_git_default.checkout({
+        await checkout3({
           fs: rawFs,
           cache,
           dir,
@@ -58136,7 +58961,7 @@ async function openRepository(url, args) {
       return isomorphic_git_default.log({
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "log",
           intercept: delayedAction
         }),
@@ -58149,10 +58974,13 @@ async function openRepository(url, args) {
       });
     },
     async mergeUpstream(cmdArgs) {
+      if (!gitUrl) {
+        throw new Error("Could not find repo url, only github supported for mergeUpstream at the moment");
+      }
       const branch2 = cmdArgs?.branch || await isomorphic_git_default.currentBranch({
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "mergeUpstream",
           intercept: delayedAction
         }),
@@ -58187,22 +59015,14 @@ async function openRepository(url, args) {
      */
     async getOrigin() {
       const repo = await this;
-      const remotes = await repo.listRemotes();
-      const origin = remotes?.find((elements) => elements.remote === "origin");
-      if (origin === void 0) {
-        return void 0;
-      }
-      let result = origin.url;
-      if (result.endsWith(".git") === false) {
-        result += ".git";
-      }
-      return transformRemote(result);
+      const remotes = await repo.listRemotes() || [];
+      return parseOrigin({ remotes });
     },
     async getCurrentBranch() {
       return await isomorphic_git_default.currentBranch({
         fs: withProxy({
           nodeishFs: rawFs,
-          verbose: debug3,
+          verbose: debug4,
           description: "getCurrentBranch",
           intercept: delayedAction
         }),
@@ -58210,11 +59030,14 @@ async function openRepository(url, args) {
       }) || void 0;
     },
     async getBranches() {
+      if (!gitUrl) {
+        throw new Error("Could not find repo url, only github supported for getBranches at the moment");
+      }
       const serverRefs = await isomorphic_git_default.listServerRefs({
         url: gitUrl,
         corsProxy: gitProxyUrl,
         prefix: "refs/heads",
-        http: makeHttpClient({ verbose: debug3, description: "getBranches" })
+        http: makeHttpClient({ verbose: debug4, description: "getBranches" })
       }).catch((error) => {
         return { error };
       });
@@ -58236,7 +59059,7 @@ async function openRepository(url, args) {
     async getFirstCommitHash() {
       const getFirstCommitFs = withProxy({
         nodeishFs: rawFs,
-        verbose: debug3,
+        verbose: debug4,
         description: "getFirstCommitHash",
         intercept: delayedAction
       });
@@ -58246,7 +59069,7 @@ async function openRepository(url, args) {
             singleBranch: true,
             dir,
             depth: 2147483647,
-            http: makeHttpClient({ verbose: debug3, description: "getFirstCommitHash" }),
+            http: makeHttpClient({ verbose: debug4, description: "getFirstCommitHash" }),
             corsProxy: gitProxyUrl,
             fs: getFirstCommitFs
           });
@@ -58282,6 +59105,9 @@ async function openRepository(url, args) {
      * Additional information about a repository provided by GitHub.
      */
     async getMeta() {
+      if (!gitUrl) {
+        throw new Error("Could not find repo url, only github supported for getMeta at the moment");
+      }
       const res = await github2.request("GET /repos/{owner}/{repo}", {
         owner,
         repo: repoName
@@ -58307,7 +59133,7 @@ async function openRepository(url, args) {
             login: res.data.owner.login
           },
           parent: res.data.parent ? {
-            url: transformRemote(res.data.parent.git_url),
+            url: transformRemote(res.data.parent.git_url) || "unknown",
             fullName: res.data.parent.full_name
           } : void 0
         };
@@ -58316,10 +59142,10 @@ async function openRepository(url, args) {
   };
 }
 
-// ../../../lix/source-code/client/dist/index.js
+// ../../../lix/packages/client/dist/index.js
 init_dist();
 
-// ../../../lix/source-code/client/dist/hash.js
+// ../../../lix/packages/client/dist/hash.js
 async function hash(inputStr) {
   let usedCrypto;
   if (typeof crypto === "undefined" && typeof process !== "undefined" && process?.versions?.node) {
@@ -58335,7 +59161,7 @@ async function hash(inputStr) {
   return [...new Uint8Array(idDigest)].map((b) => ("00" + b.toString(16)).slice(-2)).join("");
 }
 
-// ../../../lix/source-code/client/dist/mockRepo.js
+// ../../../lix/packages/client/dist/mockRepo.js
 init_dist();
 
 // ../versioned-interfaces/language-tag/dist/interface.js
@@ -60138,9 +60964,67 @@ var lintSingleMessage = async (args) => {
   return { data: reports, errors };
 };
 
+// ../../../node_modules/.pnpm/throttle-debounce@5.0.0/node_modules/throttle-debounce/esm/index.js
+function throttle(delay, callback, options) {
+  var _ref = options || {}, _ref$noTrailing = _ref.noTrailing, noTrailing = _ref$noTrailing === void 0 ? false : _ref$noTrailing, _ref$noLeading = _ref.noLeading, noLeading = _ref$noLeading === void 0 ? false : _ref$noLeading, _ref$debounceMode = _ref.debounceMode, debounceMode = _ref$debounceMode === void 0 ? void 0 : _ref$debounceMode;
+  var timeoutID;
+  var cancelled = false;
+  var lastExec = 0;
+  function clearExistingTimeout() {
+    if (timeoutID) {
+      clearTimeout(timeoutID);
+    }
+  }
+  function cancel(options2) {
+    var _ref2 = options2 || {}, _ref2$upcomingOnly = _ref2.upcomingOnly, upcomingOnly = _ref2$upcomingOnly === void 0 ? false : _ref2$upcomingOnly;
+    clearExistingTimeout();
+    cancelled = !upcomingOnly;
+  }
+  function wrapper() {
+    for (var _len = arguments.length, arguments_ = new Array(_len), _key = 0; _key < _len; _key++) {
+      arguments_[_key] = arguments[_key];
+    }
+    var self2 = this;
+    var elapsed = Date.now() - lastExec;
+    if (cancelled) {
+      return;
+    }
+    function exec2() {
+      lastExec = Date.now();
+      callback.apply(self2, arguments_);
+    }
+    function clear() {
+      timeoutID = void 0;
+    }
+    if (!noLeading && debounceMode && !timeoutID) {
+      exec2();
+    }
+    clearExistingTimeout();
+    if (debounceMode === void 0 && elapsed > delay) {
+      if (noLeading) {
+        lastExec = Date.now();
+        if (!noTrailing) {
+          timeoutID = setTimeout(debounceMode ? clear : exec2, delay);
+        }
+      } else {
+        exec2();
+      }
+    } else if (noTrailing !== true) {
+      timeoutID = setTimeout(debounceMode ? clear : exec2, debounceMode === void 0 ? delay - elapsed : delay);
+    }
+  }
+  wrapper.cancel = cancel;
+  return wrapper;
+}
+
 // ../sdk/dist/createMessageLintReportsQuery.js
+var import_debug = __toESM(require_src(), 1);
+var debug = (0, import_debug.default)("sdk:lintReports");
+function sleep2(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 function createMessageLintReportsQuery(messagesQuery, settings, installedMessageLintRules, resolvedModules) {
-  const index2 = new ReactiveMap();
+  const index2 = /* @__PURE__ */ new Map();
   const modules = resolvedModules();
   const rulesArray = modules?.messageLintRules;
   const messageLintRuleLevels = Object.fromEntries(installedMessageLintRules().map((rule) => [rule.id, rule.level]));
@@ -60152,6 +61036,11 @@ function createMessageLintReportsQuery(messagesQuery, settings, installedMessage
   };
   const messages = messagesQuery.getAll();
   const trackedMessages = /* @__PURE__ */ new Map();
+  debug(`createMessageLintReportsQuery ${rulesArray?.length} rules, ${messages.length} messages`);
+  let lintMessageCount = 0;
+  const throttledLogLintMessage = throttle(2e3, (messageId) => {
+    debug(`lintSingleMessage: ${lintMessageCount} id: ${messageId}`);
+  });
   createEffect4(() => {
     const currentMessageIds = new Set(messagesQuery.includedMessageIds());
     const deletedTrackedMessages = [...trackedMessages].filter((tracked) => !currentMessageIds.has(tracked[0]));
@@ -60173,6 +61062,8 @@ function createMessageLintReportsQuery(messagesQuery, settings, installedMessage
                 messages,
                 message
               }).then((report) => {
+                lintMessageCount++;
+                throttledLogLintMessage(messageId);
                 if (report.errors.length === 0 && index2.get(messageId) !== report.data) {
                   index2.set(messageId, report.data);
                 }
@@ -60188,20 +61079,20 @@ function createMessageLintReportsQuery(messagesQuery, settings, installedMessage
           messageEffectDisposeFunction();
           trackedMessages.delete(deletedMessageId);
           index2.delete(deletedMessageId);
+          debug(`delete lint message id: ${deletedMessageId}`);
         }
       }
     }
   });
-  const get = (args) => {
-    return structuredClone(index2.get(args.where.messageId));
-  };
   return {
-    getAll: createSubscribable(() => {
+    getAll: async () => {
+      await sleep2(0);
       return structuredClone([...index2.values()].flat().length === 0 ? [] : [...index2.values()].flat());
-    }),
-    get: Object.assign(get, {
-      subscribe: (args, callback) => createSubscribable(() => get(args)).subscribe(callback)
-    })
+    },
+    get: async (args) => {
+      await sleep2(0);
+      return structuredClone(index2.get(args.where.messageId) ?? []);
+    }
   };
 }
 
@@ -61509,8 +62400,8 @@ var identifyProject = async (args) => {
 };
 
 // ../sdk/dist/loadProject.js
-var import_debug = __toESM(require_src(), 1);
-var debug = (0, import_debug.default)("loadProject");
+var import_debug2 = __toESM(require_src(), 1);
+var debug2 = (0, import_debug2.default)("loadProject");
 var settingsCompiler = import_compiler3.TypeCompiler.Compile(ProjectSettings);
 async function loadProject(args) {
   const projectPath = normalizePath2(args.projectPath);
@@ -61596,7 +62487,7 @@ Valid examples:
         // this message is called whenever a file changes that was read earlier by this filesystem
         // - the plugin loads messages -> reads the file messages.json -> start watching on messages.json -> updateMessages
         updateMessages: () => {
-          debug("load messages because of a change in the message.json files");
+          debug2("load messages because of a change in the message.json files");
           loadMessagesViaPlugin(
             fsWithWatcher,
             messageLockDirPath,
@@ -61855,7 +62746,7 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
         }
         const importedEnecoded = stringifyMessage(loadedMessageClone);
         if (messageState.messageLoadHash[loadedMessageClone.id] === importedEnecoded) {
-          debug("skipping upsert!");
+          debug2("skipping upsert!");
           continue;
         }
         messagesQuery.update({ where: { id: loadedMessageClone.id }, data: loadedMessageClone });
@@ -61884,7 +62775,7 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
     }
     await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
     lockTime = void 0;
-    debug("loadMessagesViaPlugin: " + loadedMessages.length + " Messages processed ");
+    debug2("loadMessagesViaPlugin: " + loadedMessages.length + " Messages processed ");
     messageState.isLoading = false;
   } finally {
     if (lockTime !== void 0) {
@@ -61913,7 +62804,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
   messageState.currentSaveMessagesViaPlugin = async function() {
     const saveMessageHashes = {};
     if (Object.keys(messageState.messageDirtyFlags).length == 0) {
-      debug("save was skipped - no messages marked as dirty... build!");
+      debug2("save was skipped - no messages marked as dirty... build!");
       messageState.isSaving = false;
       return;
     }
@@ -61922,7 +62813,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
     try {
       lockTime = await acquireFileLock(fs2, lockDirPath, "saveMessage");
       if (Object.keys(messageState.messageDirtyFlags).length == 0) {
-        debug("save was skipped - no messages marked as dirty... releasing lock again");
+        debug2("save was skipped - no messages marked as dirty... releasing lock again");
         messageState.isSaving = false;
         return;
       }
@@ -61954,7 +62845,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
         lockTime = void 0;
       }
       if (messageState.sheduledLoadMessagesViaPlugin) {
-        debug("saveMessagesViaPlugin calling queued loadMessagesViaPlugin to share lock");
+        debug2("saveMessagesViaPlugin calling queued loadMessagesViaPlugin to share lock");
         await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQuery, settingsValue, loadPlugin);
       }
       messageState.isSaving = false;
@@ -61991,7 +62882,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
     });
   }
 }
-var maxRetries = 5;
+var maxRetries = 10;
 var nProbes = 50;
 var probeInterval = 100;
 async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
@@ -61999,10 +62890,10 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
     throw new Error(lockOrigin + " exceeded maximum Retries (5) to acquire lockfile " + tryCount);
   }
   try {
-    debug(lockOrigin + " tries to acquire a lockfile Retry Nr.: " + tryCount);
+    debug2(lockOrigin + " tries to acquire a lockfile Retry Nr.: " + tryCount);
     await fs2.mkdir(lockDirPath);
     const stats = await fs2.stat(lockDirPath);
-    debug(lockOrigin + " acquired a lockfile Retry Nr.: " + tryCount);
+    debug2(lockOrigin + " acquired a lockfile Retry Nr.: " + tryCount);
     return stats.mtimeMs;
   } catch (error) {
     if (error.code !== "EEXIST") {
@@ -62015,12 +62906,12 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
     currentLockTime = stats.mtimeMs;
   } catch (fstatError) {
     if (fstatError.code === "ENOENT") {
-      debug(lockOrigin + " tryCount++ lock file seems to be gone :) - lets try again " + tryCount);
+      debug2(lockOrigin + " tryCount++ lock file seems to be gone :) - lets try again " + tryCount);
       return acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
     }
     throw fstatError;
   }
-  debug(lockOrigin + " tries to acquire a lockfile  - lock currently in use... starting probe phase " + tryCount);
+  debug2(lockOrigin + " tries to acquire a lockfile  - lock currently in use... starting probe phase " + tryCount);
   return new Promise((resolve, reject) => {
     let probeCounts = 0;
     const scheduleProbationTimeout = () => {
@@ -62028,11 +62919,11 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
         probeCounts += 1;
         let lockFileStats = void 0;
         try {
-          debug(lockOrigin + " tries to acquire a lockfile - check if the lock is free now " + tryCount);
+          debug2(lockOrigin + " tries to acquire a lockfile - check if the lock is free now " + tryCount);
           lockFileStats = await fs2.stat(lockDirPath);
         } catch (fstatError) {
           if (fstatError.code === "ENOENT") {
-            debug(lockOrigin + " tryCount++ in Promise - tries to acquire a lockfile - lock file seems to be free now - try to acquire " + tryCount);
+            debug2(lockOrigin + " tryCount++ in Promise - tries to acquire a lockfile - lock file seems to be free now - try to acquire " + tryCount);
             const lock2 = acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
             return resolve(lock2);
           }
@@ -62040,7 +62931,7 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
         }
         if (lockFileStats.mtimeMs === currentLockTime) {
           if (probeCounts >= nProbes) {
-            debug(lockOrigin + " tries to acquire a lockfile  - lock not free - but stale lets drop it" + tryCount);
+            debug2(lockOrigin + " tries to acquire a lockfile  - lock not free - but stale lets drop it" + tryCount);
             try {
               await fs2.rmdir(lockDirPath);
             } catch (rmLockError) {
@@ -62049,7 +62940,7 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
               return reject(rmLockError);
             }
             try {
-              debug(lockOrigin + " tryCount++ same locker - try to acquire again after removing stale lock " + tryCount);
+              debug2(lockOrigin + " tryCount++ same locker - try to acquire again after removing stale lock " + tryCount);
               const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
               return resolve(lock2);
             } catch (lockAquireException) {
@@ -62060,7 +62951,7 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
           }
         } else {
           try {
-            debug(lockOrigin + " tryCount++ different locker - try to acquire again " + tryCount);
+            debug2(lockOrigin + " tryCount++ different locker - try to acquire again " + tryCount);
             const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
             return resolve(lock2);
           } catch (error) {
@@ -62073,19 +62964,19 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
   });
 }
 async function releaseLock(fs2, lockDirPath, lockOrigin, lockTime) {
-  debug(lockOrigin + " releasing the lock ");
+  debug2(lockOrigin + " releasing the lock ");
   try {
     const stats = await fs2.stat(lockDirPath);
     if (stats.mtimeMs === lockTime) {
       await fs2.rmdir(lockDirPath);
     }
   } catch (statError) {
-    debug(lockOrigin + " couldn't release the lock");
+    debug2(lockOrigin + " couldn't release the lock");
     if (statError.code === "ENOENT") {
-      debug(lockOrigin + " WARNING - the lock was released by a different process");
+      debug2(lockOrigin + " WARNING - the lock was released by a different process");
       return;
     }
-    debug(statError);
+    debug2(statError);
     throw statError;
   }
 }
@@ -62167,7 +63058,7 @@ async function run() {
         continue;
       }
       result.installedRules.push(...projectBase.installed.messageLintRules());
-      result.reportsBase.push(...projectBase.query.messageLintReports.getAll());
+      result.reportsBase.push(...await projectBase.query.messageLintReports.getAll());
     }
     const headMeta = {
       owner: github.context.payload.pull_request?.head.label.split(":")[0],
@@ -62245,7 +63136,7 @@ async function run() {
           result.installedRules.push(newRule);
         }
       }
-      result?.reportsHead.push(...projectHead.query.messageLintReports.getAll());
+      result?.reportsHead.push(...await projectHead.query.messageLintReports.getAll());
     }
     for (const result of results) {
       if (result.errorsHead.length > 0)
