@@ -19343,9 +19343,9 @@ var require_before_after_hook = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+endpoint@9.0.4/node_modules/@octokit/endpoint/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+endpoint@9.0.5/node_modules/@octokit/endpoint/dist-node/index.js
 var require_dist_node2 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+endpoint@9.0.4/node_modules/@octokit/endpoint/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+endpoint@9.0.5/node_modules/@octokit/endpoint/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -19370,7 +19370,7 @@ var require_dist_node2 = __commonJS({
     });
     module2.exports = __toCommonJS2(dist_src_exports);
     var import_universal_user_agent = require_dist_node();
-    var VERSION = "9.0.4";
+    var VERSION = "9.0.5";
     var userAgent = `octokit-endpoint.js/${VERSION} ${(0, import_universal_user_agent.getUserAgent)()}`;
     var DEFAULTS = {
       method: "GET",
@@ -19783,9 +19783,9 @@ var require_once = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+request-error@5.0.1/node_modules/@octokit/request-error/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+request-error@5.1.0/node_modules/@octokit/request-error/dist-node/index.js
 var require_dist_node4 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+request-error@5.0.1/node_modules/@octokit/request-error/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+request-error@5.1.0/node_modules/@octokit/request-error/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -19875,9 +19875,9 @@ var require_dist_node4 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+request@8.2.0/node_modules/@octokit/request/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+request@8.4.0/node_modules/@octokit/request/dist-node/index.js
 var require_dist_node5 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+request@8.2.0/node_modules/@octokit/request/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+request@8.4.0/node_modules/@octokit/request/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -19903,7 +19903,7 @@ var require_dist_node5 = __commonJS({
     module2.exports = __toCommonJS2(dist_src_exports);
     var import_endpoint = require_dist_node2();
     var import_universal_user_agent = require_dist_node();
-    var VERSION = "8.2.0";
+    var VERSION = "8.4.0";
     function isPlainObject(value) {
       if (typeof value !== "object" || value === null)
         return false;
@@ -19920,7 +19920,7 @@ var require_dist_node5 = __commonJS({
       return response.arrayBuffer();
     }
     function fetchWrapper(requestOptions) {
-      var _a, _b, _c;
+      var _a, _b, _c, _d;
       const log2 = requestOptions.request && requestOptions.request.log ? requestOptions.request.log : console;
       const parseSuccessResponseBody = ((_a = requestOptions.request) == null ? void 0 : _a.parseSuccessResponseBody) !== false;
       if (isPlainObject(requestOptions.body) || Array.isArray(requestOptions.body)) {
@@ -19941,8 +19941,9 @@ var require_dist_node5 = __commonJS({
       return fetch3(requestOptions.url, {
         method: requestOptions.method,
         body: requestOptions.body,
+        redirect: (_c = requestOptions.request) == null ? void 0 : _c.redirect,
         headers: requestOptions.headers,
-        signal: (_c = requestOptions.request) == null ? void 0 : _c.signal,
+        signal: (_d = requestOptions.request) == null ? void 0 : _d.signal,
         // duplex must be set if request.body is ReadableStream or Async Iterables.
         // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
         ...requestOptions.body && { duplex: "half" }
@@ -20084,9 +20085,9 @@ var require_dist_node5 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+graphql@7.0.2/node_modules/@octokit/graphql/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+graphql@7.1.0/node_modules/@octokit/graphql/dist-node/index.js
 var require_dist_node6 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+graphql@7.0.2/node_modules/@octokit/graphql/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+graphql@7.1.0/node_modules/@octokit/graphql/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -20114,7 +20115,7 @@ var require_dist_node6 = __commonJS({
     module2.exports = __toCommonJS2(dist_src_exports);
     var import_request3 = require_dist_node5();
     var import_universal_user_agent = require_dist_node();
-    var VERSION = "7.0.2";
+    var VERSION = "7.1.0";
     var import_request2 = require_dist_node5();
     var import_request = require_dist_node5();
     function _buildMessageForResponseErrors(data) {
@@ -20293,9 +20294,9 @@ var require_dist_node7 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+core@5.1.0/node_modules/@octokit/core/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+core@5.2.0/node_modules/@octokit/core/dist-node/index.js
 var require_dist_node8 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+core@5.1.0/node_modules/@octokit/core/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+core@5.2.0/node_modules/@octokit/core/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -20324,7 +20325,7 @@ var require_dist_node8 = __commonJS({
     var import_request = require_dist_node5();
     var import_graphql = require_dist_node6();
     var import_auth_token = require_dist_node7();
-    var VERSION = "5.1.0";
+    var VERSION = "5.2.0";
     var noop = () => {
     };
     var consoleWarn = console.warn.bind(console);
@@ -20452,9 +20453,9 @@ var require_dist_node8 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@10.4.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@10.4.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js
 var require_dist_node9 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@10.4.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@10.4.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -22608,9 +22609,9 @@ var require_dist_node9 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+plugin-paginate-rest@9.2.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-paginate-rest/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+plugin-paginate-rest@9.2.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-paginate-rest/dist-node/index.js
 var require_dist_node10 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+plugin-paginate-rest@9.2.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-paginate-rest/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+plugin-paginate-rest@9.2.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-paginate-rest/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -23101,9 +23102,9 @@ var require_github = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+plugin-paginate-graphql@4.0.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-paginate-graphql/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+plugin-paginate-graphql@4.0.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-paginate-graphql/dist-node/index.js
 var require_dist_node11 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+plugin-paginate-graphql@4.0.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-paginate-graphql/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+plugin-paginate-graphql@4.0.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-paginate-graphql/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -24610,9 +24611,9 @@ var require_light = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+plugin-retry@6.0.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-retry/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+plugin-retry@6.0.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-retry/dist-node/index.js
 var require_dist_node12 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+plugin-retry@6.0.1_@octokit+core@5.1.0/node_modules/@octokit/plugin-retry/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+plugin-retry@6.0.1_@octokit+core@5.2.0/node_modules/@octokit/plugin-retry/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -24720,9 +24721,9 @@ var require_dist_node12 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+plugin-throttling@8.2.0_@octokit+core@5.1.0/node_modules/@octokit/plugin-throttling/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+plugin-throttling@8.2.0_@octokit+core@5.2.0/node_modules/@octokit/plugin-throttling/dist-node/index.js
 var require_dist_node13 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+plugin-throttling@8.2.0_@octokit+core@5.1.0/node_modules/@octokit/plugin-throttling/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+plugin-throttling@8.2.0_@octokit+core@5.2.0/node_modules/@octokit/plugin-throttling/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -25035,9 +25036,9 @@ var require_dist_node14 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+oauth-methods@4.0.1/node_modules/@octokit/oauth-methods/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+oauth-methods@4.1.0/node_modules/@octokit/oauth-methods/dist-node/index.js
 var require_dist_node15 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+oauth-methods@4.0.1/node_modules/@octokit/oauth-methods/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+oauth-methods@4.1.0/node_modules/@octokit/oauth-methods/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -25081,7 +25082,7 @@ var require_dist_node15 = __commonJS({
       scopeToken: () => scopeToken
     });
     module2.exports = __toCommonJS2(dist_src_exports);
-    var VERSION = "4.0.1";
+    var VERSION = "4.1.0";
     var import_oauth_authorization_url = require_dist_node14();
     var import_request = require_dist_node5();
     var import_request_error = require_dist_node4();
@@ -25378,9 +25379,9 @@ var require_dist_node15 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+auth-oauth-device@6.0.1/node_modules/@octokit/auth-oauth-device/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+auth-oauth-device@6.1.0/node_modules/@octokit/auth-oauth-device/dist-node/index.js
 var require_dist_node16 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+auth-oauth-device@6.0.1/node_modules/@octokit/auth-oauth-device/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+auth-oauth-device@6.1.0/node_modules/@octokit/auth-oauth-device/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -25500,7 +25501,7 @@ var require_dist_node16 = __commonJS({
       endpoint.headers.authorization = `token ${token}`;
       return request(endpoint);
     }
-    var VERSION = "6.0.1";
+    var VERSION = "6.1.0";
     function createOAuthDeviceAuth(options) {
       const requestWithDefaults = options.request || import_request.request.defaults({
         headers: {
@@ -25535,9 +25536,9 @@ var require_dist_node16 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+auth-oauth-user@4.0.1/node_modules/@octokit/auth-oauth-user/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+auth-oauth-user@4.1.0/node_modules/@octokit/auth-oauth-user/dist-node/index.js
 var require_dist_node17 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+auth-oauth-user@4.0.1/node_modules/@octokit/auth-oauth-user/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+auth-oauth-user@4.1.0/node_modules/@octokit/auth-oauth-user/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -25574,7 +25575,7 @@ var require_dist_node17 = __commonJS({
     module2.exports = __toCommonJS2(dist_src_exports);
     var import_universal_user_agent = require_dist_node();
     var import_request = require_dist_node5();
-    var VERSION = "4.0.1";
+    var VERSION = "4.1.0";
     var import_auth_oauth_device = require_dist_node16();
     var import_oauth_methods = require_dist_node15();
     async function getAuthentication(state) {
@@ -25763,9 +25764,9 @@ var require_dist_node17 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+auth-oauth-app@7.0.1/node_modules/@octokit/auth-oauth-app/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+auth-oauth-app@7.1.0/node_modules/@octokit/auth-oauth-app/dist-node/index.js
 var require_dist_node18 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+auth-oauth-app@7.0.1/node_modules/@octokit/auth-oauth-app/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+auth-oauth-app@7.1.0/node_modules/@octokit/auth-oauth-app/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -25866,7 +25867,7 @@ var require_dist_node18 = __commonJS({
         throw error;
       }
     }
-    var VERSION = "7.0.1";
+    var VERSION = "7.1.0";
     var import_auth_oauth_user3 = require_dist_node17();
     function createOAuthAppAuth(options) {
       const state = Object.assign(
@@ -31573,9 +31574,9 @@ var require_commonjs = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/@octokit+auth-app@6.1.0/node_modules/@octokit/auth-app/dist-node/index.js
+// ../../../node_modules/.pnpm/@octokit+auth-app@6.1.1/node_modules/@octokit/auth-app/dist-node/index.js
 var require_dist_node20 = __commonJS({
-  "../../../node_modules/.pnpm/@octokit+auth-app@6.1.0/node_modules/@octokit/auth-app/dist-node/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/@octokit+auth-app@6.1.1/node_modules/@octokit/auth-app/dist-node/index.js"(exports2, module2) {
     "use strict";
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
@@ -31986,7 +31987,7 @@ var require_dist_node20 = __commonJS({
         return sendRequestWithRetries(state, request, options, createdAt, retries);
       }
     }
-    var VERSION = "6.1.0";
+    var VERSION = "6.1.1";
     var import_auth_oauth_user2 = require_dist_node17();
     function createAppAuth(options) {
       if (!options.appId) {
@@ -58702,9 +58703,7 @@ async function openRepository(url, args) {
       // TODO: use only first and last commit in lazy clone? (we need first commit for repo id)
       depth: 1,
       noTags: true
-    }).then(() => checkOutPlaceholders()).catch((newError) => {
-      setErrors((previous) => [...previous || [], newError]);
-    });
+    }).then(() => checkOutPlaceholders());
   } else {
     console.info("Using existing cloned repo");
   }
@@ -60233,16 +60232,31 @@ var resolveModules = async (args) => {
   };
 };
 
+// ../sdk/dist/validateProjectPath.js
+function assertValidProjectPath(projectPath) {
+  if (!isAbsolutePath(projectPath)) {
+    throw new Error(`Expected an absolute path but received "${projectPath}".`);
+  }
+  if (!isInlangProjectPath(projectPath)) {
+    throw new Error(`Expected a path ending in "{name}.inlang" but received "${projectPath}".
+
+Valid examples: 
+- "/path/to/micky-mouse.inlang"
+- "/path/to/green-elephant.inlang
+`);
+  }
+}
+function isInlangProjectPath(path) {
+  return /[^\\/]+\.inlang$/.test(path);
+}
+function isAbsolutePath(path) {
+  return /^\/|^[A-Za-z]:[\\/]/.test(path);
+}
+
 // ../sdk/dist/loadProject.js
 var import_compiler3 = __toESM(require_compiler2(), 1);
 
 // ../sdk/dist/errors.js
-var LoadProjectInvalidArgument = class extends Error {
-  constructor(message, options) {
-    super(`The argument "${options.argument}" of loadProject() is invalid: ${message}`);
-    this.name = "LoadProjectInvalidArgument";
-  }
-};
 var ProjectSettingsInvalidError = class extends Error {
   constructor(options) {
     super(`The project settings are invalid:
@@ -61300,14 +61314,6 @@ function migrateIfOutdated(schema2) {
 
 // ../sdk/dist/createNodeishFsWithAbsolutePaths.js
 init_dist();
-
-// ../sdk/dist/isAbsolutePath.js
-var isAbsolutePath = (path) => {
-  const matchPosixAndWindowsAbsolutePaths = /^(?:[A-Za-z]:\\(?:[^\\]+\\)*[^\\]+|[A-Za-z]:\/(?:[^/]+\/)*[^/]+|\/(?:[^/]+\/)*[^/]+)$/;
-  return matchPosixAndWindowsAbsolutePaths.test(path);
-};
-
-// ../sdk/dist/createNodeishFsWithAbsolutePaths.js
 var createNodeishFsWithAbsolutePaths = (args) => {
   if (!isAbsolutePath(args.projectPath)) {
     throw new Error(`Expected an absolute path but received "${args.projectPath}".`);
@@ -62593,16 +62599,7 @@ async function loadProject(args) {
     isLoading: false,
     sheduledLoadMessagesViaPlugin: void 0
   };
-  if (!isAbsolutePath(args.projectPath)) {
-    throw new LoadProjectInvalidArgument(`Expected an absolute path but received "${args.projectPath}".`, { argument: "projectPath" });
-  } else if (/[^\\/]+\.inlang$/.test(projectPath) === false) {
-    throw new LoadProjectInvalidArgument(`Expected a path ending in "{name}.inlang" but received "${projectPath}".
-
-Valid examples: 
-- "/path/to/micky-mouse.inlang"
-- "/path/to/green-elephant.inlang
-`, { argument: "projectPath" });
-  }
+  assertValidProjectPath(projectPath);
   const nodeishFs = createNodeishFsWithAbsolutePaths({
     projectPath,
     nodeishFs: args.repo.nodeishFs
