@@ -60804,6 +60804,12 @@ function stringifyMessage(message) {
       return variantA.match.join("-").localeCompare(variantB.match.join("-"));
     }
     return languageComparison;
+  }).map((variant) => {
+    const variantWithSortedKeys = {};
+    for (const key of Object.keys(variant).sort()) {
+      variantWithSortedKeys[key] = variant[key];
+    }
+    return variantWithSortedKeys;
   });
   return JSON.stringify(messageWithSortedKeys, void 0, 4);
 }
@@ -62764,9 +62770,9 @@ ${error?.cause.stack}`;
         continue;
       }
       if (result.errorsBase.length > 0 && result.errorsHead.length === 0) {
-        console.debug(`#### \u2705 Setup of project \`${result.projectPath}\` fixed`);
+        console.debug(`\u2705 Setup of project \`${result.projectPath}\` fixed`);
       }
-      if (result.errorsBase.length > 0 || result.errorsHead.length > 0)
+      if (result.errorsHead.length > 0)
         continue;
       if (result.lintSummary.length === 0)
         continue;
