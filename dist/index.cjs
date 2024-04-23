@@ -60793,7 +60793,7 @@ and the following GitHub issue for more information https://github.com/opral/mon
 `;
 
 // ../sdk/dist/storage/helper.js
-function stringifyMessage(message) {
+function normalizeMessage(message) {
   const messageWithSortedKeys = {};
   for (const key of Object.keys(message).sort()) {
     messageWithSortedKeys[key] = message[key];
@@ -60806,12 +60806,25 @@ function stringifyMessage(message) {
     return languageComparison;
   }).map((variant) => {
     const variantWithSortedKeys = {};
-    for (const key of Object.keys(variant).sort()) {
-      variantWithSortedKeys[key] = variant[key];
+    for (const variantKey of Object.keys(variant).sort()) {
+      if (variantKey === "pattern") {
+        variantWithSortedKeys[variantKey] = variant["pattern"].map((token) => {
+          const tokenWithSortedKey = {};
+          for (const tokenKey of Object.keys(token).sort()) {
+            tokenWithSortedKey[tokenKey] = token[tokenKey];
+          }
+          return tokenWithSortedKey;
+        });
+      } else {
+        variantWithSortedKeys[variantKey] = variant[variantKey];
+      }
     }
     return variantWithSortedKeys;
   });
-  return JSON.stringify(messageWithSortedKeys, void 0, 4);
+  return messageWithSortedKeys;
+}
+function stringifyMessage(message) {
+  return JSON.stringify(normalizeMessage(message), void 0, 4);
 }
 
 // ../sdk/dist/storage/human-id/human-readable-id.js
@@ -61999,7 +62012,8 @@ var identifyProject = async (args) => {
 
 // ../sdk/dist/loadProject.js
 var import_debug2 = __toESM(require_src(), 1);
-var debug2 = (0, import_debug2.default)("loadProject");
+var debug2 = (0, import_debug2.default)("sdk:loadProject");
+var debugLock = (0, import_debug2.default)("sdk:lockfile");
 var settingsCompiler = import_compiler3.TypeCompiler.Compile(ProjectSettings);
 async function loadProject(args) {
   const projectPath = normalizePath2(args.projectPath);
@@ -62334,7 +62348,6 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQue
         }
         const importedEnecoded = stringifyMessage(loadedMessageClone);
         if (messageState.messageLoadHash[loadedMessageClone.id] === importedEnecoded) {
-          debug2("skipping upsert!");
           continue;
         }
         messagesQuery.update({ where: { id: loadedMessageClone.id }, data: loadedMessageClone });
@@ -62478,10 +62491,10 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
     throw new Error(lockOrigin + " exceeded maximum Retries (5) to acquire lockfile " + tryCount);
   }
   try {
-    debug2(lockOrigin + " tries to acquire a lockfile Retry Nr.: " + tryCount);
+    debugLock(lockOrigin + " tries to acquire a lockfile Retry Nr.: " + tryCount);
     await fs2.mkdir(lockDirPath);
     const stats = await fs2.stat(lockDirPath);
-    debug2(lockOrigin + " acquired a lockfile Retry Nr.: " + tryCount);
+    debugLock(lockOrigin + " acquired a lockfile Retry Nr.: " + tryCount);
     return stats.mtimeMs;
   } catch (error) {
     if (error.code !== "EEXIST") {
@@ -62494,12 +62507,12 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
     currentLockTime = stats.mtimeMs;
   } catch (fstatError) {
     if (fstatError.code === "ENOENT") {
-      debug2(lockOrigin + " tryCount++ lock file seems to be gone :) - lets try again " + tryCount);
+      debugLock(lockOrigin + " tryCount++ lock file seems to be gone :) - lets try again " + tryCount);
       return acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
     }
     throw fstatError;
   }
-  debug2(lockOrigin + " tries to acquire a lockfile  - lock currently in use... starting probe phase " + tryCount);
+  debugLock(lockOrigin + " tries to acquire a lockfile  - lock currently in use... starting probe phase " + tryCount);
   return new Promise((resolve, reject) => {
     let probeCounts = 0;
     const scheduleProbationTimeout = () => {
@@ -62507,11 +62520,11 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
         probeCounts += 1;
         let lockFileStats = void 0;
         try {
-          debug2(lockOrigin + " tries to acquire a lockfile - check if the lock is free now " + tryCount);
+          debugLock(lockOrigin + " tries to acquire a lockfile - check if the lock is free now " + tryCount);
           lockFileStats = await fs2.stat(lockDirPath);
         } catch (fstatError) {
           if (fstatError.code === "ENOENT") {
-            debug2(lockOrigin + " tryCount++ in Promise - tries to acquire a lockfile - lock file seems to be free now - try to acquire " + tryCount);
+            debugLock(lockOrigin + " tryCount++ in Promise - tries to acquire a lockfile - lock file seems to be free now - try to acquire " + tryCount);
             const lock2 = acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
             return resolve(lock2);
           }
@@ -62519,7 +62532,7 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
         }
         if (lockFileStats.mtimeMs === currentLockTime) {
           if (probeCounts >= nProbes) {
-            debug2(lockOrigin + " tries to acquire a lockfile  - lock not free - but stale lets drop it" + tryCount);
+            debugLock(lockOrigin + " tries to acquire a lockfile  - lock not free - but stale lets drop it" + tryCount);
             try {
               await fs2.rmdir(lockDirPath);
             } catch (rmLockError) {
@@ -62528,7 +62541,7 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
               return reject(rmLockError);
             }
             try {
-              debug2(lockOrigin + " tryCount++ same locker - try to acquire again after removing stale lock " + tryCount);
+              debugLock(lockOrigin + " tryCount++ same locker - try to acquire again after removing stale lock " + tryCount);
               const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
               return resolve(lock2);
             } catch (lockAquireException) {
@@ -62539,7 +62552,7 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
           }
         } else {
           try {
-            debug2(lockOrigin + " tryCount++ different locker - try to acquire again " + tryCount);
+            debugLock(lockOrigin + " tryCount++ different locker - try to acquire again " + tryCount);
             const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
             return resolve(lock2);
           } catch (error) {
@@ -62552,19 +62565,19 @@ async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
   });
 }
 async function releaseLock(fs2, lockDirPath, lockOrigin, lockTime) {
-  debug2(lockOrigin + " releasing the lock ");
+  debugLock(lockOrigin + " releasing the lock ");
   try {
     const stats = await fs2.stat(lockDirPath);
     if (stats.mtimeMs === lockTime) {
       await fs2.rmdir(lockDirPath);
     }
   } catch (statError) {
-    debug2(lockOrigin + " couldn't release the lock");
+    debugLock(lockOrigin + " couldn't release the lock");
     if (statError.code === "ENOENT") {
-      debug2(lockOrigin + " WARNING - the lock was released by a different process");
+      debugLock(lockOrigin + " WARNING - the lock was released by a different process");
       return;
     }
-    debug2(statError);
+    debugLock(statError);
     throw statError;
   }
 }
