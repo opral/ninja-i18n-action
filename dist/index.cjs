@@ -723,7 +723,7 @@ var require_tunnel = __commonJS({
         connectOptions.headers = connectOptions.headers || {};
         connectOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(connectOptions.proxyAuth).toString("base64");
       }
-      debug6("making CONNECT request");
+      debug9("making CONNECT request");
       var connectReq = self2.request(connectOptions);
       connectReq.useChunkedEncodingByDefault = false;
       connectReq.once("response", onResponse);
@@ -743,7 +743,7 @@ var require_tunnel = __commonJS({
         connectReq.removeAllListeners();
         socket.removeAllListeners();
         if (res.statusCode !== 200) {
-          debug6(
+          debug9(
             "tunneling socket could not be established, statusCode=%d",
             res.statusCode
           );
@@ -755,7 +755,7 @@ var require_tunnel = __commonJS({
           return;
         }
         if (head.length > 0) {
-          debug6("got illegal response body from proxy");
+          debug9("got illegal response body from proxy");
           socket.destroy();
           var error = new Error("got illegal response body from proxy");
           error.code = "ECONNRESET";
@@ -763,13 +763,13 @@ var require_tunnel = __commonJS({
           self2.removeSocket(placeholder);
           return;
         }
-        debug6("tunneling connection has established");
+        debug9("tunneling connection has established");
         self2.sockets[self2.sockets.indexOf(placeholder)] = socket;
         return cb(socket);
       }
       function onError(cause) {
         connectReq.removeAllListeners();
-        debug6(
+        debug9(
           "tunneling socket could not be established, cause=%s\n",
           cause.message,
           cause.stack
@@ -831,9 +831,9 @@ var require_tunnel = __commonJS({
       }
       return target;
     }
-    var debug6;
+    var debug9;
     if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-      debug6 = function() {
+      debug9 = function() {
         var args = Array.prototype.slice.call(arguments);
         if (typeof args[0] === "string") {
           args[0] = "TUNNEL: " + args[0];
@@ -843,10 +843,10 @@ var require_tunnel = __commonJS({
         console.error.apply(console, args);
       };
     } else {
-      debug6 = function() {
+      debug9 = function() {
       };
     }
-    exports2.debug = debug6;
+    exports2.debug = debug9;
   }
 });
 
@@ -6687,34 +6687,34 @@ var require_constants3 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.SPECIAL_HEADERS = exports2.HEADER_STATE = exports2.MINOR = exports2.MAJOR = exports2.CONNECTION_TOKEN_CHARS = exports2.HEADER_CHARS = exports2.TOKEN = exports2.STRICT_TOKEN = exports2.HEX = exports2.URL_CHAR = exports2.STRICT_URL_CHAR = exports2.USERINFO_CHARS = exports2.MARK = exports2.ALPHANUM = exports2.NUM = exports2.HEX_MAP = exports2.NUM_MAP = exports2.ALPHA = exports2.FINISH = exports2.H_METHOD_MAP = exports2.METHOD_MAP = exports2.METHODS_RTSP = exports2.METHODS_ICE = exports2.METHODS_HTTP = exports2.METHODS = exports2.LENIENT_FLAGS = exports2.FLAGS = exports2.TYPE = exports2.ERROR = void 0;
     var utils_1 = require_utils2();
-    var ERROR2;
-    (function(ERROR3) {
-      ERROR3[ERROR3["OK"] = 0] = "OK";
-      ERROR3[ERROR3["INTERNAL"] = 1] = "INTERNAL";
-      ERROR3[ERROR3["STRICT"] = 2] = "STRICT";
-      ERROR3[ERROR3["LF_EXPECTED"] = 3] = "LF_EXPECTED";
-      ERROR3[ERROR3["UNEXPECTED_CONTENT_LENGTH"] = 4] = "UNEXPECTED_CONTENT_LENGTH";
-      ERROR3[ERROR3["CLOSED_CONNECTION"] = 5] = "CLOSED_CONNECTION";
-      ERROR3[ERROR3["INVALID_METHOD"] = 6] = "INVALID_METHOD";
-      ERROR3[ERROR3["INVALID_URL"] = 7] = "INVALID_URL";
-      ERROR3[ERROR3["INVALID_CONSTANT"] = 8] = "INVALID_CONSTANT";
-      ERROR3[ERROR3["INVALID_VERSION"] = 9] = "INVALID_VERSION";
-      ERROR3[ERROR3["INVALID_HEADER_TOKEN"] = 10] = "INVALID_HEADER_TOKEN";
-      ERROR3[ERROR3["INVALID_CONTENT_LENGTH"] = 11] = "INVALID_CONTENT_LENGTH";
-      ERROR3[ERROR3["INVALID_CHUNK_SIZE"] = 12] = "INVALID_CHUNK_SIZE";
-      ERROR3[ERROR3["INVALID_STATUS"] = 13] = "INVALID_STATUS";
-      ERROR3[ERROR3["INVALID_EOF_STATE"] = 14] = "INVALID_EOF_STATE";
-      ERROR3[ERROR3["INVALID_TRANSFER_ENCODING"] = 15] = "INVALID_TRANSFER_ENCODING";
-      ERROR3[ERROR3["CB_MESSAGE_BEGIN"] = 16] = "CB_MESSAGE_BEGIN";
-      ERROR3[ERROR3["CB_HEADERS_COMPLETE"] = 17] = "CB_HEADERS_COMPLETE";
-      ERROR3[ERROR3["CB_MESSAGE_COMPLETE"] = 18] = "CB_MESSAGE_COMPLETE";
-      ERROR3[ERROR3["CB_CHUNK_HEADER"] = 19] = "CB_CHUNK_HEADER";
-      ERROR3[ERROR3["CB_CHUNK_COMPLETE"] = 20] = "CB_CHUNK_COMPLETE";
-      ERROR3[ERROR3["PAUSED"] = 21] = "PAUSED";
-      ERROR3[ERROR3["PAUSED_UPGRADE"] = 22] = "PAUSED_UPGRADE";
-      ERROR3[ERROR3["PAUSED_H2_UPGRADE"] = 23] = "PAUSED_H2_UPGRADE";
-      ERROR3[ERROR3["USER"] = 24] = "USER";
-    })(ERROR2 = exports2.ERROR || (exports2.ERROR = {}));
+    var ERROR3;
+    (function(ERROR4) {
+      ERROR4[ERROR4["OK"] = 0] = "OK";
+      ERROR4[ERROR4["INTERNAL"] = 1] = "INTERNAL";
+      ERROR4[ERROR4["STRICT"] = 2] = "STRICT";
+      ERROR4[ERROR4["LF_EXPECTED"] = 3] = "LF_EXPECTED";
+      ERROR4[ERROR4["UNEXPECTED_CONTENT_LENGTH"] = 4] = "UNEXPECTED_CONTENT_LENGTH";
+      ERROR4[ERROR4["CLOSED_CONNECTION"] = 5] = "CLOSED_CONNECTION";
+      ERROR4[ERROR4["INVALID_METHOD"] = 6] = "INVALID_METHOD";
+      ERROR4[ERROR4["INVALID_URL"] = 7] = "INVALID_URL";
+      ERROR4[ERROR4["INVALID_CONSTANT"] = 8] = "INVALID_CONSTANT";
+      ERROR4[ERROR4["INVALID_VERSION"] = 9] = "INVALID_VERSION";
+      ERROR4[ERROR4["INVALID_HEADER_TOKEN"] = 10] = "INVALID_HEADER_TOKEN";
+      ERROR4[ERROR4["INVALID_CONTENT_LENGTH"] = 11] = "INVALID_CONTENT_LENGTH";
+      ERROR4[ERROR4["INVALID_CHUNK_SIZE"] = 12] = "INVALID_CHUNK_SIZE";
+      ERROR4[ERROR4["INVALID_STATUS"] = 13] = "INVALID_STATUS";
+      ERROR4[ERROR4["INVALID_EOF_STATE"] = 14] = "INVALID_EOF_STATE";
+      ERROR4[ERROR4["INVALID_TRANSFER_ENCODING"] = 15] = "INVALID_TRANSFER_ENCODING";
+      ERROR4[ERROR4["CB_MESSAGE_BEGIN"] = 16] = "CB_MESSAGE_BEGIN";
+      ERROR4[ERROR4["CB_HEADERS_COMPLETE"] = 17] = "CB_HEADERS_COMPLETE";
+      ERROR4[ERROR4["CB_MESSAGE_COMPLETE"] = 18] = "CB_MESSAGE_COMPLETE";
+      ERROR4[ERROR4["CB_CHUNK_HEADER"] = 19] = "CB_CHUNK_HEADER";
+      ERROR4[ERROR4["CB_CHUNK_COMPLETE"] = 20] = "CB_CHUNK_COMPLETE";
+      ERROR4[ERROR4["PAUSED"] = 21] = "PAUSED";
+      ERROR4[ERROR4["PAUSED_UPGRADE"] = 22] = "PAUSED_UPGRADE";
+      ERROR4[ERROR4["PAUSED_H2_UPGRADE"] = 23] = "PAUSED_H2_UPGRADE";
+      ERROR4[ERROR4["USER"] = 24] = "USER";
+    })(ERROR3 = exports2.ERROR || (exports2.ERROR = {}));
     var TYPE;
     (function(TYPE2) {
       TYPE2[TYPE2["BOTH"] = 0] = "BOTH";
@@ -18943,10 +18943,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       return process.env["RUNNER_DEBUG"] === "1";
     }
     exports2.isDebug = isDebug;
-    function debug6(message) {
+    function debug9(message) {
       command_1.issueCommand("debug", {}, message);
     }
-    exports2.debug = debug6;
+    exports2.debug = debug9;
     function error(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -32913,9 +32913,9 @@ var require_constants7 = __commonJS({
 // ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js
 var require_debug = __commonJS({
   "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js"(exports2, module2) {
-    var debug6 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
+    var debug9 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
     };
-    module2.exports = debug6;
+    module2.exports = debug9;
   }
 });
 
@@ -32927,7 +32927,7 @@ var require_re = __commonJS({
       MAX_SAFE_BUILD_LENGTH,
       MAX_LENGTH
     } = require_constants7();
-    var debug6 = require_debug();
+    var debug9 = require_debug();
     exports2 = module2.exports = {};
     var re = exports2.re = [];
     var safeRe = exports2.safeRe = [];
@@ -32949,7 +32949,7 @@ var require_re = __commonJS({
     var createToken = (name, value, isGlobal) => {
       const safe = makeSafeRegex(value);
       const index2 = R++;
-      debug6(name, index2, value);
+      debug9(name, index2, value);
       t[name] = index2;
       src[index2] = value;
       re[index2] = new RegExp(value, isGlobal ? "g" : void 0);
@@ -33046,7 +33046,7 @@ var require_identifiers = __commonJS({
 // ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js
 var require_semver = __commonJS({
   "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js"(exports2, module2) {
-    var debug6 = require_debug();
+    var debug9 = require_debug();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants7();
     var { safeRe: re, t } = require_re();
     var parseOptions = require_parse_options();
@@ -33068,7 +33068,7 @@ var require_semver = __commonJS({
             `version is longer than ${MAX_LENGTH} characters`
           );
         }
-        debug6("SemVer", version3, options);
+        debug9("SemVer", version3, options);
         this.options = options;
         this.loose = !!options.loose;
         this.includePrerelease = !!options.includePrerelease;
@@ -33116,7 +33116,7 @@ var require_semver = __commonJS({
         return this.version;
       }
       compare(other) {
-        debug6("SemVer.compare", this.version, this.options, other);
+        debug9("SemVer.compare", this.version, this.options, other);
         if (!(other instanceof _SemVer)) {
           if (typeof other === "string" && other === this.version) {
             return 0;
@@ -33149,7 +33149,7 @@ var require_semver = __commonJS({
         do {
           const a = this.prerelease[i];
           const b = other.prerelease[i];
-          debug6("prerelease compare", i, a, b);
+          debug9("prerelease compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -33171,7 +33171,7 @@ var require_semver = __commonJS({
         do {
           const a = this.build[i];
           const b = other.build[i];
-          debug6("prerelease compare", i, a, b);
+          debug9("prerelease compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -34355,21 +34355,21 @@ var require_range = __commonJS({
         const loose = this.options.loose;
         const hr = loose ? re[t.HYPHENRANGELOOSE] : re[t.HYPHENRANGE];
         range = range.replace(hr, hyphenReplace(this.options.includePrerelease));
-        debug6("hyphen replace", range);
+        debug9("hyphen replace", range);
         range = range.replace(re[t.COMPARATORTRIM], comparatorTrimReplace);
-        debug6("comparator trim", range);
+        debug9("comparator trim", range);
         range = range.replace(re[t.TILDETRIM], tildeTrimReplace);
-        debug6("tilde trim", range);
+        debug9("tilde trim", range);
         range = range.replace(re[t.CARETTRIM], caretTrimReplace);
-        debug6("caret trim", range);
+        debug9("caret trim", range);
         let rangeList = range.split(" ").map((comp) => parseComparator(comp, this.options)).join(" ").split(/\s+/).map((comp) => replaceGTE0(comp, this.options));
         if (loose) {
           rangeList = rangeList.filter((comp) => {
-            debug6("loose invalid filter", comp, this.options);
+            debug9("loose invalid filter", comp, this.options);
             return !!comp.match(re[t.COMPARATORLOOSE]);
           });
         }
-        debug6("range list", rangeList);
+        debug9("range list", rangeList);
         const rangeMap = /* @__PURE__ */ new Map();
         const comparators = rangeList.map((comp) => new Comparator(comp, this.options));
         for (const comp of comparators) {
@@ -34424,7 +34424,7 @@ var require_range = __commonJS({
     var cache = new LRU({ max: 1e3 });
     var parseOptions = require_parse_options();
     var Comparator = require_comparator();
-    var debug6 = require_debug();
+    var debug9 = require_debug();
     var SemVer = require_semver();
     var {
       safeRe: re,
@@ -34449,15 +34449,15 @@ var require_range = __commonJS({
       return result;
     };
     var parseComparator = (comp, options) => {
-      debug6("comp", comp, options);
+      debug9("comp", comp, options);
       comp = replaceCarets(comp, options);
-      debug6("caret", comp);
+      debug9("caret", comp);
       comp = replaceTildes(comp, options);
-      debug6("tildes", comp);
+      debug9("tildes", comp);
       comp = replaceXRanges(comp, options);
-      debug6("xrange", comp);
+      debug9("xrange", comp);
       comp = replaceStars(comp, options);
-      debug6("stars", comp);
+      debug9("stars", comp);
       return comp;
     };
     var isX = (id) => !id || id.toLowerCase() === "x" || id === "*";
@@ -34467,7 +34467,7 @@ var require_range = __commonJS({
     var replaceTilde = (comp, options) => {
       const r = options.loose ? re[t.TILDELOOSE] : re[t.TILDE];
       return comp.replace(r, (_, M, m, p, pr) => {
-        debug6("tilde", comp, _, M, m, p, pr);
+        debug9("tilde", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
@@ -34476,12 +34476,12 @@ var require_range = __commonJS({
         } else if (isX(p)) {
           ret = `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`;
         } else if (pr) {
-          debug6("replaceTilde pr", pr);
+          debug9("replaceTilde pr", pr);
           ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
         } else {
           ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
         }
-        debug6("tilde return", ret);
+        debug9("tilde return", ret);
         return ret;
       });
     };
@@ -34489,11 +34489,11 @@ var require_range = __commonJS({
       return comp.trim().split(/\s+/).map((c) => replaceCaret(c, options)).join(" ");
     };
     var replaceCaret = (comp, options) => {
-      debug6("caret", comp, options);
+      debug9("caret", comp, options);
       const r = options.loose ? re[t.CARETLOOSE] : re[t.CARET];
       const z = options.includePrerelease ? "-0" : "";
       return comp.replace(r, (_, M, m, p, pr) => {
-        debug6("caret", comp, _, M, m, p, pr);
+        debug9("caret", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
@@ -34506,7 +34506,7 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
           }
         } else if (pr) {
-          debug6("replaceCaret pr", pr);
+          debug9("replaceCaret pr", pr);
           if (M === "0") {
             if (m === "0") {
               ret = `>=${M}.${m}.${p}-${pr} <${M}.${m}.${+p + 1}-0`;
@@ -34517,7 +34517,7 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.${p}-${pr} <${+M + 1}.0.0-0`;
           }
         } else {
-          debug6("no pr");
+          debug9("no pr");
           if (M === "0") {
             if (m === "0") {
               ret = `>=${M}.${m}.${p}${z} <${M}.${m}.${+p + 1}-0`;
@@ -34528,19 +34528,19 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
           }
         }
-        debug6("caret return", ret);
+        debug9("caret return", ret);
         return ret;
       });
     };
     var replaceXRanges = (comp, options) => {
-      debug6("replaceXRanges", comp, options);
+      debug9("replaceXRanges", comp, options);
       return comp.split(/\s+/).map((c) => replaceXRange(c, options)).join(" ");
     };
     var replaceXRange = (comp, options) => {
       comp = comp.trim();
       const r = options.loose ? re[t.XRANGELOOSE] : re[t.XRANGE];
       return comp.replace(r, (ret, gtlt, M, m, p, pr) => {
-        debug6("xRange", comp, ret, gtlt, M, m, p, pr);
+        debug9("xRange", comp, ret, gtlt, M, m, p, pr);
         const xM = isX(M);
         const xm = xM || isX(m);
         const xp = xm || isX(p);
@@ -34587,16 +34587,16 @@ var require_range = __commonJS({
         } else if (xp) {
           ret = `>=${M}.${m}.0${pr} <${M}.${+m + 1}.0-0`;
         }
-        debug6("xRange return", ret);
+        debug9("xRange return", ret);
         return ret;
       });
     };
     var replaceStars = (comp, options) => {
-      debug6("replaceStars", comp, options);
+      debug9("replaceStars", comp, options);
       return comp.trim().replace(re[t.STAR], "");
     };
     var replaceGTE0 = (comp, options) => {
-      debug6("replaceGTE0", comp, options);
+      debug9("replaceGTE0", comp, options);
       return comp.trim().replace(re[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
     };
     var hyphenReplace = (incPr) => ($0, from2, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) => {
@@ -34634,7 +34634,7 @@ var require_range = __commonJS({
       }
       if (version3.prerelease.length && !options.includePrerelease) {
         for (let i = 0; i < set.length; i++) {
-          debug6(set[i].semver);
+          debug9(set[i].semver);
           if (set[i].semver === Comparator.ANY) {
             continue;
           }
@@ -34670,7 +34670,7 @@ var require_comparator = __commonJS({
           }
         }
         comp = comp.trim().split(/\s+/).join(" ");
-        debug6("comparator", comp, options);
+        debug9("comparator", comp, options);
         this.options = options;
         this.loose = !!options.loose;
         this.parse(comp);
@@ -34679,7 +34679,7 @@ var require_comparator = __commonJS({
         } else {
           this.value = this.operator + this.semver.version;
         }
-        debug6("comp", this);
+        debug9("comp", this);
       }
       parse(comp) {
         const r = this.options.loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR];
@@ -34701,7 +34701,7 @@ var require_comparator = __commonJS({
         return this.value;
       }
       test(version3) {
-        debug6("Comparator.test", version3, this.options.loose);
+        debug9("Comparator.test", version3, this.options.loose);
         if (this.semver === ANY || version3 === ANY) {
           return true;
         }
@@ -34758,7 +34758,7 @@ var require_comparator = __commonJS({
     var parseOptions = require_parse_options();
     var { safeRe: re, t } = require_re();
     var cmp = require_cmp();
-    var debug6 = require_debug();
+    var debug9 = require_debug();
     var SemVer = require_semver();
     var Range = require_range();
   }
@@ -45156,11 +45156,11 @@ var require_common2 = __commonJS({
         let enableOverride = null;
         let namespacesCache;
         let enabledCache;
-        function debug6(...args) {
-          if (!debug6.enabled) {
+        function debug9(...args) {
+          if (!debug9.enabled) {
             return;
           }
-          const self2 = debug6;
+          const self2 = debug9;
           const curr = Number(/* @__PURE__ */ new Date());
           const ms = curr - (prevTime || curr);
           self2.diff = ms;
@@ -45190,12 +45190,12 @@ var require_common2 = __commonJS({
           const logFn = self2.log || createDebug.log;
           logFn.apply(self2, args);
         }
-        debug6.namespace = namespace;
-        debug6.useColors = createDebug.useColors();
-        debug6.color = createDebug.selectColor(namespace);
-        debug6.extend = extend;
-        debug6.destroy = createDebug.destroy;
-        Object.defineProperty(debug6, "enabled", {
+        debug9.namespace = namespace;
+        debug9.useColors = createDebug.useColors();
+        debug9.color = createDebug.selectColor(namespace);
+        debug9.extend = extend;
+        debug9.destroy = createDebug.destroy;
+        Object.defineProperty(debug9, "enabled", {
           enumerable: true,
           configurable: false,
           get: () => {
@@ -45213,9 +45213,9 @@ var require_common2 = __commonJS({
           }
         });
         if (typeof createDebug.init === "function") {
-          createDebug.init(debug6);
+          createDebug.init(debug9);
         }
-        return debug6;
+        return debug9;
       }
       function extend(namespace, delimiter) {
         const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
@@ -45737,11 +45737,11 @@ var require_node = __commonJS({
     function load() {
       return process.env.DEBUG;
     }
-    function init2(debug6) {
-      debug6.inspectOpts = {};
+    function init2(debug9) {
+      debug9.inspectOpts = {};
       const keys = Object.keys(exports2.inspectOpts);
       for (let i = 0; i < keys.length; i++) {
-        debug6.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
+        debug9.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
       }
     }
     module2.exports = require_common2()(exports2);
@@ -50063,14 +50063,14 @@ async function _walk({
   // @ts-ignore
   map = async (_, entry) => entry,
   // The default reducer is a flatmap that filters out undefineds.
-  reduce = async (parent, children2) => {
-    const flatten = flat(children2);
+  reduce = async (parent, children3) => {
+    const flatten = flat(children3);
     if (parent !== void 0)
       flatten.unshift(parent);
     return flatten;
   },
   // The default iterate function walks all children concurrently
-  iterate = (walk3, children2) => Promise.all([...children2].map(walk3))
+  iterate = (walk3, children3) => Promise.all([...children3].map(walk3))
 }) {
   const walkers = trees.map(
     (proxy) => proxy[GitWalkSymbol]({ fs: fs2, dir, gitdir, cache })
@@ -50091,11 +50091,11 @@ async function _walk({
     };
   };
   const walk3 = async (root2) => {
-    const { entries, children: children2 } = await unionWalkerFromReaddir(root2);
+    const { entries, children: children3 } = await unionWalkerFromReaddir(root2);
     const fullpath = entries.find((entry) => entry && entry._fullpath)._fullpath;
     const parent = await map(fullpath, entries);
     if (parent !== null) {
-      let walkedChildren = await iterate(walk3, children2);
+      let walkedChildren = await iterate(walk3, children3);
       walkedChildren = walkedChildren.filter((x) => x !== void 0);
       return reduce(parent, walkedChildren);
     }
@@ -50611,9 +50611,9 @@ async function addToIndex({
     if (!stats)
       throw new NotFoundError(currentFilepath);
     if (stats.isDirectory()) {
-      const children2 = await fs2.readdir(join(dir, currentFilepath));
+      const children3 = await fs2.readdir(join(dir, currentFilepath));
       if (parallel) {
-        const promises2 = children2.map(
+        const promises2 = children3.map(
           (child) => addToIndex({
             dir,
             gitdir,
@@ -50626,7 +50626,7 @@ async function addToIndex({
         );
         await Promise.all(promises2);
       } else {
-        for (const child of children2) {
+        for (const child of children3) {
           await addToIndex({
             dir,
             gitdir,
@@ -50737,14 +50737,14 @@ async function _commit({
   );
 }
 async function constructTree({ fs: fs2, gitdir, inode, dryRun }) {
-  const children2 = inode.children;
-  for (const inode2 of children2) {
+  const children3 = inode.children;
+  for (const inode2 of children3) {
     if (inode2.type === "tree") {
       inode2.metadata.mode = "040000";
       inode2.metadata.oid = await constructTree({ fs: fs2, gitdir, inode: inode2, dryRun });
     }
   }
-  const entries = children2.map((inode2) => ({
+  const entries = children3.map((inode2) => ({
     mode: inode2.metadata.mode,
     path: inode2.basename,
     oid: inode2.metadata.oid,
@@ -51630,16 +51630,16 @@ async function analyze({
       }
     },
     // Modify the default flat mapping
-    reduce: async function(parent, children2) {
-      children2 = flat(children2);
+    reduce: async function(parent, children3) {
+      children3 = flat(children3);
       if (!parent) {
-        return children2;
+        return children3;
       } else if (parent && parent[0] === "rmdir") {
-        children2.push(parent);
-        return children2;
+        children3.push(parent);
+        return children3;
       } else {
-        children2.unshift(parent);
-        return children2;
+        children3.unshift(parent);
+        return children3;
       }
     }
   });
@@ -53346,8 +53346,8 @@ async function mergeTree({
      * @param {TreeEntry} [parent]
      * @param {Array<TreeEntry>} children
      */
-    reduce: unmergedFiles.length !== 0 && (!dir || abortOnConflict) ? void 0 : async (parent, children2) => {
-      const entries = children2.filter(Boolean);
+    reduce: unmergedFiles.length !== 0 && (!dir || abortOnConflict) ? void 0 : async (parent, children3) => {
+      const entries = children3.filter(Boolean);
       if (!parent)
         return;
       if (parent && parent.type === "tree" && entries.length === 0)
@@ -57696,16 +57696,16 @@ async function analyze2({ fs: fs2, cache, onProgress, dir, gitdir, ref, force, f
       }
     },
     // Modify the default flat mapping
-    reduce: async function(parent, children2) {
-      children2 = flat(children2);
+    reduce: async function(parent, children3) {
+      children3 = flat(children3);
       if (!parent) {
-        return children2;
+        return children3;
       } else if (parent && parent[0] === "rmdir") {
-        children2.push(parent);
-        return children2;
+        children3.push(parent);
+        return children3;
       } else {
-        children2.unshift(parent);
-        return children2;
+        children3.unshift(parent);
+        return children3;
       }
     }
   });
@@ -58061,7 +58061,7 @@ async function getMeta(ctx) {
 
 // ../../../lix/packages/client/dist/github/forkStatus.js
 async function forkStatus(ctx, state) {
-  const { gitUrl, debug: debug6, dir, cache, owner, repoName, githubClient, gitProxyUrl } = ctx;
+  const { gitUrl, debug: debug9, dir, cache, owner, repoName, githubClient, gitProxyUrl } = ctx;
   if (!gitUrl) {
     throw new Error("Could not find repo url, only github supported for forkStatus at the moment");
   }
@@ -58095,7 +58095,7 @@ async function forkStatus(ctx, state) {
       cache,
       ref: useBranchName,
       remote: "upstream",
-      http: makeHttpClient({ debug: debug6, description: "forkStatus" }),
+      http: makeHttpClient({ debug: debug9, description: "forkStatus" }),
       fs: forkFs
     });
   } catch (err) {
@@ -58132,7 +58132,7 @@ async function forkStatus(ctx, state) {
     singleBranch: true,
     dir,
     ref: useBranchName,
-    http: makeHttpClient({ debug: debug6, description: "forkStatus" }),
+    http: makeHttpClient({ debug: debug9, description: "forkStatus" }),
     fs: forkFs
   });
   await isomorphic_git_default.fetch({
@@ -58141,7 +58141,7 @@ async function forkStatus(ctx, state) {
     singleBranch: true,
     ref: useBranchName,
     dir,
-    http: makeHttpClient({ debug: debug6, description: "forkStatus" }),
+    http: makeHttpClient({ debug: debug9, description: "forkStatus" }),
     corsProxy: gitProxyUrl,
     fs: forkFs
   });
@@ -58371,11 +58371,11 @@ function makeGithubClient({ gitHubProxyUrl } = {}) {
 async function repoContext(url, args) {
   const rawFs = args.nodeishFs || (await Promise.resolve().then(() => (init_dist(), dist_exports))).createNodeishMemoryFs();
   const author = args.author;
-  let debug6 = args.debug || false;
+  let debug9 = args.debug || false;
   if (!url || !url.startsWith("file://") && !url.startsWith("https://") && !url.startsWith("http://")) {
     throw new Error("repo url is required, use file:// for local repos");
   }
-  if (debug6 && typeof window !== "undefined") {
+  if (debug9 && typeof window !== "undefined") {
     window["rawFs"] = rawFs;
   }
   let freshClone = false;
@@ -58399,7 +58399,7 @@ async function repoContext(url, args) {
     }
   }
   const { protocol, lixHost, repoHost, owner, repoName, username, password, namespace } = parseLixUri(url);
-  if (debug6 && (username || password)) {
+  if (debug9 && (username || password)) {
     console.warn("username and password and providers other than github are not supported yet. Only local commands will work.");
   }
   const isWhitelistedRepo = allowedRepos_default.includes(`${owner}/${repoName}`.toLocaleLowerCase());
@@ -58412,7 +58412,7 @@ async function repoContext(url, args) {
     gitProxyUrl = lixHost ? `${protocol}//${lixHost}/git-proxy` : "";
     gitHubProxyUrl = lixHost ? `${protocol}//${lixHost}/github-proxy` : "";
   }
-  debug6 && console.info({
+  debug9 && console.info({
     gitProxyUrl,
     gitHubProxyUrl,
     protocol,
@@ -58425,7 +58425,7 @@ async function repoContext(url, args) {
   });
   const githubClient = makeGithubClient({ gitHubProxyUrl });
   const gitUrl = repoName ? `https://${repoHost}/${owner}/${repoName}` : "";
-  if (!gitUrl && debug6) {
+  if (!gitUrl && debug9) {
     console.warn("valid repo url / local repo not found, only fs features available outside of repo");
   }
   const expFeatures = Object.entries(experimentalFeatures).filter(([_, value]) => value).map(([key]) => key);
@@ -58445,7 +58445,7 @@ async function repoContext(url, args) {
     namespace,
     useLazyFS,
     githubClient,
-    debug: debug6,
+    debug: debug9,
     experimentalFeatures,
     author,
     freshClone,
@@ -58555,12 +58555,12 @@ async function optimizedRefsRes({ origUrl, resBody, statusCode, resHeaders }) {
 // ../../../lix/packages/client/dist/repoState.js
 var checkout3 = doCheckout;
 async function repoState(ctx, args) {
-  const { gitUrl, debug: debug6, rawFs, experimentalFeatures, gitProxyUrl, freshClone, useLazyFS, dir, cache } = ctx;
+  const { gitUrl, debug: debug9, rawFs, experimentalFeatures, gitProxyUrl, freshClone, useLazyFS, dir, cache } = ctx;
   const state = {
     pending: void 0,
     nodeishFs: withProxy({
       nodeishFs: rawFs,
-      verbose: debug6,
+      verbose: debug9,
       description: "app",
       intercept: useLazyFS ? delayedAction : void 0
     }),
@@ -58575,7 +58575,7 @@ async function repoState(ctx, args) {
     }
     const thisBatch = [...nextBatch];
     nextBatch = [];
-    if (debug6) {
+    if (debug9) {
       console.warn("checking out ", thisBatch);
     }
     for (const placeholder of thisBatch.filter((entry) => rawFs._isPlaceholder?.(entry))) {
@@ -58584,8 +58584,8 @@ async function repoState(ctx, args) {
     const res = await checkout3({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug6,
-        description: debug6 ? "checkout: " + JSON.stringify(thisBatch) : "checkout"
+        verbose: debug9,
+        description: debug9 ? "checkout: " + JSON.stringify(thisBatch) : "checkout"
       }),
       dir,
       cache,
@@ -58597,7 +58597,7 @@ async function repoState(ctx, args) {
     for (const entry of thisBatch) {
       state.checkedOut.add(entry);
     }
-    if (debug6) {
+    if (debug9) {
       console.warn("checked out ", thisBatch);
     }
     if (nextBatch.length) {
@@ -58611,9 +58611,9 @@ async function repoState(ctx, args) {
     }
     console.info("Using lix for cloning repo");
     await isomorphic_git_default.clone({
-      fs: withProxy({ nodeishFs: rawFs, verbose: debug6, description: "clone" }),
+      fs: withProxy({ nodeishFs: rawFs, verbose: debug9, description: "clone" }),
       http: makeHttpClient({
-        debug: debug6,
+        debug: debug9,
         description: "clone",
         onReq: ({ url, body }) => {
           return optimizedRefsReq({ url, body, addRef: state.branchName });
@@ -58648,7 +58648,7 @@ async function repoState(ctx, args) {
     const pathParts = filename?.split("/") || [];
     const rootObject = pathParts[0];
     if (experimentalFeatures.lazyClone && typeof rootObject !== "undefined" && rootObject !== ".git" && ["readFile", "readlink", "writeFile", "readdir"].includes(prop) && !state.checkedOut.has(rootObject) && !state.checkedOut.has(filename)) {
-      if (debug6) {
+      if (debug9) {
         console.warn("delayedAction", {
           prop,
           argumentsList,
@@ -58671,7 +58671,7 @@ async function repoState(ctx, args) {
     if (state.pending) {
       return state.pending.then(execute).finally(() => {
         state.pending = void 0;
-        if (debug6) {
+        if (debug9) {
           console.warn("executed", filename, prop);
         }
       });
@@ -58810,7 +58810,7 @@ var InternalProjectSettings = import_typebox4.Type.Object({
     }),
     import_typebox4.Type.String({
       pattern: "^(?!.*@\\d\\.)[^]*$",
-      description: "The module can only contain a major version number (ComVer, not SemVer). See https://inlang.com/documentation/comver"
+      description: "The module can only contain a major version number."
     })
   ]), {
     uniqueItems: true,
@@ -59749,13 +59749,19 @@ var import_compiler3 = __toESM(require_compiler2(), 1);
 var ProjectSettingsInvalidError = class extends Error {
   constructor(options) {
     super(`The project settings are invalid:
-
-${options.errors.filter((error) => error.path).map((error) => `"${error.path}":
-
-${error.message}`).join("\n")}`);
+${options.errors.filter((error) => error.path).map(FormatProjectSettingsError).join("\n")}`);
     this.name = "ProjectSettingsInvalidError";
   }
 };
+function FormatProjectSettingsError(error) {
+  let msg = `${error.message} at ${error.path}`;
+  if (error.path.startsWith("/modules/")) {
+    msg += `
+value = "${error.value}"
+- ${error.schema.allOf.map((o) => `${o.description ?? ""}`).join("\n- ")}`;
+  }
+  return msg;
+}
 var ProjectSettingsFileJSONSyntaxError = class extends Error {
   constructor(options) {
     super(`The settings file at "${options.path}" is not a valid JSON file:
@@ -59940,8 +59946,8 @@ function createContext(defaultValue, options) {
   };
 }
 function children(fn) {
-  const children2 = createMemo(fn);
-  const memo2 = createMemo(() => resolveChildren(children2()));
+  const children3 = createMemo(fn);
+  const memo2 = createMemo(() => resolveChildren(children3()));
   memo2.toArray = () => {
     const c = memo2();
     return Array.isArray(c) ? c : c != null ? [c] : [];
@@ -60378,18 +60384,18 @@ function handleError(err) {
 function lookup2(owner, key) {
   return owner ? owner.context && owner.context[key] !== void 0 ? owner.context[key] : lookup2(owner.owner, key) : void 0;
 }
-function resolveChildren(children2) {
-  if (typeof children2 === "function" && !children2.length)
-    return resolveChildren(children2());
-  if (Array.isArray(children2)) {
+function resolveChildren(children3) {
+  if (typeof children3 === "function" && !children3.length)
+    return resolveChildren(children3());
+  if (Array.isArray(children3)) {
     const results = [];
-    for (let i = 0; i < children2.length; i++) {
-      const result = resolveChildren(children2[i]);
+    for (let i = 0; i < children3.length; i++) {
+      const result = resolveChildren(children3[i]);
       Array.isArray(result) ? results.push.apply(results, result) : results.push(result);
     }
     return results;
   }
-  return children2;
+  return children3;
 }
 function createProvider(id, options) {
   return function provider(props) {
@@ -60534,345 +60540,250 @@ var ReactiveMap = class extends Map {
   }
 };
 
-// ../sdk/dist/createMessagesQuery.js
-function createMessagesQuery(messages) {
-  const index2 = new ReactiveMap();
-  const defaultAliasIndex = new ReactiveMap();
-  createEffect2(() => {
-    index2.clear();
-    for (const message of structuredClone(messages())) {
-      index2.set(message.id, message);
-      if ("default" in message.alias) {
-        defaultAliasIndex.set(message.alias.default, message);
-      }
-    }
-  });
-  const get = (args) => index2.get(args.where.id);
-  const getByDefaultAlias = (alias) => defaultAliasIndex.get(alias);
-  return {
-    create: ({ data }) => {
-      if (index2.has(data.id))
-        return false;
-      index2.set(data.id, data);
-      if ("default" in data.alias) {
-        defaultAliasIndex.set(data.alias.default, data);
-      }
-      return true;
-    },
-    get: Object.assign(get, {
-      subscribe: (args, callback) => createSubscribable(() => get(args)).subscribe(callback)
-    }),
-    getByDefaultAlias: Object.assign(getByDefaultAlias, {
-      subscribe: (alias, callback) => createSubscribable(() => getByDefaultAlias(alias)).subscribe(callback)
-    }),
-    includedMessageIds: createSubscribable(() => {
-      return [...index2.keys()];
-    }),
-    getAll: createSubscribable(() => {
-      return [...index2.values()];
-    }),
-    update: ({ where, data }) => {
-      const message = index2.get(where.id);
-      if (message === void 0)
-        return false;
-      index2.set(where.id, { ...message, ...data });
-      return true;
-    },
-    upsert: ({ where, data }) => {
-      const message = index2.get(where.id);
-      if (message === void 0) {
-        index2.set(where.id, data);
-        if ("default" in data.alias) {
-          defaultAliasIndex.set(data.alias.default, data);
+// ../sdk/dist/createNodeishFsWithWatcher.js
+var createNodeishFsWithWatcher = (args) => {
+  const pathList = [];
+  const makeWatcher = (path) => {
+    ;
+    (async () => {
+      try {
+        const watcher = args.nodeishFs.watch(path, {
+          signal: args.abortController.signal,
+          persistent: false
+        });
+        if (watcher) {
+          for await (const event of watcher) {
+            args.updateMessages();
+          }
         }
-      } else {
-        index2.set(where.id, { ...message, ...data });
+      } catch (err) {
+        if (err.name === "AbortError")
+          return;
+        else if (err.code === "ENOENT")
+          return;
+        throw err;
       }
-      return true;
-    },
-    delete: ({ where }) => {
-      const message = index2.get(where.id);
-      if (message === void 0)
-        return false;
-      if ("default" in message.alias) {
-        defaultAliasIndex.delete(message.alias.default);
-      }
-      index2.delete(where.id);
-      return true;
-    }
+    })();
   };
-}
-
-// ../sdk/dist/lint/message/errors.js
-var MessagedLintRuleThrowedError = class extends Error {
-  constructor(message, options) {
-    super(message, options);
-    this.name = "MessagedLintRuleThrowedError";
-  }
-};
-
-// ../sdk/dist/lint/message/lintSingleMessage.js
-var lintSingleMessage = async (args) => {
-  const reports = [];
-  const errors = [];
-  const promises = args.rules.map(async (rule) => {
-    const level = args.settings.messageLintRuleLevels?.[rule.id];
-    if (level === void 0) {
-      throw Error("No lint level provided for lint rule: " + rule.id);
+  const readFileAndExtractPath = (path, options) => {
+    if (!pathList.includes(path)) {
+      makeWatcher(path);
+      pathList.push(path);
     }
-    try {
-      await rule.run({
-        message: args.message,
-        settings: args.settings,
-        report: (reportArgs) => {
-          reports.push({
-            ruleId: rule.id,
-            level,
-            messageId: reportArgs.messageId,
-            languageTag: reportArgs.languageTag,
-            body: reportArgs.body
-          });
-        }
-      });
-    } catch (error) {
-      errors.push(new MessagedLintRuleThrowedError(`Lint rule '${rule.id}' throwed while linting message "${args.message.id}".`, { cause: error }));
-    }
-  });
-  await Promise.all(promises);
-  return { data: reports, errors };
-};
-
-// ../../../node_modules/.pnpm/throttle-debounce@5.0.0/node_modules/throttle-debounce/esm/index.js
-function throttle(delay, callback, options) {
-  var _ref = options || {}, _ref$noTrailing = _ref.noTrailing, noTrailing = _ref$noTrailing === void 0 ? false : _ref$noTrailing, _ref$noLeading = _ref.noLeading, noLeading = _ref$noLeading === void 0 ? false : _ref$noLeading, _ref$debounceMode = _ref.debounceMode, debounceMode = _ref$debounceMode === void 0 ? void 0 : _ref$debounceMode;
-  var timeoutID;
-  var cancelled = false;
-  var lastExec = 0;
-  function clearExistingTimeout() {
-    if (timeoutID) {
-      clearTimeout(timeoutID);
-    }
-  }
-  function cancel(options2) {
-    var _ref2 = options2 || {}, _ref2$upcomingOnly = _ref2.upcomingOnly, upcomingOnly = _ref2$upcomingOnly === void 0 ? false : _ref2$upcomingOnly;
-    clearExistingTimeout();
-    cancelled = !upcomingOnly;
-  }
-  function wrapper() {
-    for (var _len = arguments.length, arguments_ = new Array(_len), _key = 0; _key < _len; _key++) {
-      arguments_[_key] = arguments[_key];
-    }
-    var self2 = this;
-    var elapsed = Date.now() - lastExec;
-    if (cancelled) {
-      return;
-    }
-    function exec2() {
-      lastExec = Date.now();
-      callback.apply(self2, arguments_);
-    }
-    function clear() {
-      timeoutID = void 0;
-    }
-    if (!noLeading && debounceMode && !timeoutID) {
-      exec2();
-    }
-    clearExistingTimeout();
-    if (debounceMode === void 0 && elapsed > delay) {
-      if (noLeading) {
-        lastExec = Date.now();
-        if (!noTrailing) {
-          timeoutID = setTimeout(debounceMode ? clear : exec2, delay);
-        }
-      } else {
-        exec2();
-      }
-    } else if (noTrailing !== true) {
-      timeoutID = setTimeout(debounceMode ? clear : exec2, debounceMode === void 0 ? delay - elapsed : delay);
-    }
-  }
-  wrapper.cancel = cancel;
-  return wrapper;
-}
-
-// ../sdk/dist/createMessageLintReportsQuery.js
-var import_debug3 = __toESM(require_src(), 1);
-var debug3 = (0, import_debug3.default)("sdk:lintReports");
-function sleep2(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-function createMessageLintReportsQuery(messagesQuery, settings, installedMessageLintRules, resolvedModules) {
-  const index2 = /* @__PURE__ */ new Map();
-  const modules = resolvedModules();
-  const rulesArray = modules?.messageLintRules;
-  const messageLintRuleLevels = Object.fromEntries(installedMessageLintRules().map((rule) => [rule.id, rule.level]));
-  const settingsObject = () => {
-    return {
-      ...settings(),
-      messageLintRuleLevels
-    };
-  };
-  const messages = messagesQuery.getAll();
-  const trackedMessages = /* @__PURE__ */ new Map();
-  debug3(`createMessageLintReportsQuery ${rulesArray?.length} rules, ${messages.length} messages`);
-  let lintMessageCount = 0;
-  const throttledLogLintMessage = throttle(2e3, (messageId) => {
-    debug3(`lintSingleMessage: ${lintMessageCount} id: ${messageId}`);
-  });
-  createEffect2(() => {
-    const currentMessageIds = new Set(messagesQuery.includedMessageIds());
-    const deletedTrackedMessages = [...trackedMessages].filter((tracked) => !currentMessageIds.has(tracked[0]));
-    if (rulesArray) {
-      for (const messageId of currentMessageIds) {
-        if (!trackedMessages.has(messageId)) {
-          createRoot2((dispose) => {
-            createEffect2(() => {
-              const message = messagesQuery.get({ where: { id: messageId } });
-              if (!message) {
-                return;
-              }
-              if (!trackedMessages?.has(messageId)) {
-                trackedMessages?.set(messageId, dispose);
-              }
-              lintSingleMessage({
-                rules: rulesArray,
-                settings: settingsObject(),
-                messages,
-                message
-              }).then((report) => {
-                lintMessageCount++;
-                throttledLogLintMessage(messageId);
-                if (report.errors.length === 0 && index2.get(messageId) !== report.data) {
-                  index2.set(messageId, report.data);
-                }
-              });
-            });
-          });
-        }
-      }
-      for (const deletedMessage of deletedTrackedMessages) {
-        const deletedMessageId = deletedMessage[0];
-        const messageEffectDisposeFunction = trackedMessages.get(deletedMessageId);
-        if (messageEffectDisposeFunction) {
-          messageEffectDisposeFunction();
-          trackedMessages.delete(deletedMessageId);
-          index2.delete(deletedMessageId);
-          debug3(`delete lint message id: ${deletedMessageId}`);
-        }
-      }
-    }
-  });
-  return {
-    getAll: async () => {
-      await sleep2(0);
-      return structuredClone([...index2.values()].flat().length === 0 ? [] : [...index2.values()].flat());
-    },
-    get: async (args) => {
-      await sleep2(0);
-      return structuredClone(index2.get(args.where.messageId) ?? []);
-    }
-  };
-}
-
-// ../versioned-interfaces/project-settings/dist/migration/1-to-2.js
-var migrate1to2 = (config) => {
-  const migrated = {
-    $schema: "https://inlang.com/schema/project-settings",
-    sourceLanguageTag: config.sourceLanguageTag,
-    languageTags: config.languageTags,
-    modules: config.modules
-  };
-  if (config.settings["project.messageLintRuleLevels"]) {
-    migrated.messageLintRuleLevels = config.settings["project.messageLintRuleLevels"];
-  }
-  for (const key in config.settings) {
-    if (key === "project.messageLintRuleLevels")
-      continue;
-    migrated[key] = config.settings[key];
-  }
-  return migrated;
-};
-
-// ../versioned-interfaces/project-settings/dist/migration/index.js
-function migrateIfOutdated(schema2) {
-  if (schema2.settings) {
-    return migrate1to2(schema2);
-  }
-  return schema2;
-}
-
-// ../sdk/dist/createNodeishFsWithAbsolutePaths.js
-init_dist();
-var createNodeishFsWithAbsolutePaths = (args) => {
-  if (!isAbsolutePath(args.projectPath)) {
-    throw new Error(`Expected an absolute path but received "${args.projectPath}".`);
-  }
-  const basePath = normalizePath2(args.projectPath).split("/").slice(0, -1).join("/");
-  const makeAbsolute = (path) => {
-    if (isAbsolutePath(path)) {
-      return normalizePath2(path);
-    }
-    return normalizePath2(basePath + "/" + path);
+    return args.nodeishFs.readFile(path, options);
   };
   return {
     // @ts-expect-error
-    readFile: (path, options) => args.nodeishFs.readFile(makeAbsolute(path), options),
-    readdir: (path) => args.nodeishFs.readdir(makeAbsolute(path)),
-    mkdir: (path, options) => args.nodeishFs.mkdir(makeAbsolute(path), options),
-    writeFile: (path, data) => args.nodeishFs.writeFile(makeAbsolute(path), data),
-    stat: (path) => args.nodeishFs.stat(makeAbsolute(path)),
-    rm: (path) => args.nodeishFs.rm(makeAbsolute(path)),
-    rmdir: (path) => args.nodeishFs.rmdir(makeAbsolute(path)),
-    watch: (path, options) => args.nodeishFs.watch(makeAbsolute(path), options),
-    // This might be surprising when symlinks were intended to be relative
-    symlink: (target, path) => args.nodeishFs.symlink(makeAbsolute(target), makeAbsolute(path)),
-    unlink: (path) => args.nodeishFs.unlink(makeAbsolute(path)),
-    readlink: (path) => args.nodeishFs.readlink(makeAbsolute(path)),
-    lstat: (path) => args.nodeishFs.lstat(makeAbsolute(path))
+    readFile: (path, options) => readFileAndExtractPath(path, options),
+    rm: args.nodeishFs.rm,
+    readdir: args.nodeishFs.readdir,
+    mkdir: args.nodeishFs.mkdir,
+    rmdir: args.nodeishFs.rmdir,
+    writeFile: args.nodeishFs.writeFile,
+    watch: args.nodeishFs.watch,
+    stat: args.nodeishFs.stat
   };
 };
 
-// ../sdk/dist/loadProject.js
+// ../../../node_modules/.pnpm/solid-js@1.6.12/node_modules/solid-js/dist/server.js
+var $PROXY2 = Symbol("solid-proxy");
+var $TRACK2 = Symbol("solid-track");
+var $DEVCOMP2 = Symbol("solid-dev-component");
+var ERROR2 = Symbol("error");
+var BRANCH = Symbol("branch");
+function castError2(err) {
+  if (err instanceof Error || typeof err === "string")
+    return err;
+  return new Error("Unknown error");
+}
+function handleError2(err) {
+  err = castError2(err);
+  const fns = lookup3(Owner2, ERROR2);
+  if (!fns)
+    throw err;
+  for (const f of fns)
+    f(err);
+}
+var Owner2 = null;
+function createMemo2(fn, value) {
+  Owner2 = {
+    owner: Owner2,
+    context: null
+  };
+  let v;
+  try {
+    v = fn(value);
+  } catch (err) {
+    handleError2(err);
+  } finally {
+    Owner2 = Owner2.owner;
+  }
+  return () => v;
+}
+function onCleanup3(fn) {
+  let node;
+  if (Owner2 && (node = lookup3(Owner2, BRANCH))) {
+    if (!node.cleanups)
+      node.cleanups = [fn];
+    else
+      node.cleanups.push(fn);
+  }
+  return fn;
+}
+function createContext2(defaultValue) {
+  const id = Symbol("context");
+  return {
+    id,
+    Provider: createProvider2(id),
+    defaultValue
+  };
+}
+function children2(fn) {
+  const memo2 = createMemo2(() => resolveChildren2(fn()));
+  memo2.toArray = () => {
+    const c = memo2();
+    return Array.isArray(c) ? c : c != null ? [c] : [];
+  };
+  return memo2;
+}
+function lookup3(owner, key) {
+  return owner ? owner.context && owner.context[key] !== void 0 ? owner.context[key] : lookup3(owner.owner, key) : void 0;
+}
+function resolveChildren2(children3) {
+  if (typeof children3 === "function" && !children3.length)
+    return resolveChildren2(children3());
+  if (Array.isArray(children3)) {
+    const results = [];
+    for (let i = 0; i < children3.length; i++) {
+      const result = resolveChildren2(children3[i]);
+      Array.isArray(result) ? results.push.apply(results, result) : results.push(result);
+    }
+    return results;
+  }
+  return children3;
+}
+function createProvider2(id) {
+  return function provider(props) {
+    return createMemo2(() => {
+      Owner2.context = {
+        [id]: props.value
+      };
+      return children2(() => props.children);
+    });
+  };
+}
+var SuspenseContext2 = createContext2();
+
+// ../sdk/dist/persistence/filelock/acquireFileLock.js
 init_dist();
-
-// ../sdk/dist/migrations/migrateToDirectory.js
-var maybeMigrateToDirectory = async (args) => {
-  if (args.projectPath.endsWith("project.inlang") === false) {
-    return;
+var import_debug3 = __toESM(require_src(), 1);
+var debug3 = (0, import_debug3.default)("sdk:acquireFileLock");
+var maxRetries = 10;
+var nProbes = 50;
+var probeInterval = 100;
+async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
+  if (tryCount > maxRetries) {
+    throw new Error(lockOrigin + " exceeded maximum Retries (5) to acquire lockfile " + tryCount);
   }
-  const projectDirectory = await tryCatch(() => args.nodeishFs.stat(args.projectPath));
-  if (projectDirectory.data) {
-    return;
+  try {
+    debug3(lockOrigin + " tries to acquire a lockfile Retry Nr.: " + tryCount);
+    await fs2.mkdir(lockDirPath);
+    const stats = await fs2.stat(lockDirPath);
+    debug3(lockOrigin + " acquired a lockfile Retry Nr.: " + tryCount);
+    return stats.mtimeMs;
+  } catch (error) {
+    if (error.code !== "EEXIST") {
+      throw error;
+    }
   }
-  const settingsFile = await tryCatch(() => args.nodeishFs.readFile(args.projectPath + ".json", { encoding: "utf-8" }));
-  if (settingsFile.error) {
-    return;
+  let currentLockTime;
+  try {
+    const stats = await fs2.stat(lockDirPath);
+    currentLockTime = stats.mtimeMs;
+  } catch (fstatError) {
+    if (fstatError.code === "ENOENT") {
+      debug3(lockOrigin + " tryCount++ lock file seems to be gone :) - lets try again " + tryCount);
+      return acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
+    }
+    throw fstatError;
   }
-  await args.nodeishFs.mkdir(args.projectPath);
-  await args.nodeishFs.writeFile(`${args.projectPath}/settings.json`, settingsFile.data);
-  await args.nodeishFs.writeFile(args.projectPath + ".README.md", readme);
-};
-var readme = `
-# DELETE THE \`project.inlang.json\` FILE
+  debug3(lockOrigin + " tries to acquire a lockfile  - lock currently in use... starting probe phase " + tryCount);
+  return new Promise((resolve, reject) => {
+    let probeCounts = 0;
+    const scheduleProbationTimeout = () => {
+      setTimeout(async () => {
+        probeCounts += 1;
+        let lockFileStats = void 0;
+        try {
+          debug3(lockOrigin + " tries to acquire a lockfile - check if the lock is free now " + tryCount);
+          lockFileStats = await fs2.stat(lockDirPath);
+        } catch (fstatError) {
+          if (fstatError.code === "ENOENT") {
+            debug3(lockOrigin + " tryCount++ in Promise - tries to acquire a lockfile - lock file seems to be free now - try to acquire " + tryCount);
+            const lock2 = acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
+            return resolve(lock2);
+          }
+          return reject(fstatError);
+        }
+        if (lockFileStats.mtimeMs === currentLockTime) {
+          if (probeCounts >= nProbes) {
+            debug3(lockOrigin + " tries to acquire a lockfile  - lock not free - but stale lets drop it" + tryCount);
+            try {
+              await fs2.rmdir(lockDirPath);
+            } catch (rmLockError) {
+              if (rmLockError.code === "ENOENT") {
+              }
+              return reject(rmLockError);
+            }
+            try {
+              debug3(lockOrigin + " tryCount++ same locker - try to acquire again after removing stale lock " + tryCount);
+              const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
+              return resolve(lock2);
+            } catch (lockAquireException) {
+              return reject(lockAquireException);
+            }
+          } else {
+            return scheduleProbationTimeout();
+          }
+        } else {
+          try {
+            debug3(lockOrigin + " tryCount++ different locker - try to acquire again " + tryCount);
+            const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
+            return resolve(lock2);
+          } catch (error) {
+            return reject(error);
+          }
+        }
+      }, probeInterval);
+    };
+    scheduleProbationTimeout();
+  });
+}
 
-The \`project.inlang.json\` file is now contained in a project directory e.g. \`project.inlang/settings.json\`.
+// ../sdk/dist/createMessagesQuery.js
+var import_debug5 = __toESM(require_src(), 1);
 
-
-## What you need to do
-
-1. Update the inlang CLI (if you use it) to use the new path \`project.inlang\` instead of \`project.inlang.json\`.
-2. Delete the \`project.inlang.json\` file.
-
-
-## Why is this happening?
-
-See this RFC https://docs.google.com/document/d/1OYyA1wYfQRbIJOIBDliYoWjiUlkFBNxH_U2R4WpVRZ4/edit#heading=h.pecv6xb7ial6 
-and the following GitHub issue for more information https://github.com/opral/monorepo/issues/1678.
-
-- Monorepo support https://github.com/opral/monorepo/discussions/258. 
-- Required for many other future features like caching, first class offline support, and more. 
-- Stablize the inlang project format.
-`;
+// ../sdk/dist/persistence/filelock/releaseLock.js
+init_dist();
+var import_debug4 = __toESM(require_src(), 1);
+var debug4 = (0, import_debug4.default)("sdk:releaseLock");
+async function releaseLock(fs2, lockDirPath, lockOrigin, lockTime) {
+  debug4(lockOrigin + " releasing the lock ");
+  try {
+    const stats = await fs2.stat(lockDirPath);
+    if (stats.mtimeMs === lockTime) {
+      await fs2.rmdir(lockDirPath);
+    }
+  } catch (statError) {
+    debug4(lockOrigin + " couldn't release the lock");
+    if (statError.code === "ENOENT") {
+      debug4(lockOrigin + " WARNING - the lock was released by a different process");
+      return;
+    }
+    debug4(statError);
+    throw statError;
+  }
+}
 
 // ../sdk/dist/storage/human-id/human-readable-id.js
 var import_murmurhash3js = __toESM(require_murmurhash3js(), 1);
@@ -61923,50 +61834,603 @@ function humanIdHash(value, offset = 0) {
   return `${adjectives[part1]}_${animals[part2]}_${verbs[part3]}_${adverbs[part4]}`;
 }
 
-// ../sdk/dist/createNodeishFsWithWatcher.js
-var createNodeishFsWithWatcher = (args) => {
-  const pathList = [];
-  const makeWatcher = (path) => {
-    const abortController = new AbortController();
-    (async () => {
-      try {
-        const watcher = args.nodeishFs.watch(path, {
-          signal: abortController.signal,
-          persistent: false
-        });
-        if (watcher) {
-          for await (const event of watcher) {
-            args.updateMessages();
-          }
-        }
-      } catch (err) {
-        if (err.name === "AbortError")
-          return;
-        else if (err.code === "ENOENT")
-          return;
-        throw err;
-      }
-    })();
+// ../sdk/dist/createMessagesQuery.js
+var debug5 = (0, import_debug5.default)("sdk:createMessagesQuery");
+function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules, onInitialMessageLoadResult, onLoadMessageResult, onSaveMessageResult }) {
+  const index2 = new ReactiveMap();
+  const messageLockDirPath = projectPath + "/messagelock";
+  const defaultAliasIndex = new ReactiveMap();
+  const messageStates = {
+    messageDirtyFlags: {},
+    messageLoadHash: {},
+    isSaving: false,
+    currentSaveMessagesViaPlugin: void 0,
+    sheduledSaveMessages: void 0,
+    isLoading: false,
+    sheduledLoadMessagesViaPlugin: void 0
   };
-  const readFileAndExtractPath = (path, options) => {
-    if (!pathList.includes(path)) {
-      makeWatcher(path);
-      pathList.push(path);
+  createEffect2(() => {
+    index2.clear();
+    defaultAliasIndex.clear();
+    const _settings = settings();
+    if (!_settings)
+      return;
+    const resolvedPluginApi = resolvedModules()?.resolvedPluginApi;
+    if (!resolvedPluginApi)
+      return;
+    const abortController = new AbortController();
+    onCleanup3(() => {
+      abortController.abort();
+    });
+    const fsWithWatcher = createNodeishFsWithWatcher({
+      nodeishFs,
+      // this message is called whenever a file changes that was read earlier by this filesystem
+      // - the plugin loads messages -> reads the file messages.json -> start watching on messages.json -> updateMessages
+      updateMessages: () => {
+        loadMessagesViaPlugin(
+          fsWithWatcher,
+          messageLockDirPath,
+          messageStates,
+          index2,
+          _settings,
+          // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
+          resolvedPluginApi
+        ).catch((e) => {
+          onLoadMessageResult(e);
+        }).then(() => {
+          onLoadMessageResult();
+        });
+      },
+      abortController
+    });
+    if (!resolvedPluginApi.loadMessages) {
+      onInitialMessageLoadResult(new Error("no loadMessages in resolved Modules found"));
+      return;
     }
-    return args.nodeishFs.readFile(path, options);
+    loadMessagesViaPlugin(
+      fsWithWatcher,
+      messageLockDirPath,
+      messageStates,
+      index2,
+      _settings,
+      // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
+      resolvedPluginApi
+    ).catch((e) => {
+      onInitialMessageLoadResult(new PluginLoadMessagesError({ cause: e }));
+    }).then(() => {
+      onInitialMessageLoadResult();
+    });
+  });
+  const get = (args) => index2.get(args.where.id);
+  const getByDefaultAlias = (alias) => defaultAliasIndex.get(alias);
+  const scheduleSave = function() {
+    const _settings = settings();
+    if (!_settings)
+      return;
+    const resolvedPluginApi = resolvedModules()?.resolvedPluginApi;
+    if (!resolvedPluginApi)
+      return;
+    saveMessagesViaPlugin(
+      nodeishFs,
+      messageLockDirPath,
+      messageStates,
+      index2,
+      _settings,
+      // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
+      resolvedPluginApi
+    ).catch((e) => {
+      debug5.log("error during saveMessagesViaPlugin");
+      debug5.log(e);
+    }).catch((e) => {
+      onSaveMessageResult(e);
+    }).then(() => {
+      onSaveMessageResult();
+    });
+  };
+  return {
+    create: ({ data }) => {
+      if (index2.has(data.id))
+        return false;
+      index2.set(data.id, data);
+      if ("default" in data.alias) {
+        defaultAliasIndex.set(data.alias.default, data);
+      }
+      messageStates.messageDirtyFlags[data.id] = true;
+      scheduleSave();
+      return true;
+    },
+    get: Object.assign(get, {
+      subscribe: (args, callback) => createSubscribable(() => get(args)).subscribe(callback)
+    }),
+    getByDefaultAlias: Object.assign(getByDefaultAlias, {
+      subscribe: (alias, callback) => createSubscribable(() => getByDefaultAlias(alias)).subscribe(callback)
+    }),
+    includedMessageIds: createSubscribable(() => {
+      return [...index2.keys()];
+    }),
+    getAll: createSubscribable(() => {
+      return [...index2.values()];
+    }),
+    update: ({ where, data }) => {
+      const message = index2.get(where.id);
+      if (message === void 0)
+        return false;
+      index2.set(where.id, { ...message, ...data });
+      messageStates.messageDirtyFlags[where.id] = true;
+      scheduleSave();
+      return true;
+    },
+    upsert: ({ where, data }) => {
+      const message = index2.get(where.id);
+      if (message === void 0) {
+        index2.set(where.id, data);
+        if ("default" in data.alias) {
+          defaultAliasIndex.set(data.alias.default, data);
+        }
+      } else {
+        index2.set(where.id, { ...message, ...data });
+      }
+      messageStates.messageDirtyFlags[where.id] = true;
+      scheduleSave();
+      return true;
+    },
+    delete: ({ where }) => {
+      const message = index2.get(where.id);
+      if (message === void 0)
+        return false;
+      if ("default" in message.alias) {
+        defaultAliasIndex.delete(message.alias.default);
+      }
+      index2.delete(where.id);
+      messageStates.messageDirtyFlags[where.id] = true;
+      scheduleSave();
+      return true;
+    }
+  };
+}
+async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi) {
+  const experimentalAliases = !!settingsValue.experimental?.aliases;
+  if (messageState.isLoading) {
+    if (!messageState.sheduledLoadMessagesViaPlugin) {
+      messageState.sheduledLoadMessagesViaPlugin = createAwaitable();
+    }
+    return messageState.sheduledLoadMessagesViaPlugin.promise;
+  }
+  messageState.isLoading = true;
+  let lockTime = void 0;
+  try {
+    lockTime = await acquireFileLock(fs2, lockDirPath, "loadMessage");
+    const loadedMessages = await makeTrulyAsync(resolvedPluginApi.loadMessages({
+      settings: settingsValue,
+      nodeishFs: fs2
+    }));
+    for (const loadedMessage of loadedMessages) {
+      const loadedMessageClone = structuredClone(loadedMessage);
+      const currentMessages = [...messages.values()].filter((message) => (experimentalAliases ? message.alias["default"] : message.id) === loadedMessage.id);
+      if (currentMessages.length > 1) {
+        throw new Error("more than one message with the same id or alias found ");
+      } else if (currentMessages.length === 1) {
+        loadedMessageClone.alias = {};
+        if (experimentalAliases) {
+          loadedMessageClone.alias["default"] = loadedMessageClone.id;
+          loadedMessageClone.id = currentMessages[0].id;
+        }
+        const importedEnecoded = stringifyMessage(loadedMessageClone);
+        if (messageState.messageLoadHash[loadedMessageClone.id] === importedEnecoded) {
+          continue;
+        }
+        messages.set(loadedMessageClone.id, loadedMessageClone);
+        messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
+      } else {
+        loadedMessageClone.alias = {};
+        if (experimentalAliases) {
+          loadedMessageClone.alias["default"] = loadedMessageClone.id;
+          let currentOffset = 0;
+          let messsageId;
+          do {
+            messsageId = humanIdHash(loadedMessageClone.id, currentOffset);
+            if (messages.get(messsageId)) {
+              currentOffset += 1;
+              messsageId = void 0;
+            }
+          } while (messsageId === void 0);
+          loadedMessageClone.id = messsageId;
+        }
+        const importedEnecoded = stringifyMessage(loadedMessageClone);
+        messages.set(loadedMessageClone.id, loadedMessageClone);
+        messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
+      }
+    }
+    await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
+    lockTime = void 0;
+    debug5("loadMessagesViaPlugin: " + loadedMessages.length + " Messages processed ");
+    messageState.isLoading = false;
+  } finally {
+    if (lockTime !== void 0) {
+      await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
+    }
+    messageState.isLoading = false;
+  }
+  const executingScheduledMessages = messageState.sheduledLoadMessagesViaPlugin;
+  if (executingScheduledMessages) {
+    messageState.sheduledLoadMessagesViaPlugin = void 0;
+    loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi).then(() => {
+      executingScheduledMessages.resolve();
+    }).catch((e) => {
+      executingScheduledMessages.reject(e);
+    });
+  }
+}
+async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi) {
+  if (messageState.isSaving) {
+    if (!messageState.sheduledSaveMessages) {
+      messageState.sheduledSaveMessages = createAwaitable();
+    }
+    return messageState.sheduledSaveMessages.promise;
+  }
+  messageState.isSaving = true;
+  messageState.currentSaveMessagesViaPlugin = async function() {
+    const saveMessageHashes = {};
+    if (Object.keys(messageState.messageDirtyFlags).length == 0) {
+      debug5("save was skipped - no messages marked as dirty... build!");
+      messageState.isSaving = false;
+      return;
+    }
+    let messageDirtyFlagsBeforeSave;
+    let lockTime;
+    try {
+      lockTime = await acquireFileLock(fs2, lockDirPath, "saveMessage");
+      if (Object.keys(messageState.messageDirtyFlags).length == 0) {
+        debug5("save was skipped - no messages marked as dirty... releasing lock again");
+        messageState.isSaving = false;
+        return;
+      }
+      const currentMessages = [...messages.values()];
+      const messagesToExport = [];
+      for (const message of currentMessages) {
+        if (messageState.messageDirtyFlags[message.id]) {
+          const importedEnecoded = stringifyMessage(message);
+          saveMessageHashes[message.id] = importedEnecoded;
+        }
+        const fixedExportMessage = { ...message };
+        if (settingsValue.experimental?.aliases) {
+          fixedExportMessage.id = fixedExportMessage.alias["default"] ?? fixedExportMessage.id;
+        }
+        messagesToExport.push(fixedExportMessage);
+      }
+      messageDirtyFlagsBeforeSave = { ...messageState.messageDirtyFlags };
+      messageState.messageDirtyFlags = {};
+      await resolvedPluginApi.saveMessages({
+        settings: settingsValue,
+        messages: messagesToExport,
+        nodeishFs: fs2
+      });
+      for (const [messageId, messageHash] of Object.entries(saveMessageHashes)) {
+        messageState.messageLoadHash[messageId] = messageHash;
+      }
+      if (lockTime !== void 0) {
+        await releaseLock(fs2, lockDirPath, "saveMessage", lockTime);
+        lockTime = void 0;
+      }
+      if (messageState.sheduledLoadMessagesViaPlugin) {
+        debug5("saveMessagesViaPlugin calling queued loadMessagesViaPlugin to share lock");
+        await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi);
+      }
+      messageState.isSaving = false;
+    } catch (err) {
+      if (messageDirtyFlagsBeforeSave !== void 0) {
+        for (const dirtyMessageId of Object.keys(messageDirtyFlagsBeforeSave)) {
+          messageState.messageDirtyFlags[dirtyMessageId] = true;
+        }
+      }
+      if (lockTime !== void 0) {
+        await releaseLock(fs2, lockDirPath, "saveMessage", lockTime);
+        lockTime = void 0;
+      }
+      messageState.isSaving = false;
+      throw new PluginSaveMessagesError({
+        cause: err
+      });
+    } finally {
+      if (lockTime !== void 0) {
+        await releaseLock(fs2, lockDirPath, "saveMessage", lockTime);
+        lockTime = void 0;
+      }
+      messageState.isSaving = false;
+    }
+  }();
+  await messageState.currentSaveMessagesViaPlugin;
+  if (messageState.sheduledSaveMessages) {
+    const executingSheduledSaveMessages = messageState.sheduledSaveMessages;
+    messageState.sheduledSaveMessages = void 0;
+    saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi).then(() => {
+      executingSheduledSaveMessages.resolve();
+    }).catch((e) => {
+      executingSheduledSaveMessages.reject(e);
+    });
+  }
+}
+var makeTrulyAsync = (fn) => (async () => fn)();
+var createAwaitable = () => {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+};
+
+// ../sdk/dist/lint/message/errors.js
+var MessagedLintRuleThrowedError = class extends Error {
+  constructor(message, options) {
+    super(message, options);
+    this.name = "MessagedLintRuleThrowedError";
+  }
+};
+
+// ../sdk/dist/lint/message/lintSingleMessage.js
+var lintSingleMessage = async (args) => {
+  const reports = [];
+  const errors = [];
+  const promises = args.rules.map(async (rule) => {
+    const level = args.settings.messageLintRuleLevels?.[rule.id];
+    if (level === void 0) {
+      throw Error("No lint level provided for lint rule: " + rule.id);
+    }
+    try {
+      await rule.run({
+        message: args.message,
+        settings: args.settings,
+        report: (reportArgs) => {
+          reports.push({
+            ruleId: rule.id,
+            level,
+            messageId: reportArgs.messageId,
+            languageTag: reportArgs.languageTag,
+            body: reportArgs.body
+          });
+        }
+      });
+    } catch (error) {
+      errors.push(new MessagedLintRuleThrowedError(`Lint rule '${rule.id}' throwed while linting message "${args.message.id}".`, { cause: error }));
+    }
+  });
+  await Promise.all(promises);
+  return { data: reports, errors };
+};
+
+// ../../../node_modules/.pnpm/throttle-debounce@5.0.0/node_modules/throttle-debounce/esm/index.js
+function throttle(delay, callback, options) {
+  var _ref = options || {}, _ref$noTrailing = _ref.noTrailing, noTrailing = _ref$noTrailing === void 0 ? false : _ref$noTrailing, _ref$noLeading = _ref.noLeading, noLeading = _ref$noLeading === void 0 ? false : _ref$noLeading, _ref$debounceMode = _ref.debounceMode, debounceMode = _ref$debounceMode === void 0 ? void 0 : _ref$debounceMode;
+  var timeoutID;
+  var cancelled = false;
+  var lastExec = 0;
+  function clearExistingTimeout() {
+    if (timeoutID) {
+      clearTimeout(timeoutID);
+    }
+  }
+  function cancel(options2) {
+    var _ref2 = options2 || {}, _ref2$upcomingOnly = _ref2.upcomingOnly, upcomingOnly = _ref2$upcomingOnly === void 0 ? false : _ref2$upcomingOnly;
+    clearExistingTimeout();
+    cancelled = !upcomingOnly;
+  }
+  function wrapper() {
+    for (var _len = arguments.length, arguments_ = new Array(_len), _key = 0; _key < _len; _key++) {
+      arguments_[_key] = arguments[_key];
+    }
+    var self2 = this;
+    var elapsed = Date.now() - lastExec;
+    if (cancelled) {
+      return;
+    }
+    function exec2() {
+      lastExec = Date.now();
+      callback.apply(self2, arguments_);
+    }
+    function clear() {
+      timeoutID = void 0;
+    }
+    if (!noLeading && debounceMode && !timeoutID) {
+      exec2();
+    }
+    clearExistingTimeout();
+    if (debounceMode === void 0 && elapsed > delay) {
+      if (noLeading) {
+        lastExec = Date.now();
+        if (!noTrailing) {
+          timeoutID = setTimeout(debounceMode ? clear : exec2, delay);
+        }
+      } else {
+        exec2();
+      }
+    } else if (noTrailing !== true) {
+      timeoutID = setTimeout(debounceMode ? clear : exec2, debounceMode === void 0 ? delay - elapsed : delay);
+    }
+  }
+  wrapper.cancel = cancel;
+  return wrapper;
+}
+
+// ../sdk/dist/createMessageLintReportsQuery.js
+var import_debug6 = __toESM(require_src(), 1);
+var debug6 = (0, import_debug6.default)("sdk:lintReports");
+function sleep2(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function createMessageLintReportsQuery(messagesQuery, settings, installedMessageLintRules, resolvedModules) {
+  const index2 = /* @__PURE__ */ new Map();
+  const modules = resolvedModules();
+  const rulesArray = modules?.messageLintRules;
+  const messageLintRuleLevels = Object.fromEntries(installedMessageLintRules().map((rule) => [rule.id, rule.level]));
+  const settingsObject = () => {
+    return {
+      ...settings(),
+      messageLintRuleLevels
+    };
+  };
+  const messages = messagesQuery.getAll();
+  const trackedMessages = /* @__PURE__ */ new Map();
+  debug6(`createMessageLintReportsQuery ${rulesArray?.length} rules, ${messages.length} messages`);
+  let lintMessageCount = 0;
+  const throttledLogLintMessage = throttle(2e3, (messageId) => {
+    debug6(`lintSingleMessage: ${lintMessageCount} id: ${messageId}`);
+  });
+  createEffect2(() => {
+    const currentMessageIds = new Set(messagesQuery.includedMessageIds());
+    const deletedTrackedMessages = [...trackedMessages].filter((tracked) => !currentMessageIds.has(tracked[0]));
+    if (rulesArray) {
+      for (const messageId of currentMessageIds) {
+        if (!trackedMessages.has(messageId)) {
+          createRoot2((dispose) => {
+            createEffect2(() => {
+              const message = messagesQuery.get({ where: { id: messageId } });
+              if (!message) {
+                return;
+              }
+              if (!trackedMessages?.has(messageId)) {
+                trackedMessages?.set(messageId, dispose);
+              }
+              lintSingleMessage({
+                rules: rulesArray,
+                settings: settingsObject(),
+                messages,
+                message
+              }).then((report) => {
+                lintMessageCount++;
+                throttledLogLintMessage(messageId);
+                if (report.errors.length === 0 && index2.get(messageId) !== report.data) {
+                  index2.set(messageId, report.data);
+                }
+              });
+            });
+          });
+        }
+      }
+      for (const deletedMessage of deletedTrackedMessages) {
+        const deletedMessageId = deletedMessage[0];
+        const messageEffectDisposeFunction = trackedMessages.get(deletedMessageId);
+        if (messageEffectDisposeFunction) {
+          messageEffectDisposeFunction();
+          trackedMessages.delete(deletedMessageId);
+          index2.delete(deletedMessageId);
+          debug6(`delete lint message id: ${deletedMessageId}`);
+        }
+      }
+    }
+  });
+  return {
+    getAll: async () => {
+      await sleep2(0);
+      return structuredClone([...index2.values()].flat().length === 0 ? [] : [...index2.values()].flat());
+    },
+    get: async (args) => {
+      await sleep2(0);
+      return structuredClone(index2.get(args.where.messageId) ?? []);
+    }
+  };
+}
+
+// ../versioned-interfaces/project-settings/dist/migration/1-to-2.js
+var migrate1to2 = (config) => {
+  const migrated = {
+    $schema: "https://inlang.com/schema/project-settings",
+    sourceLanguageTag: config.sourceLanguageTag,
+    languageTags: config.languageTags,
+    modules: config.modules
+  };
+  if (config.settings["project.messageLintRuleLevels"]) {
+    migrated.messageLintRuleLevels = config.settings["project.messageLintRuleLevels"];
+  }
+  for (const key in config.settings) {
+    if (key === "project.messageLintRuleLevels")
+      continue;
+    migrated[key] = config.settings[key];
+  }
+  return migrated;
+};
+
+// ../versioned-interfaces/project-settings/dist/migration/index.js
+function migrateIfOutdated(schema2) {
+  if (schema2.settings) {
+    return migrate1to2(schema2);
+  }
+  return schema2;
+}
+
+// ../sdk/dist/createNodeishFsWithAbsolutePaths.js
+init_dist();
+var createNodeishFsWithAbsolutePaths = (args) => {
+  if (!isAbsolutePath(args.projectPath)) {
+    throw new Error(`Expected an absolute path but received "${args.projectPath}".`);
+  }
+  const basePath = normalizePath2(args.projectPath).split("/").slice(0, -1).join("/");
+  const makeAbsolute = (path) => {
+    if (isAbsolutePath(path)) {
+      return normalizePath2(path);
+    }
+    return normalizePath2(basePath + "/" + path);
   };
   return {
     // @ts-expect-error
-    readFile: (path, options) => readFileAndExtractPath(path, options),
-    rm: args.nodeishFs.rm,
-    readdir: args.nodeishFs.readdir,
-    mkdir: args.nodeishFs.mkdir,
-    rmdir: args.nodeishFs.rmdir,
-    writeFile: args.nodeishFs.writeFile,
-    watch: args.nodeishFs.watch,
-    stat: args.nodeishFs.stat
+    readFile: (path, options) => args.nodeishFs.readFile(makeAbsolute(path), options),
+    readdir: (path) => args.nodeishFs.readdir(makeAbsolute(path)),
+    mkdir: (path, options) => args.nodeishFs.mkdir(makeAbsolute(path), options),
+    writeFile: (path, data) => args.nodeishFs.writeFile(makeAbsolute(path), data),
+    stat: (path) => args.nodeishFs.stat(makeAbsolute(path)),
+    rm: (path) => args.nodeishFs.rm(makeAbsolute(path)),
+    rmdir: (path) => args.nodeishFs.rmdir(makeAbsolute(path)),
+    watch: (path, options) => args.nodeishFs.watch(makeAbsolute(path), options),
+    // This might be surprising when symlinks were intended to be relative
+    symlink: (target, path) => args.nodeishFs.symlink(makeAbsolute(target), makeAbsolute(path)),
+    unlink: (path) => args.nodeishFs.unlink(makeAbsolute(path)),
+    readlink: (path) => args.nodeishFs.readlink(makeAbsolute(path)),
+    lstat: (path) => args.nodeishFs.lstat(makeAbsolute(path))
   };
 };
+
+// ../sdk/dist/loadProject.js
+init_dist();
+
+// ../sdk/dist/migrations/migrateToDirectory.js
+var maybeMigrateToDirectory = async (args) => {
+  if (args.projectPath.endsWith("project.inlang") === false) {
+    return;
+  }
+  const projectDirectory = await tryCatch(() => args.nodeishFs.stat(args.projectPath));
+  if (projectDirectory.data) {
+    return;
+  }
+  const settingsFile = await tryCatch(() => args.nodeishFs.readFile(args.projectPath + ".json", { encoding: "utf-8" }));
+  if (settingsFile.error) {
+    return;
+  }
+  await args.nodeishFs.mkdir(args.projectPath);
+  await args.nodeishFs.writeFile(`${args.projectPath}/settings.json`, settingsFile.data);
+  await args.nodeishFs.writeFile(args.projectPath + ".README.md", readme);
+};
+var readme = `
+# DELETE THE \`project.inlang.json\` FILE
+
+The \`project.inlang.json\` file is now contained in a project directory e.g. \`project.inlang/settings.json\`.
+
+
+## What you need to do
+
+1. Update the inlang CLI (if you use it) to use the new path \`project.inlang\` instead of \`project.inlang.json\`.
+2. Delete the \`project.inlang.json\` file.
+
+
+## Why is this happening?
+
+See this RFC https://docs.google.com/document/d/1OYyA1wYfQRbIJOIBDliYoWjiUlkFBNxH_U2R4WpVRZ4/edit#heading=h.pecv6xb7ial6 
+and the following GitHub issue for more information https://github.com/opral/monorepo/issues/1678.
+
+- Monorepo support https://github.com/opral/monorepo/discussions/258. 
+- Required for many other future features like caching, first class offline support, and more. 
+- Stablize the inlang project format.
+`;
 
 // ../sdk/dist/migrations/maybeCreateFirstProjectId.js
 async function maybeCreateFirstProjectId(args) {
@@ -62058,23 +62522,13 @@ var identifyProject = async (args) => {
 };
 
 // ../sdk/dist/loadProject.js
-var import_debug4 = __toESM(require_src(), 1);
-var debug4 = (0, import_debug4.default)("sdk:loadProject");
-var debugLock = (0, import_debug4.default)("sdk:lockfile");
+var import_debug7 = __toESM(require_src(), 1);
+var debug7 = (0, import_debug7.default)("sdk:loadProject");
 var settingsCompiler = import_compiler3.TypeCompiler.Compile(ProjectSettings);
 async function loadProject(args) {
   const projectPath = normalizePath2(args.projectPath);
-  const messageStates = {
-    messageDirtyFlags: {},
-    messageLoadHash: {},
-    isSaving: false,
-    currentSaveMessagesViaPlugin: void 0,
-    sheduledSaveMessages: void 0,
-    isLoading: false,
-    sheduledLoadMessagesViaPlugin: void 0
-  };
   assertValidProjectPath(projectPath);
-  debug4(projectPath);
+  debug7(projectPath);
   const nodeishFs = createNodeishFsWithAbsolutePaths({
     projectPath,
     nodeishFs: args.repo.nodeishFs
@@ -62083,7 +62537,7 @@ async function loadProject(args) {
   await maybeCreateFirstProjectId({ projectPath, repo: args.repo });
   return await createRoot2(async () => {
     const { data: projectId } = await tryCatch(() => nodeishFs.readFile(args.projectPath + "/project_id", { encoding: "utf-8" }));
-    const [initialized, markInitAsComplete, markInitAsFailed] = createAwaitable();
+    const [initialized, markInitAsComplete, markInitAsFailed] = createAwaitable2();
     const [settings, _setSettings] = createSignal2();
     createEffect2(() => {
       loadSettings({ settingsFilePath: projectPath + "/settings.json", nodeishFs }).then((settings2) => setSettings(settings2)).catch((err) => {
@@ -62120,49 +62574,26 @@ async function loadProject(args) {
     });
     let settingsValue;
     createEffect2(() => settingsValue = settings());
-    const [messages, setMessages] = createSignal2([]);
     const [loadMessagesViaPluginError, setLoadMessagesViaPluginError] = createSignal2();
     const [saveMessagesViaPluginError, setSaveMessagesViaPluginError] = createSignal2();
-    const messagesQuery = createMessagesQuery(() => messages());
-    const messageLockDirPath = projectPath + "/messagelock";
-    createEffect2(() => {
-      const _resolvedModules = resolvedModules();
-      if (!_resolvedModules)
-        return;
-      const resolvedPluginApi = _resolvedModules.resolvedPluginApi;
-      if (!resolvedPluginApi.loadMessages) {
-        markInitAsFailed(void 0);
-        return;
-      }
-      const _settings = settings();
-      if (!_settings)
-        return;
-      const fsWithWatcher = createNodeishFsWithWatcher({
-        nodeishFs,
-        // this message is called whenever a file changes that was read earlier by this filesystem
-        // - the plugin loads messages -> reads the file messages.json -> start watching on messages.json -> updateMessages
-        updateMessages: () => {
-          debug4("load messages because of a change in the message.json files");
-          loadMessagesViaPlugin(
-            fsWithWatcher,
-            messageLockDirPath,
-            messageStates,
-            messagesQuery,
-            settings(),
-            // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
-            resolvedPluginApi
-          ).catch((e) => setLoadMessagesViaPluginError(new PluginLoadMessagesError({ cause: e }))).then(() => {
-            if (loadMessagesViaPluginError() !== void 0) {
-              setLoadMessagesViaPluginError(void 0);
-            }
-          });
+    const messagesQuery = createMessagesQuery({
+      projectPath,
+      nodeishFs,
+      settings,
+      resolvedModules,
+      onInitialMessageLoadResult: (e) => {
+        if (e) {
+          markInitAsFailed(e);
+        } else {
+          markInitAsComplete();
         }
-      });
-      loadMessagesViaPlugin(fsWithWatcher, messageLockDirPath, messageStates, messagesQuery, _settings, resolvedPluginApi).then(() => {
-        markInitAsComplete();
-      }).catch((err) => {
-        markInitAsFailed(new PluginLoadMessagesError({ cause: err }));
-      });
+      },
+      onLoadMessageResult: (e) => {
+        setLoadMessagesViaPluginError(e);
+      },
+      onSaveMessageResult: (e) => {
+        setSaveMessagesViaPluginError(e);
+      }
     });
     const installedMessageLintRules = () => {
       if (!resolvedModules())
@@ -62189,59 +62620,6 @@ async function loadProject(args) {
       }));
     };
     const initializeError = await initialized.catch((error) => error);
-    const abortController = new AbortController();
-    nodeishFs.watch("/", { signal: abortController.signal }) !== void 0;
-    const trackedMessages = /* @__PURE__ */ new Map();
-    let initialSetup = true;
-    createEffect2(() => {
-      const _resolvedModules = resolvedModules();
-      if (!_resolvedModules)
-        return;
-      const resolvedPluginApi = _resolvedModules.resolvedPluginApi;
-      const currentMessageIds = new Set(messagesQuery.includedMessageIds());
-      const deletedTrackedMessages = [...trackedMessages].filter((tracked) => !currentMessageIds.has(tracked[0]));
-      for (const messageId of currentMessageIds) {
-        if (!trackedMessages.has(messageId)) {
-          createRoot2((dispose) => {
-            createEffect2(() => {
-              const message = messagesQuery.get({ where: { id: messageId } });
-              if (!message) {
-                return;
-              }
-              if (!trackedMessages?.has(messageId)) {
-                trackedMessages?.set(messageId, dispose);
-              }
-              if (!initialSetup) {
-                debug4("message changed", messageId);
-                messageStates.messageDirtyFlags[message.id] = true;
-                saveMessagesViaPlugin(nodeishFs, messageLockDirPath, messageStates, messagesQuery, settings(), resolvedPluginApi).catch((e) => setSaveMessagesViaPluginError(new PluginSaveMessagesError({ cause: e }))).then(() => {
-                  if (saveMessagesViaPluginError() !== void 0) {
-                    setSaveMessagesViaPluginError(void 0);
-                  }
-                });
-              }
-            });
-          });
-        }
-      }
-      for (const deletedMessage of deletedTrackedMessages) {
-        const deletedMessageId = deletedMessage[0];
-        const messageEffectDisposeFunction = trackedMessages.get(deletedMessageId);
-        if (messageEffectDisposeFunction) {
-          messageEffectDisposeFunction();
-          trackedMessages.delete(deletedMessageId);
-        }
-        messageStates.messageDirtyFlags[deletedMessageId] = true;
-      }
-      if (deletedTrackedMessages.length > 0) {
-        saveMessagesViaPlugin(nodeishFs, messageLockDirPath, messageStates, messagesQuery, settings(), resolvedPluginApi).catch((e) => setSaveMessagesViaPluginError(new PluginSaveMessagesError({ cause: e }))).then(() => {
-          if (saveMessagesViaPluginError() !== void 0) {
-            setSaveMessagesViaPluginError(void 0);
-          }
-        });
-      }
-      initialSetup = false;
-    });
     const lintReportsQuery = createMessageLintReportsQuery(messagesQuery, settings, installedMessageLintRules, resolvedModules);
     let projectLoadedCapturedAlready = false;
     if (projectId && projectLoadedCapturedAlready === false) {
@@ -62344,7 +62722,7 @@ var _writeSettingsToDisk = async (args) => {
     throw writeSettingsError;
   }
 };
-var createAwaitable = () => {
+var createAwaitable2 = () => {
   let resolve;
   let reject;
   const promise = new Promise((res, rej) => {
@@ -62353,7 +62731,6 @@ var createAwaitable = () => {
   });
   return [promise, resolve, reject];
 };
-var makeTrulyAsync = (fn) => (async () => fn)();
 function skipFirst(func) {
   let initial = false;
   return function(...args) {
@@ -62371,268 +62748,6 @@ function createSubscribable(signal) {
       });
     }
   });
-}
-async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQuery, settingsValue, resolvedPluginApi) {
-  const experimentalAliases = !!settingsValue.experimental?.aliases;
-  if (messageState.isLoading) {
-    if (!messageState.sheduledLoadMessagesViaPlugin) {
-      messageState.sheduledLoadMessagesViaPlugin = createAwaitable();
-    }
-    return messageState.sheduledLoadMessagesViaPlugin[0];
-  }
-  messageState.isLoading = true;
-  let lockTime = void 0;
-  try {
-    lockTime = await acquireFileLock(fs2, lockDirPath, "loadMessage");
-    const loadedMessages = await makeTrulyAsync(resolvedPluginApi.loadMessages({
-      settings: settingsValue,
-      nodeishFs: fs2
-    }));
-    for (const loadedMessage of loadedMessages) {
-      const loadedMessageClone = structuredClone(loadedMessage);
-      const currentMessages = messagesQuery.getAll().filter((message) => (experimentalAliases ? message.alias["default"] : message.id) === loadedMessage.id);
-      if (currentMessages.length > 1) {
-        throw new Error("more than one message with the same id or alias found ");
-      } else if (currentMessages.length === 1) {
-        loadedMessageClone.alias = {};
-        if (experimentalAliases) {
-          loadedMessageClone.alias["default"] = loadedMessageClone.id;
-          loadedMessageClone.id = currentMessages[0].id;
-        }
-        const importedEnecoded = stringifyMessage(loadedMessageClone);
-        if (messageState.messageLoadHash[loadedMessageClone.id] === importedEnecoded) {
-          continue;
-        }
-        messagesQuery.update({ where: { id: loadedMessageClone.id }, data: loadedMessageClone });
-        delete messageState.messageDirtyFlags[loadedMessageClone.id];
-        messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
-      } else {
-        loadedMessageClone.alias = {};
-        if (experimentalAliases) {
-          loadedMessageClone.alias["default"] = loadedMessageClone.id;
-          let currentOffset = 0;
-          let messsageId;
-          do {
-            messsageId = humanIdHash(loadedMessageClone.id, currentOffset);
-            if (messagesQuery.get({ where: { id: messsageId } })) {
-              currentOffset += 1;
-              messsageId = void 0;
-            }
-          } while (messsageId === void 0);
-          loadedMessageClone.id = messsageId;
-        }
-        const importedEnecoded = stringifyMessage(loadedMessageClone);
-        messagesQuery.create({ data: loadedMessageClone });
-        delete messageState.messageDirtyFlags[loadedMessageClone.id];
-        messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
-      }
-    }
-    await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
-    lockTime = void 0;
-    debug4("loadMessagesViaPlugin: " + loadedMessages.length + " Messages processed ");
-    messageState.isLoading = false;
-  } finally {
-    if (lockTime !== void 0) {
-      await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
-    }
-    messageState.isLoading = false;
-  }
-  const executingScheduledMessages = messageState.sheduledLoadMessagesViaPlugin;
-  if (executingScheduledMessages) {
-    messageState.sheduledLoadMessagesViaPlugin = void 0;
-    loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQuery, settingsValue, resolvedPluginApi).then(() => {
-      executingScheduledMessages[1]();
-    }).catch((e) => {
-      executingScheduledMessages[2](e);
-    });
-  }
-}
-async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQuery, settingsValue, resolvedPluginApi) {
-  if (messageState.isSaving) {
-    if (!messageState.sheduledSaveMessages) {
-      messageState.sheduledSaveMessages = createAwaitable();
-    }
-    return messageState.sheduledSaveMessages[0];
-  }
-  messageState.isSaving = true;
-  messageState.currentSaveMessagesViaPlugin = async function() {
-    const saveMessageHashes = {};
-    if (Object.keys(messageState.messageDirtyFlags).length == 0) {
-      debug4("save was skipped - no messages marked as dirty... build!");
-      messageState.isSaving = false;
-      return;
-    }
-    let messageDirtyFlagsBeforeSave;
-    let lockTime;
-    try {
-      lockTime = await acquireFileLock(fs2, lockDirPath, "saveMessage");
-      if (Object.keys(messageState.messageDirtyFlags).length == 0) {
-        debug4("save was skipped - no messages marked as dirty... releasing lock again");
-        messageState.isSaving = false;
-        return;
-      }
-      const currentMessages = messagesQuery.getAll();
-      const messagesToExport = [];
-      for (const message of currentMessages) {
-        if (messageState.messageDirtyFlags[message.id]) {
-          const importedEnecoded = stringifyMessage(message);
-          saveMessageHashes[message.id] = importedEnecoded;
-        }
-        const fixedExportMessage = { ...message };
-        if (settingsValue.experimental?.aliases) {
-          fixedExportMessage.id = fixedExportMessage.alias["default"] ?? fixedExportMessage.id;
-        }
-        messagesToExport.push(fixedExportMessage);
-      }
-      messageDirtyFlagsBeforeSave = { ...messageState.messageDirtyFlags };
-      messageState.messageDirtyFlags = {};
-      await resolvedPluginApi.saveMessages({
-        settings: settingsValue,
-        messages: messagesToExport,
-        nodeishFs: fs2
-      });
-      for (const [messageId, messageHash] of Object.entries(saveMessageHashes)) {
-        messageState.messageLoadHash[messageId] = messageHash;
-      }
-      if (lockTime !== void 0) {
-        await releaseLock(fs2, lockDirPath, "saveMessage", lockTime);
-        lockTime = void 0;
-      }
-      if (messageState.sheduledLoadMessagesViaPlugin) {
-        debug4("saveMessagesViaPlugin calling queued loadMessagesViaPlugin to share lock");
-        await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQuery, settingsValue, resolvedPluginApi);
-      }
-      messageState.isSaving = false;
-    } catch (err) {
-      if (messageDirtyFlagsBeforeSave !== void 0) {
-        for (const dirtyMessageId of Object.keys(messageDirtyFlagsBeforeSave)) {
-          messageState.messageDirtyFlags[dirtyMessageId] = true;
-        }
-      }
-      if (lockTime !== void 0) {
-        await releaseLock(fs2, lockDirPath, "saveMessage", lockTime);
-        lockTime = void 0;
-      }
-      messageState.isSaving = false;
-      throw new PluginSaveMessagesError({
-        cause: err
-      });
-    } finally {
-      if (lockTime !== void 0) {
-        await releaseLock(fs2, lockDirPath, "saveMessage", lockTime);
-        lockTime = void 0;
-      }
-      messageState.isSaving = false;
-    }
-  }();
-  await messageState.currentSaveMessagesViaPlugin;
-  if (messageState.sheduledSaveMessages) {
-    const executingSheduledSaveMessages = messageState.sheduledSaveMessages;
-    messageState.sheduledSaveMessages = void 0;
-    saveMessagesViaPlugin(fs2, lockDirPath, messageState, messagesQuery, settingsValue, resolvedPluginApi).then(() => {
-      executingSheduledSaveMessages[1]();
-    }).catch((e) => {
-      executingSheduledSaveMessages[2](e);
-    });
-  }
-}
-var maxRetries = 10;
-var nProbes = 50;
-var probeInterval = 100;
-async function acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount = 0) {
-  if (tryCount > maxRetries) {
-    throw new Error(lockOrigin + " exceeded maximum Retries (5) to acquire lockfile " + tryCount);
-  }
-  try {
-    debugLock(lockOrigin + " tries to acquire a lockfile Retry Nr.: " + tryCount);
-    await fs2.mkdir(lockDirPath);
-    const stats = await fs2.stat(lockDirPath);
-    debugLock(lockOrigin + " acquired a lockfile Retry Nr.: " + tryCount);
-    return stats.mtimeMs;
-  } catch (error) {
-    if (error.code !== "EEXIST") {
-      throw error;
-    }
-  }
-  let currentLockTime;
-  try {
-    const stats = await fs2.stat(lockDirPath);
-    currentLockTime = stats.mtimeMs;
-  } catch (fstatError) {
-    if (fstatError.code === "ENOENT") {
-      debugLock(lockOrigin + " tryCount++ lock file seems to be gone :) - lets try again " + tryCount);
-      return acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
-    }
-    throw fstatError;
-  }
-  debugLock(lockOrigin + " tries to acquire a lockfile  - lock currently in use... starting probe phase " + tryCount);
-  return new Promise((resolve, reject) => {
-    let probeCounts = 0;
-    const scheduleProbationTimeout = () => {
-      setTimeout(async () => {
-        probeCounts += 1;
-        let lockFileStats = void 0;
-        try {
-          debugLock(lockOrigin + " tries to acquire a lockfile - check if the lock is free now " + tryCount);
-          lockFileStats = await fs2.stat(lockDirPath);
-        } catch (fstatError) {
-          if (fstatError.code === "ENOENT") {
-            debugLock(lockOrigin + " tryCount++ in Promise - tries to acquire a lockfile - lock file seems to be free now - try to acquire " + tryCount);
-            const lock2 = acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
-            return resolve(lock2);
-          }
-          return reject(fstatError);
-        }
-        if (lockFileStats.mtimeMs === currentLockTime) {
-          if (probeCounts >= nProbes) {
-            debugLock(lockOrigin + " tries to acquire a lockfile  - lock not free - but stale lets drop it" + tryCount);
-            try {
-              await fs2.rmdir(lockDirPath);
-            } catch (rmLockError) {
-              if (rmLockError.code === "ENOENT") {
-              }
-              return reject(rmLockError);
-            }
-            try {
-              debugLock(lockOrigin + " tryCount++ same locker - try to acquire again after removing stale lock " + tryCount);
-              const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
-              return resolve(lock2);
-            } catch (lockAquireException) {
-              return reject(lockAquireException);
-            }
-          } else {
-            return scheduleProbationTimeout();
-          }
-        } else {
-          try {
-            debugLock(lockOrigin + " tryCount++ different locker - try to acquire again " + tryCount);
-            const lock2 = await acquireFileLock(fs2, lockDirPath, lockOrigin, tryCount + 1);
-            return resolve(lock2);
-          } catch (error) {
-            return reject(error);
-          }
-        }
-      }, probeInterval);
-    };
-    scheduleProbationTimeout();
-  });
-}
-async function releaseLock(fs2, lockDirPath, lockOrigin, lockTime) {
-  debugLock(lockOrigin + " releasing the lock ");
-  try {
-    const stats = await fs2.stat(lockDirPath);
-    if (stats.mtimeMs === lockTime) {
-      await fs2.rmdir(lockDirPath);
-    }
-  } catch (statError) {
-    debugLock(lockOrigin + " couldn't release the lock");
-    if (statError.code === "ENOENT") {
-      debugLock(lockOrigin + " WARNING - the lock was released by a different process");
-      return;
-    }
-    debugLock(statError);
-    throw statError;
-  }
 }
 
 // ../sdk/dist/listProjects.js
