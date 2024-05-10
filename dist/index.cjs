@@ -723,7 +723,7 @@ var require_tunnel = __commonJS({
         connectOptions.headers = connectOptions.headers || {};
         connectOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(connectOptions.proxyAuth).toString("base64");
       }
-      debug9("making CONNECT request");
+      debug8("making CONNECT request");
       var connectReq = self2.request(connectOptions);
       connectReq.useChunkedEncodingByDefault = false;
       connectReq.once("response", onResponse);
@@ -743,7 +743,7 @@ var require_tunnel = __commonJS({
         connectReq.removeAllListeners();
         socket.removeAllListeners();
         if (res.statusCode !== 200) {
-          debug9(
+          debug8(
             "tunneling socket could not be established, statusCode=%d",
             res.statusCode
           );
@@ -755,7 +755,7 @@ var require_tunnel = __commonJS({
           return;
         }
         if (head.length > 0) {
-          debug9("got illegal response body from proxy");
+          debug8("got illegal response body from proxy");
           socket.destroy();
           var error = new Error("got illegal response body from proxy");
           error.code = "ECONNRESET";
@@ -763,13 +763,13 @@ var require_tunnel = __commonJS({
           self2.removeSocket(placeholder);
           return;
         }
-        debug9("tunneling connection has established");
+        debug8("tunneling connection has established");
         self2.sockets[self2.sockets.indexOf(placeholder)] = socket;
         return cb(socket);
       }
       function onError(cause) {
         connectReq.removeAllListeners();
-        debug9(
+        debug8(
           "tunneling socket could not be established, cause=%s\n",
           cause.message,
           cause.stack
@@ -831,9 +831,9 @@ var require_tunnel = __commonJS({
       }
       return target;
     }
-    var debug9;
+    var debug8;
     if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-      debug9 = function() {
+      debug8 = function() {
         var args = Array.prototype.slice.call(arguments);
         if (typeof args[0] === "string") {
           args[0] = "TUNNEL: " + args[0];
@@ -843,10 +843,10 @@ var require_tunnel = __commonJS({
         console.error.apply(console, args);
       };
     } else {
-      debug9 = function() {
+      debug8 = function() {
       };
     }
-    exports2.debug = debug9;
+    exports2.debug = debug8;
   }
 });
 
@@ -18943,10 +18943,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       return process.env["RUNNER_DEBUG"] === "1";
     }
     exports2.isDebug = isDebug;
-    function debug9(message) {
+    function debug8(message) {
       command_1.issueCommand("debug", {}, message);
     }
-    exports2.debug = debug9;
+    exports2.debug = debug8;
     function error(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -32913,9 +32913,9 @@ var require_constants7 = __commonJS({
 // ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js
 var require_debug = __commonJS({
   "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js"(exports2, module2) {
-    var debug9 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
+    var debug8 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
     };
-    module2.exports = debug9;
+    module2.exports = debug8;
   }
 });
 
@@ -32927,7 +32927,7 @@ var require_re = __commonJS({
       MAX_SAFE_BUILD_LENGTH,
       MAX_LENGTH
     } = require_constants7();
-    var debug9 = require_debug();
+    var debug8 = require_debug();
     exports2 = module2.exports = {};
     var re = exports2.re = [];
     var safeRe = exports2.safeRe = [];
@@ -32949,7 +32949,7 @@ var require_re = __commonJS({
     var createToken = (name, value, isGlobal) => {
       const safe = makeSafeRegex(value);
       const index2 = R++;
-      debug9(name, index2, value);
+      debug8(name, index2, value);
       t[name] = index2;
       src[index2] = value;
       re[index2] = new RegExp(value, isGlobal ? "g" : void 0);
@@ -33046,7 +33046,7 @@ var require_identifiers = __commonJS({
 // ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js
 var require_semver = __commonJS({
   "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js"(exports2, module2) {
-    var debug9 = require_debug();
+    var debug8 = require_debug();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants7();
     var { safeRe: re, t } = require_re();
     var parseOptions = require_parse_options();
@@ -33068,7 +33068,7 @@ var require_semver = __commonJS({
             `version is longer than ${MAX_LENGTH} characters`
           );
         }
-        debug9("SemVer", version3, options);
+        debug8("SemVer", version3, options);
         this.options = options;
         this.loose = !!options.loose;
         this.includePrerelease = !!options.includePrerelease;
@@ -33116,7 +33116,7 @@ var require_semver = __commonJS({
         return this.version;
       }
       compare(other) {
-        debug9("SemVer.compare", this.version, this.options, other);
+        debug8("SemVer.compare", this.version, this.options, other);
         if (!(other instanceof _SemVer)) {
           if (typeof other === "string" && other === this.version) {
             return 0;
@@ -33149,7 +33149,7 @@ var require_semver = __commonJS({
         do {
           const a = this.prerelease[i];
           const b = other.prerelease[i];
-          debug9("prerelease compare", i, a, b);
+          debug8("prerelease compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -33171,7 +33171,7 @@ var require_semver = __commonJS({
         do {
           const a = this.build[i];
           const b = other.build[i];
-          debug9("prerelease compare", i, a, b);
+          debug8("prerelease compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -34355,21 +34355,21 @@ var require_range = __commonJS({
         const loose = this.options.loose;
         const hr = loose ? re[t.HYPHENRANGELOOSE] : re[t.HYPHENRANGE];
         range = range.replace(hr, hyphenReplace(this.options.includePrerelease));
-        debug9("hyphen replace", range);
+        debug8("hyphen replace", range);
         range = range.replace(re[t.COMPARATORTRIM], comparatorTrimReplace);
-        debug9("comparator trim", range);
+        debug8("comparator trim", range);
         range = range.replace(re[t.TILDETRIM], tildeTrimReplace);
-        debug9("tilde trim", range);
+        debug8("tilde trim", range);
         range = range.replace(re[t.CARETTRIM], caretTrimReplace);
-        debug9("caret trim", range);
+        debug8("caret trim", range);
         let rangeList = range.split(" ").map((comp) => parseComparator(comp, this.options)).join(" ").split(/\s+/).map((comp) => replaceGTE0(comp, this.options));
         if (loose) {
           rangeList = rangeList.filter((comp) => {
-            debug9("loose invalid filter", comp, this.options);
+            debug8("loose invalid filter", comp, this.options);
             return !!comp.match(re[t.COMPARATORLOOSE]);
           });
         }
-        debug9("range list", rangeList);
+        debug8("range list", rangeList);
         const rangeMap = /* @__PURE__ */ new Map();
         const comparators = rangeList.map((comp) => new Comparator(comp, this.options));
         for (const comp of comparators) {
@@ -34424,7 +34424,7 @@ var require_range = __commonJS({
     var cache = new LRU({ max: 1e3 });
     var parseOptions = require_parse_options();
     var Comparator = require_comparator();
-    var debug9 = require_debug();
+    var debug8 = require_debug();
     var SemVer = require_semver();
     var {
       safeRe: re,
@@ -34449,15 +34449,15 @@ var require_range = __commonJS({
       return result;
     };
     var parseComparator = (comp, options) => {
-      debug9("comp", comp, options);
+      debug8("comp", comp, options);
       comp = replaceCarets(comp, options);
-      debug9("caret", comp);
+      debug8("caret", comp);
       comp = replaceTildes(comp, options);
-      debug9("tildes", comp);
+      debug8("tildes", comp);
       comp = replaceXRanges(comp, options);
-      debug9("xrange", comp);
+      debug8("xrange", comp);
       comp = replaceStars(comp, options);
-      debug9("stars", comp);
+      debug8("stars", comp);
       return comp;
     };
     var isX = (id) => !id || id.toLowerCase() === "x" || id === "*";
@@ -34467,7 +34467,7 @@ var require_range = __commonJS({
     var replaceTilde = (comp, options) => {
       const r = options.loose ? re[t.TILDELOOSE] : re[t.TILDE];
       return comp.replace(r, (_, M, m, p, pr) => {
-        debug9("tilde", comp, _, M, m, p, pr);
+        debug8("tilde", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
@@ -34476,12 +34476,12 @@ var require_range = __commonJS({
         } else if (isX(p)) {
           ret = `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`;
         } else if (pr) {
-          debug9("replaceTilde pr", pr);
+          debug8("replaceTilde pr", pr);
           ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
         } else {
           ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
         }
-        debug9("tilde return", ret);
+        debug8("tilde return", ret);
         return ret;
       });
     };
@@ -34489,11 +34489,11 @@ var require_range = __commonJS({
       return comp.trim().split(/\s+/).map((c) => replaceCaret(c, options)).join(" ");
     };
     var replaceCaret = (comp, options) => {
-      debug9("caret", comp, options);
+      debug8("caret", comp, options);
       const r = options.loose ? re[t.CARETLOOSE] : re[t.CARET];
       const z = options.includePrerelease ? "-0" : "";
       return comp.replace(r, (_, M, m, p, pr) => {
-        debug9("caret", comp, _, M, m, p, pr);
+        debug8("caret", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
@@ -34506,7 +34506,7 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
           }
         } else if (pr) {
-          debug9("replaceCaret pr", pr);
+          debug8("replaceCaret pr", pr);
           if (M === "0") {
             if (m === "0") {
               ret = `>=${M}.${m}.${p}-${pr} <${M}.${m}.${+p + 1}-0`;
@@ -34517,7 +34517,7 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.${p}-${pr} <${+M + 1}.0.0-0`;
           }
         } else {
-          debug9("no pr");
+          debug8("no pr");
           if (M === "0") {
             if (m === "0") {
               ret = `>=${M}.${m}.${p}${z} <${M}.${m}.${+p + 1}-0`;
@@ -34528,19 +34528,19 @@ var require_range = __commonJS({
             ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
           }
         }
-        debug9("caret return", ret);
+        debug8("caret return", ret);
         return ret;
       });
     };
     var replaceXRanges = (comp, options) => {
-      debug9("replaceXRanges", comp, options);
+      debug8("replaceXRanges", comp, options);
       return comp.split(/\s+/).map((c) => replaceXRange(c, options)).join(" ");
     };
     var replaceXRange = (comp, options) => {
       comp = comp.trim();
       const r = options.loose ? re[t.XRANGELOOSE] : re[t.XRANGE];
       return comp.replace(r, (ret, gtlt, M, m, p, pr) => {
-        debug9("xRange", comp, ret, gtlt, M, m, p, pr);
+        debug8("xRange", comp, ret, gtlt, M, m, p, pr);
         const xM = isX(M);
         const xm = xM || isX(m);
         const xp = xm || isX(p);
@@ -34587,16 +34587,16 @@ var require_range = __commonJS({
         } else if (xp) {
           ret = `>=${M}.${m}.0${pr} <${M}.${+m + 1}.0-0`;
         }
-        debug9("xRange return", ret);
+        debug8("xRange return", ret);
         return ret;
       });
     };
     var replaceStars = (comp, options) => {
-      debug9("replaceStars", comp, options);
+      debug8("replaceStars", comp, options);
       return comp.trim().replace(re[t.STAR], "");
     };
     var replaceGTE0 = (comp, options) => {
-      debug9("replaceGTE0", comp, options);
+      debug8("replaceGTE0", comp, options);
       return comp.trim().replace(re[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
     };
     var hyphenReplace = (incPr) => ($0, from2, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) => {
@@ -34634,7 +34634,7 @@ var require_range = __commonJS({
       }
       if (version3.prerelease.length && !options.includePrerelease) {
         for (let i = 0; i < set.length; i++) {
-          debug9(set[i].semver);
+          debug8(set[i].semver);
           if (set[i].semver === Comparator.ANY) {
             continue;
           }
@@ -34670,7 +34670,7 @@ var require_comparator = __commonJS({
           }
         }
         comp = comp.trim().split(/\s+/).join(" ");
-        debug9("comparator", comp, options);
+        debug8("comparator", comp, options);
         this.options = options;
         this.loose = !!options.loose;
         this.parse(comp);
@@ -34679,7 +34679,7 @@ var require_comparator = __commonJS({
         } else {
           this.value = this.operator + this.semver.version;
         }
-        debug9("comp", this);
+        debug8("comp", this);
       }
       parse(comp) {
         const r = this.options.loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR];
@@ -34701,7 +34701,7 @@ var require_comparator = __commonJS({
         return this.value;
       }
       test(version3) {
-        debug9("Comparator.test", version3, this.options.loose);
+        debug8("Comparator.test", version3, this.options.loose);
         if (this.semver === ANY || version3 === ANY) {
           return true;
         }
@@ -34758,7 +34758,7 @@ var require_comparator = __commonJS({
     var parseOptions = require_parse_options();
     var { safeRe: re, t } = require_re();
     var cmp = require_cmp();
-    var debug9 = require_debug();
+    var debug8 = require_debug();
     var SemVer = require_semver();
     var Range = require_range();
   }
@@ -45156,11 +45156,11 @@ var require_common2 = __commonJS({
         let enableOverride = null;
         let namespacesCache;
         let enabledCache;
-        function debug9(...args) {
-          if (!debug9.enabled) {
+        function debug8(...args) {
+          if (!debug8.enabled) {
             return;
           }
-          const self2 = debug9;
+          const self2 = debug8;
           const curr = Number(/* @__PURE__ */ new Date());
           const ms = curr - (prevTime || curr);
           self2.diff = ms;
@@ -45190,12 +45190,12 @@ var require_common2 = __commonJS({
           const logFn = self2.log || createDebug.log;
           logFn.apply(self2, args);
         }
-        debug9.namespace = namespace;
-        debug9.useColors = createDebug.useColors();
-        debug9.color = createDebug.selectColor(namespace);
-        debug9.extend = extend;
-        debug9.destroy = createDebug.destroy;
-        Object.defineProperty(debug9, "enabled", {
+        debug8.namespace = namespace;
+        debug8.useColors = createDebug.useColors();
+        debug8.color = createDebug.selectColor(namespace);
+        debug8.extend = extend;
+        debug8.destroy = createDebug.destroy;
+        Object.defineProperty(debug8, "enabled", {
           enumerable: true,
           configurable: false,
           get: () => {
@@ -45213,9 +45213,9 @@ var require_common2 = __commonJS({
           }
         });
         if (typeof createDebug.init === "function") {
-          createDebug.init(debug9);
+          createDebug.init(debug8);
         }
-        return debug9;
+        return debug8;
       }
       function extend(namespace, delimiter) {
         const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
@@ -45737,11 +45737,11 @@ var require_node = __commonJS({
     function load() {
       return process.env.DEBUG;
     }
-    function init2(debug9) {
-      debug9.inspectOpts = {};
+    function init2(debug8) {
+      debug8.inspectOpts = {};
       const keys = Object.keys(exports2.inspectOpts);
       for (let i = 0; i < keys.length; i++) {
-        debug9.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
+        debug8.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
       }
     }
     module2.exports = require_common2()(exports2);
@@ -58061,7 +58061,7 @@ async function getMeta(ctx) {
 
 // ../../../lix/packages/client/dist/github/forkStatus.js
 async function forkStatus(ctx, state) {
-  const { gitUrl, debug: debug9, dir, cache, owner, repoName, githubClient, gitProxyUrl } = ctx;
+  const { gitUrl, debug: debug8, dir, cache, owner, repoName, githubClient, gitProxyUrl } = ctx;
   if (!gitUrl) {
     throw new Error("Could not find repo url, only github supported for forkStatus at the moment");
   }
@@ -58095,7 +58095,7 @@ async function forkStatus(ctx, state) {
       cache,
       ref: useBranchName,
       remote: "upstream",
-      http: makeHttpClient({ debug: debug9, description: "forkStatus" }),
+      http: makeHttpClient({ debug: debug8, description: "forkStatus" }),
       fs: forkFs
     });
   } catch (err) {
@@ -58132,7 +58132,7 @@ async function forkStatus(ctx, state) {
     singleBranch: true,
     dir,
     ref: useBranchName,
-    http: makeHttpClient({ debug: debug9, description: "forkStatus" }),
+    http: makeHttpClient({ debug: debug8, description: "forkStatus" }),
     fs: forkFs
   });
   await isomorphic_git_default.fetch({
@@ -58141,7 +58141,7 @@ async function forkStatus(ctx, state) {
     singleBranch: true,
     ref: useBranchName,
     dir,
-    http: makeHttpClient({ debug: debug9, description: "forkStatus" }),
+    http: makeHttpClient({ debug: debug8, description: "forkStatus" }),
     corsProxy: gitProxyUrl,
     fs: forkFs
   });
@@ -58371,11 +58371,11 @@ function makeGithubClient({ gitHubProxyUrl } = {}) {
 async function repoContext(url, args) {
   const rawFs = args.nodeishFs || (await Promise.resolve().then(() => (init_dist(), dist_exports))).createNodeishMemoryFs();
   const author = args.author;
-  let debug9 = args.debug || false;
+  let debug8 = args.debug || false;
   if (!url || !url.startsWith("file://") && !url.startsWith("https://") && !url.startsWith("http://")) {
     throw new Error("repo url is required, use file:// for local repos");
   }
-  if (debug9 && typeof window !== "undefined") {
+  if (debug8 && typeof window !== "undefined") {
     window["rawFs"] = rawFs;
   }
   let freshClone = false;
@@ -58399,7 +58399,7 @@ async function repoContext(url, args) {
     }
   }
   const { protocol, lixHost, repoHost, owner, repoName, username, password, namespace } = parseLixUri(url);
-  if (debug9 && (username || password)) {
+  if (debug8 && (username || password)) {
     console.warn("username and password and providers other than github are not supported yet. Only local commands will work.");
   }
   const isWhitelistedRepo = allowedRepos_default.includes(`${owner}/${repoName}`.toLocaleLowerCase());
@@ -58412,7 +58412,7 @@ async function repoContext(url, args) {
     gitProxyUrl = lixHost ? `${protocol}//${lixHost}/git-proxy` : "";
     gitHubProxyUrl = lixHost ? `${protocol}//${lixHost}/github-proxy` : "";
   }
-  debug9 && console.info({
+  debug8 && console.info({
     gitProxyUrl,
     gitHubProxyUrl,
     protocol,
@@ -58425,7 +58425,7 @@ async function repoContext(url, args) {
   });
   const githubClient = makeGithubClient({ gitHubProxyUrl });
   const gitUrl = repoName ? `https://${repoHost}/${owner}/${repoName}` : "";
-  if (!gitUrl && debug9) {
+  if (!gitUrl && debug8) {
     console.warn("valid repo url / local repo not found, only fs features available outside of repo");
   }
   const expFeatures = Object.entries(experimentalFeatures).filter(([_, value]) => value).map(([key]) => key);
@@ -58445,7 +58445,7 @@ async function repoContext(url, args) {
     namespace,
     useLazyFS,
     githubClient,
-    debug: debug9,
+    debug: debug8,
     experimentalFeatures,
     author,
     freshClone,
@@ -58555,12 +58555,12 @@ async function optimizedRefsRes({ origUrl, resBody, statusCode, resHeaders }) {
 // ../../../lix/packages/client/dist/repoState.js
 var checkout3 = doCheckout;
 async function repoState(ctx, args) {
-  const { gitUrl, debug: debug9, rawFs, experimentalFeatures, gitProxyUrl, freshClone, useLazyFS, dir, cache } = ctx;
+  const { gitUrl, debug: debug8, rawFs, experimentalFeatures, gitProxyUrl, freshClone, useLazyFS, dir, cache } = ctx;
   const state = {
     pending: void 0,
     nodeishFs: withProxy({
       nodeishFs: rawFs,
-      verbose: debug9,
+      verbose: debug8,
       description: "app",
       intercept: useLazyFS ? delayedAction : void 0
     }),
@@ -58575,7 +58575,7 @@ async function repoState(ctx, args) {
     }
     const thisBatch = [...nextBatch];
     nextBatch = [];
-    if (debug9) {
+    if (debug8) {
       console.warn("checking out ", thisBatch);
     }
     for (const placeholder of thisBatch.filter((entry) => rawFs._isPlaceholder?.(entry))) {
@@ -58584,8 +58584,8 @@ async function repoState(ctx, args) {
     const res = await checkout3({
       fs: withProxy({
         nodeishFs: rawFs,
-        verbose: debug9,
-        description: debug9 ? "checkout: " + JSON.stringify(thisBatch) : "checkout"
+        verbose: debug8,
+        description: debug8 ? "checkout: " + JSON.stringify(thisBatch) : "checkout"
       }),
       dir,
       cache,
@@ -58597,7 +58597,7 @@ async function repoState(ctx, args) {
     for (const entry of thisBatch) {
       state.checkedOut.add(entry);
     }
-    if (debug9) {
+    if (debug8) {
       console.warn("checked out ", thisBatch);
     }
     if (nextBatch.length) {
@@ -58611,9 +58611,9 @@ async function repoState(ctx, args) {
     }
     console.info("Using lix for cloning repo");
     await isomorphic_git_default.clone({
-      fs: withProxy({ nodeishFs: rawFs, verbose: debug9, description: "clone" }),
+      fs: withProxy({ nodeishFs: rawFs, verbose: debug8, description: "clone" }),
       http: makeHttpClient({
-        debug: debug9,
+        debug: debug8,
         description: "clone",
         onReq: ({ url, body }) => {
           return optimizedRefsReq({ url, body, addRef: state.branchName });
@@ -58648,7 +58648,7 @@ async function repoState(ctx, args) {
     const pathParts = filename?.split("/") || [];
     const rootObject = pathParts[0];
     if (experimentalFeatures.lazyClone && typeof rootObject !== "undefined" && rootObject !== ".git" && ["readFile", "readlink", "writeFile", "readdir"].includes(prop) && !state.checkedOut.has(rootObject) && !state.checkedOut.has(filename)) {
-      if (debug9) {
+      if (debug8) {
         console.warn("delayedAction", {
           prop,
           argumentsList,
@@ -58671,7 +58671,7 @@ async function repoState(ctx, args) {
     if (state.pending) {
       return state.pending.then(execute).finally(() => {
         state.pending = void 0;
-        if (debug9) {
+        if (debug8) {
           console.warn("executed", filename, prop);
         }
       });
@@ -61836,9 +61836,16 @@ function humanIdHash(value, offset = 0) {
 
 // ../sdk/dist/createMessagesQuery.js
 var debug5 = (0, import_debug5.default)("sdk:createMessagesQuery");
+function sleep2(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules, onInitialMessageLoadResult, onLoadMessageResult, onSaveMessageResult }) {
   const index2 = new ReactiveMap();
   const messageLockDirPath = projectPath + "/messagelock";
+  let delegate = void 0;
+  const setDelegate = (newDelegate) => {
+    delegate = newDelegate;
+  };
   const defaultAliasIndex = new ReactiveMap();
   const messageStates = {
     messageDirtyFlags: {},
@@ -61861,6 +61868,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
     const abortController = new AbortController();
     onCleanup3(() => {
       abortController.abort();
+      delegate?.onCleanup();
     });
     const fsWithWatcher = createNodeishFsWithWatcher({
       nodeishFs,
@@ -61872,6 +61880,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
           messageLockDirPath,
           messageStates,
           index2,
+          delegate,
           _settings,
           // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
           resolvedPluginApi
@@ -61892,6 +61901,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       messageLockDirPath,
       messageStates,
       index2,
+      delegate,
       _settings,
       // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
       resolvedPluginApi
@@ -61899,6 +61909,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       onInitialMessageLoadResult(new PluginLoadMessagesError({ cause: e }));
     }).then(() => {
       onInitialMessageLoadResult();
+      delegate?.onLoaded([...index2.values()]);
     });
   });
   const get = (args) => index2.get(args.where.id);
@@ -61915,6 +61926,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       messageLockDirPath,
       messageStates,
       index2,
+      delegate,
       _settings,
       // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
       resolvedPluginApi
@@ -61928,6 +61940,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
     });
   };
   return {
+    setDelegate,
     create: ({ data }) => {
       if (index2.has(data.id))
         return false;
@@ -61936,6 +61949,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         defaultAliasIndex.set(data.alias.default, data);
       }
       messageStates.messageDirtyFlags[data.id] = true;
+      delegate?.onMessageCreate(data.id, index2.get(data.id));
       scheduleSave();
       return true;
     },
@@ -61957,6 +61971,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         return false;
       index2.set(where.id, { ...message, ...data });
       messageStates.messageDirtyFlags[where.id] = true;
+      delegate?.onMessageCreate(where.id, index2.get(data.id));
       scheduleSave();
       return true;
     },
@@ -61967,10 +61982,13 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         if ("default" in data.alias) {
           defaultAliasIndex.set(data.alias.default, data);
         }
+        messageStates.messageDirtyFlags[where.id] = true;
+        delegate?.onMessageCreate(data.id, index2.get(data.id));
       } else {
         index2.set(where.id, { ...message, ...data });
+        messageStates.messageDirtyFlags[where.id] = true;
+        delegate?.onMessageUpdate(data.id, index2.get(data.id));
       }
-      messageStates.messageDirtyFlags[where.id] = true;
       scheduleSave();
       return true;
     },
@@ -61983,12 +62001,14 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       }
       index2.delete(where.id);
       messageStates.messageDirtyFlags[where.id] = true;
+      delegate?.onMessageDelete(where.id);
       scheduleSave();
       return true;
     }
   };
 }
-async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi) {
+var maxMessagesPerTick = 500;
+async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi) {
   const experimentalAliases = !!settingsValue.experimental?.aliases;
   if (messageState.isLoading) {
     if (!messageState.sheduledLoadMessagesViaPlugin) {
@@ -62004,6 +62024,7 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, s
       settings: settingsValue,
       nodeishFs: fs2
     }));
+    let loadedMessageCount = 0;
     for (const loadedMessage of loadedMessages) {
       const loadedMessageClone = structuredClone(loadedMessage);
       const currentMessages = [...messages.values()].filter((message) => (experimentalAliases ? message.alias["default"] : message.id) === loadedMessage.id);
@@ -62021,6 +62042,8 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, s
         }
         messages.set(loadedMessageClone.id, loadedMessageClone);
         messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
+        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone);
+        loadedMessageCount++;
       } else {
         loadedMessageClone.alias = {};
         if (experimentalAliases) {
@@ -62039,6 +62062,12 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, s
         const importedEnecoded = stringifyMessage(loadedMessageClone);
         messages.set(loadedMessageClone.id, loadedMessageClone);
         messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
+        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone);
+        loadedMessageCount++;
+      }
+      if (loadedMessageCount > maxMessagesPerTick) {
+        await sleep2(0);
+        loadedMessageCount = 0;
       }
     }
     await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
@@ -62054,14 +62083,14 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, s
   const executingScheduledMessages = messageState.sheduledLoadMessagesViaPlugin;
   if (executingScheduledMessages) {
     messageState.sheduledLoadMessagesViaPlugin = void 0;
-    loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi).then(() => {
+    loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi).then(() => {
       executingScheduledMessages.resolve();
     }).catch((e) => {
       executingScheduledMessages.reject(e);
     });
   }
 }
-async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi) {
+async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi) {
   if (messageState.isSaving) {
     if (!messageState.sheduledSaveMessages) {
       messageState.sheduledSaveMessages = createAwaitable();
@@ -62114,7 +62143,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, s
       }
       if (messageState.sheduledLoadMessagesViaPlugin) {
         debug5("saveMessagesViaPlugin calling queued loadMessagesViaPlugin to share lock");
-        await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi);
+        await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi);
       }
       messageState.isSaving = false;
     } catch (err) {
@@ -62143,7 +62172,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, s
   if (messageState.sheduledSaveMessages) {
     const executingSheduledSaveMessages = messageState.sheduledSaveMessages;
     messageState.sheduledSaveMessages = void 0;
-    saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, settingsValue, resolvedPluginApi).then(() => {
+    saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi).then(() => {
       executingSheduledSaveMessages.resolve();
     }).catch((e) => {
       executingSheduledSaveMessages.reject(e);
@@ -62200,63 +62229,8 @@ var lintSingleMessage = async (args) => {
   return { data: reports, errors };
 };
 
-// ../../../node_modules/.pnpm/throttle-debounce@5.0.0/node_modules/throttle-debounce/esm/index.js
-function throttle(delay, callback, options) {
-  var _ref = options || {}, _ref$noTrailing = _ref.noTrailing, noTrailing = _ref$noTrailing === void 0 ? false : _ref$noTrailing, _ref$noLeading = _ref.noLeading, noLeading = _ref$noLeading === void 0 ? false : _ref$noLeading, _ref$debounceMode = _ref.debounceMode, debounceMode = _ref$debounceMode === void 0 ? void 0 : _ref$debounceMode;
-  var timeoutID;
-  var cancelled = false;
-  var lastExec = 0;
-  function clearExistingTimeout() {
-    if (timeoutID) {
-      clearTimeout(timeoutID);
-    }
-  }
-  function cancel(options2) {
-    var _ref2 = options2 || {}, _ref2$upcomingOnly = _ref2.upcomingOnly, upcomingOnly = _ref2$upcomingOnly === void 0 ? false : _ref2$upcomingOnly;
-    clearExistingTimeout();
-    cancelled = !upcomingOnly;
-  }
-  function wrapper() {
-    for (var _len = arguments.length, arguments_ = new Array(_len), _key = 0; _key < _len; _key++) {
-      arguments_[_key] = arguments[_key];
-    }
-    var self2 = this;
-    var elapsed = Date.now() - lastExec;
-    if (cancelled) {
-      return;
-    }
-    function exec2() {
-      lastExec = Date.now();
-      callback.apply(self2, arguments_);
-    }
-    function clear() {
-      timeoutID = void 0;
-    }
-    if (!noLeading && debounceMode && !timeoutID) {
-      exec2();
-    }
-    clearExistingTimeout();
-    if (debounceMode === void 0 && elapsed > delay) {
-      if (noLeading) {
-        lastExec = Date.now();
-        if (!noTrailing) {
-          timeoutID = setTimeout(debounceMode ? clear : exec2, delay);
-        }
-      } else {
-        exec2();
-      }
-    } else if (noTrailing !== true) {
-      timeoutID = setTimeout(debounceMode ? clear : exec2, debounceMode === void 0 ? delay - elapsed : delay);
-    }
-  }
-  wrapper.cancel = cancel;
-  return wrapper;
-}
-
 // ../sdk/dist/createMessageLintReportsQuery.js
-var import_debug6 = __toESM(require_src(), 1);
-var debug6 = (0, import_debug6.default)("sdk:lintReports");
-function sleep2(ms) {
+function sleep3(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function createMessageLintReportsQuery(messagesQuery, settings, installedMessageLintRules, resolvedModules) {
@@ -62270,63 +62244,52 @@ function createMessageLintReportsQuery(messagesQuery, settings, installedMessage
       messageLintRuleLevels
     };
   };
-  const messages = messagesQuery.getAll();
-  const trackedMessages = /* @__PURE__ */ new Map();
-  debug6(`createMessageLintReportsQuery ${rulesArray?.length} rules, ${messages.length} messages`);
-  let lintMessageCount = 0;
-  const throttledLogLintMessage = throttle(2e3, (messageId) => {
-    debug6(`lintSingleMessage: ${lintMessageCount} id: ${messageId}`);
-  });
-  createEffect2(() => {
-    const currentMessageIds = new Set(messagesQuery.includedMessageIds());
-    const deletedTrackedMessages = [...trackedMessages].filter((tracked) => !currentMessageIds.has(tracked[0]));
-    if (rulesArray) {
-      for (const messageId of currentMessageIds) {
-        if (!trackedMessages.has(messageId)) {
-          createRoot2((dispose) => {
-            createEffect2(() => {
-              const message = messagesQuery.get({ where: { id: messageId } });
-              if (!message) {
-                return;
-              }
-              if (!trackedMessages?.has(messageId)) {
-                trackedMessages?.set(messageId, dispose);
-              }
-              lintSingleMessage({
-                rules: rulesArray,
-                settings: settingsObject(),
-                messages,
-                message
-              }).then((report) => {
-                lintMessageCount++;
-                throttledLogLintMessage(messageId);
-                if (report.errors.length === 0 && index2.get(messageId) !== report.data) {
-                  index2.set(messageId, report.data);
-                }
-              });
-            });
-          });
-        }
-      }
-      for (const deletedMessage of deletedTrackedMessages) {
-        const deletedMessageId = deletedMessage[0];
-        const messageEffectDisposeFunction = trackedMessages.get(deletedMessageId);
-        if (messageEffectDisposeFunction) {
-          messageEffectDisposeFunction();
-          trackedMessages.delete(deletedMessageId);
-          index2.delete(deletedMessageId);
-          debug6(`delete lint message id: ${deletedMessageId}`);
-        }
-      }
+  const lintMessage = (message, messages2) => {
+    if (!rulesArray) {
+      return;
     }
-  });
+    lintSingleMessage({
+      rules: rulesArray,
+      settings: settingsObject(),
+      messages: messages2,
+      message
+    }).then((report) => {
+      if (report.errors.length === 0 && index2.get(message.id) !== report.data) {
+        index2.set(message.id, report.data);
+      }
+    });
+  };
+  const messages = messagesQuery.getAll();
+  for (const message of messages) {
+    lintMessage(message, messages);
+  }
+  const messageQueryChangeDelegate = {
+    onCleanup: () => {
+      index2.clear();
+    },
+    onLoaded: (messages2) => {
+      for (const message of messages2) {
+        lintMessage(message, messages2);
+      }
+    },
+    onMessageCreate: (messageId, message) => {
+      lintMessage(message, messages);
+    },
+    onMessageUpdate: (messageId, message) => {
+      lintMessage(message, messages);
+    },
+    onMessageDelete: (messageId) => {
+      index2.delete(messageId);
+    }
+  };
+  messagesQuery.setDelegate(messageQueryChangeDelegate);
   return {
     getAll: async () => {
-      await sleep2(0);
+      await sleep3(0);
       return structuredClone([...index2.values()].flat().length === 0 ? [] : [...index2.values()].flat());
     },
     get: async (args) => {
-      await sleep2(0);
+      await sleep3(0);
       return structuredClone(index2.get(args.where.messageId) ?? []);
     }
   };
@@ -62522,13 +62485,13 @@ var identifyProject = async (args) => {
 };
 
 // ../sdk/dist/loadProject.js
-var import_debug7 = __toESM(require_src(), 1);
-var debug7 = (0, import_debug7.default)("sdk:loadProject");
+var import_debug6 = __toESM(require_src(), 1);
+var debug6 = (0, import_debug6.default)("sdk:loadProject");
 var settingsCompiler = import_compiler3.TypeCompiler.Compile(ProjectSettings);
 async function loadProject(args) {
   const projectPath = normalizePath2(args.projectPath);
   assertValidProjectPath(projectPath);
-  debug7(projectPath);
+  debug6(projectPath);
   const nodeishFs = createNodeishFsWithAbsolutePaths({
     projectPath,
     nodeishFs: args.repo.nodeishFs
