@@ -23193,7 +23193,7 @@ var require_lib2 = __commonJS({
           }
         }
       };
-      var exec2 = function(locked) {
+      var exec = function(locked) {
         if (resolved) {
           return done(locked);
         }
@@ -23238,19 +23238,19 @@ var require_lib2 = __commonJS({
         }
       };
       if (self2.domainReentrant && !!process.domain) {
-        exec2 = process.domain.bind(exec2);
+        exec = process.domain.bind(exec);
       }
       var maxPending = opts.maxPending || self2.maxPending;
       if (!self2.queues[key]) {
         self2.queues[key] = [];
-        exec2(true);
+        exec(true);
       } else if (self2.domainReentrant && !!process.domain && process.domain === self2.domains[key]) {
-        exec2(false);
+        exec(false);
       } else if (self2.queues[key].length >= maxPending) {
         done(false, new Error("Too many pending tasks in queue " + key));
       } else {
         var taskFn = function() {
-          exec2(true);
+          exec(true);
         };
         if (opts.skipQueue) {
           self2.queues[key].unshift(taskFn);
@@ -59141,7 +59141,7 @@ var resolveMessageLintRules = (args) => {
   return result;
 };
 
-// ../../../node_modules/.pnpm/dedent@1.5.1/node_modules/dedent/dist/dedent.mjs
+// ../../../node_modules/.pnpm/dedent@1.5.1_babel-plugin-macros@2.8.0/node_modules/dedent/dist/dedent.mjs
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
   if (Object.getOwnPropertySymbols) {
@@ -60543,12 +60543,21 @@ var ReactiveMap = class extends Map {
 // ../sdk/dist/createNodeishFsWithWatcher.js
 var createNodeishFsWithWatcher = (args) => {
   const pathList = [];
+  let abortControllers = [];
+  const stopWatching = () => {
+    for (const ac of abortControllers) {
+      ac.abort();
+    }
+    abortControllers = [];
+  };
   const makeWatcher = (path) => {
     ;
     (async () => {
       try {
+        const ac = new AbortController();
+        abortControllers.push(ac);
         const watcher = args.nodeishFs.watch(path, {
-          signal: args.abortController.signal,
+          signal: ac.signal,
           persistent: false
         });
         if (watcher) {
@@ -60581,7 +60590,8 @@ var createNodeishFsWithWatcher = (args) => {
     rmdir: args.nodeishFs.rmdir,
     writeFile: args.nodeishFs.writeFile,
     watch: args.nodeishFs.watch,
-    stat: args.nodeishFs.stat
+    stat: args.nodeishFs.stat,
+    stopWatching
   };
 };
 
@@ -61865,11 +61875,6 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
     const resolvedPluginApi = resolvedModules()?.resolvedPluginApi;
     if (!resolvedPluginApi)
       return;
-    const abortController = new AbortController();
-    onCleanup3(() => {
-      abortController.abort();
-      delegate?.onCleanup();
-    });
     const fsWithWatcher = createNodeishFsWithWatcher({
       nodeishFs,
       // this message is called whenever a file changes that was read earlier by this filesystem
@@ -61889,8 +61894,11 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         }).then(() => {
           onLoadMessageResult();
         });
-      },
-      abortController
+      }
+    });
+    onCleanup3(() => {
+      fsWithWatcher.stopWatching();
+      delegate?.onCleanup();
     });
     if (!resolvedPluginApi.loadMessages) {
       onInitialMessageLoadResult(new Error("no loadMessages in resolved Modules found"));
@@ -62750,7 +62758,6 @@ var listProjects = async (nodeishFs, from2) => {
 };
 
 // src/main.ts
-var import_node_child_process = require("node:child_process");
 async function run() {
   core.debug("Running the action");
   try {
@@ -62758,75 +62765,76 @@ async function run() {
     if (!token) {
       throw new Error("GITHUB_TOKEN is not set");
     }
+    const octokit = github.getOctokit(token);
     const { owner, repo } = github.context.repo;
     const prNumber = github.context.payload.pull_request?.number;
-    const repoBase = await openRepository("file://" + process.cwd(), {
+    const { data } = await octokit.rest.pulls.get({
+      owner,
+      repo,
+      pull_number: prNumber
+    });
+    if (data.mergeable) {
+      console.debug(`Pull Request #${prNumber} is mergeable.`);
+    } else {
+      console.warn(`Pull Request #${prNumber} is not mergeable. Skipping linting.`);
+      return;
+    }
+    process.chdir("target");
+    core.debug(`Changed directory to target`);
+    const repoTarget = await openRepository("file://" + process.cwd(), {
       nodeishFs: fs,
       branch: github.context.payload.pull_request?.head.ref
     });
-    const projectListBase = await listProjects(repoBase.nodeishFs, process.cwd());
-    const results = projectListBase.map((project) => ({
+    core.debug(`Opened target repository`);
+    const projectListTarget = await listProjects(repoTarget.nodeishFs, process.cwd());
+    const results = projectListTarget.map((project) => ({
       projectPath: project.projectPath.replace(process.cwd(), ""),
-      errorsBase: [],
-      errorsHead: [],
+      errorsTarget: [],
+      errorsMerge: [],
       installedRules: [],
-      reportsBase: [],
-      reportsHead: [],
+      reportsTarget: [],
+      reportsMerge: [],
       lintSummary: [],
       changedIds: [],
       commentContent: ""
     }));
     for (const result of results) {
-      core.debug(`Checking project: ${result.projectPath}`);
-      const projectBase = await loadProject({
+      core.debug(`Checking project: ${result.projectPath} in target repo`);
+      const projectTarget = await loadProject({
         projectPath: process.cwd() + result.projectPath,
-        repo: repoBase,
+        repo: repoTarget,
         appId: "app.inlang.ninjaI18nAction"
       });
-      if (projectBase.errors().length > 0) {
+      if (projectTarget.errors().length > 0) {
         if (result)
-          result.errorsBase = projectBase.errors();
+          result.errorsTarget = projectTarget.errors();
         console.debug("Skip project ", result.projectPath, " in base repo because of errors");
         continue;
       }
-      result.installedRules.push(...projectBase.installed.messageLintRules());
-      result.reportsBase.push(...await projectBase.query.messageLintReports.getAll());
+      result.installedRules.push(...projectTarget.installed.messageLintRules());
+      const messageLintReports = await projectTarget.query.messageLintReports.getAll();
+      core.debug(`message: ${messageLintReports.length}`);
+      result.reportsTarget.push(...messageLintReports);
+      core.debug(`detected lint reports: ${messageLintReports.length}`);
     }
     const headMeta = {
       owner: github.context.payload.pull_request?.head.label.split(":")[0],
       repo: github.context.payload.pull_request?.head.repo.name,
-      branch: github.context.payload.pull_request?.head.label.split(":")[1],
-      link: github.context.payload.pull_request?.head.repo.html_url
+      branch: github.context.payload.pull_request?.head.label.split(":")[1]
     };
     const baseMeta = {
       owner: github.context.payload.pull_request?.base.label.split(":")[0],
       repo,
-      branch: github.context.payload.pull_request?.base.label.split(":")[1],
-      link: github.context.payload.pull_request?.base.repo.html_url
+      branch: github.context.payload.pull_request?.base.label.split(":")[1]
     };
-    const isFork = headMeta.owner !== baseMeta.owner;
-    core.debug(`Is fork: ${isFork}`);
-    let repoHead;
-    if (isFork) {
-      core.debug("Fork detected, cloning head repository");
-      process.chdir("../../../");
-      await cloneRepository(headMeta);
-      process.chdir(headMeta.repo);
-      repoHead = await openRepository("file://" + process.cwd(), {
-        nodeishFs: fs
-      });
-    } else {
-      core.debug("Fork not detected, fetching and checking out head repository");
-      await fetchBranch(headMeta.branch);
-      await checkoutBranch(headMeta.branch);
-      await pull3();
-      repoHead = await openRepository("file://" + process.cwd(), {
-        nodeishFs: fs,
-        branch: headMeta.branch
-      });
-    }
-    const projectListHead = await listProjects(repoHead.nodeishFs, process.cwd());
-    const newProjects = projectListHead.filter(
+    process.chdir("../merge");
+    core.debug(`Changed directory to merge`);
+    const repoMerge = await openRepository("file://" + process.cwd(), {
+      nodeishFs: fs
+    });
+    core.debug(`Opened merge repository`);
+    const projectListMerge = await listProjects(repoMerge.nodeishFs, process.cwd());
+    const newProjects = projectListMerge.filter(
       (project) => !results.some(
         (result) => result.projectPath === project.projectPath.replace(process.cwd(), "")
       )
@@ -62834,50 +62842,62 @@ async function run() {
     for (const project of newProjects) {
       results.push({
         projectPath: project.projectPath.replace(process.cwd(), ""),
-        errorsBase: [],
-        errorsHead: [],
+        errorsTarget: [],
+        errorsMerge: [],
         installedRules: [],
-        reportsBase: [],
-        reportsHead: [],
+        reportsTarget: [],
+        reportsMerge: [],
         lintSummary: [],
         changedIds: [],
         commentContent: ""
       });
     }
     for (const result of results) {
-      if (projectListHead.some(
+      core.debug(`Checking project: ${result.projectPath} in merge repo`);
+      if (projectListMerge.some(
         (project) => project.projectPath.replace(process.cwd(), "") === result.projectPath
       ) === false) {
         console.debug(`Project ${result.projectPath} not found in head repo`);
         continue;
       }
-      const projectHead = await loadProject({
+      const projectMerge = await loadProject({
         projectPath: process.cwd() + result.projectPath,
-        repo: repoHead,
+        repo: repoMerge,
         appId: "app.inlang.ninjaI18nAction"
       });
-      if (projectHead.errors().length > 0) {
+      if (projectMerge.errors().length > 0) {
         if (result)
-          result.errorsHead = projectHead.errors();
+          result.errorsMerge = projectMerge.errors();
         console.debug("Skip project ", result.projectPath, " in head repo because of errors");
         continue;
       }
-      const newInstalledRules = projectHead.installed.messageLintRules();
+      const newInstalledRules = projectMerge.installed.messageLintRules();
       for (const newRule of newInstalledRules) {
         if (!result.installedRules.some((rule) => rule.id === newRule.id)) {
           result.installedRules.push(newRule);
         }
       }
-      result?.reportsHead.push(...await projectHead.query.messageLintReports.getAll());
+      const messageLintReports = await projectMerge.query.messageLintReports.getAll();
+      core.debug(`message: ${messageLintReports.length}`);
+      result?.reportsMerge.push(...messageLintReports);
+      core.debug(`detected lint reports: ${messageLintReports.length}`);
     }
+    let projectWithNewSetupErrors = false;
+    let projectWithNewLintErrors = false;
     for (const result of results) {
-      if (result.errorsHead.length > 0)
+      if (result.errorsMerge.length > 0)
         continue;
       const LintSummary = createLintSummary(
-        result.reportsHead,
-        result.reportsBase,
+        result.reportsMerge,
+        result.reportsTarget,
         result.installedRules
       );
+      if (LintSummary.summary.some((lintSummary) => lintSummary.level === "error")) {
+        console.debug(
+          `\u2757\uFE0F New lint errors found in project ${result.projectPath}. Set workflow to fail.`
+        );
+        projectWithNewLintErrors = true;
+      }
       result.lintSummary = LintSummary.summary;
       result.changedIds = LintSummary.changedIds;
     }
@@ -62890,9 +62910,13 @@ async function run() {
           return result.projectPath;
         }
       };
-      if (result.errorsBase.length === 0 && result.errorsHead.length > 0) {
+      if (result.errorsTarget.length === 0 && result.errorsMerge.length > 0) {
+        console.debug(
+          `\u2757\uFE0F New errors in setup of project \`${result.projectPath}\` found. Set workflow to fail.`
+        );
+        projectWithNewSetupErrors = true;
         result.commentContent = `#### \u2757\uFE0F New errors in setup of project \`${shortenedProjectPath()}\` found
-${result.errorsHead.map((error) => {
+${result.errorsMerge.map((error) => {
           let errorLog = `<details>
 <summary>${error?.name}</summary>
 ${error?.message}`;
@@ -62913,27 +62937,26 @@ ${error?.cause.stack}`;
         }).join("\n")}`;
         continue;
       }
-      if (result.errorsBase.length > 0 && result.errorsHead.length === 0) {
+      if (result.errorsTarget.length > 0 && result.errorsMerge.length === 0) {
         console.debug(`\u2705 Setup of project \`${result.projectPath}\` fixed`);
       }
-      if (result.errorsHead.length > 0)
+      if (result.errorsMerge.length > 0)
         continue;
       if (result.lintSummary.length === 0)
         continue;
       const lintSummary = result.lintSummary;
       const commentContent2 = `#### Project \`${shortenedProjectPath()}\`
-| lint rule | new reports | link |
-|-----------|-------------|------|
+| lint rule | new reports | level | link |
+|-----------|-------------| ------|------|
 ${lintSummary.map(
-        (lintSummary2) => `| ${lintSummary2.name} | ${lintSummary2.count} | [contribute (via Fink \u{1F426})](https://fink.inlang.com/github.com/${headMeta.owner}/${headMeta.repo}?branch=${headMeta.branch}&project=${result.projectPath}&lint=${lintSummary2.id}&${result.changedIds.map((id) => `id=${id}`).join("&")}&ref=ninja-${baseMeta.owner}/${baseMeta.repo}/pull/${prNumber}) |`
+        (lintSummary2) => `| ${lintSummary2.name} | ${lintSummary2.count}| ${lintSummary2.level} | [contribute (via Fink \u{1F426})](https://fink.inlang.com/github.com/${headMeta.owner}/${headMeta.repo}?branch=${headMeta.branch}&project=${result.projectPath}&lint=${lintSummary2.id}&${result.changedIds.map((id) => `id=${id}`).join("&")}&ref=ninja-${baseMeta.owner}/${baseMeta.repo}/pull/${prNumber}) |`
       ).join("\n")}
 `;
       result.commentContent = commentContent2;
     }
-    const commentHeadline = `### \u{1F977} Ninja i18n \u2013 \u{1F6CE}\uFE0F Translations need to be updated`;
+    const commentMergeline = `### \u{1F977} Ninja i18n \u2013 \u{1F6CE}\uFE0F Translations need to be updated`;
     const commentResolved = `### \u{1F977} Ninja i18n \u2013 \u{1F389} Translations have been successfully updated`;
-    const commentContent = commentHeadline + "\n\n" + results.map((result) => result.commentContent).filter((content) => content.length > 0).join("\n");
-    const octokit = github.getOctokit(token);
+    const commentContent = commentMergeline + "\n\n" + results.map((result) => result.commentContent).filter((content) => content.length > 0).join("\n");
     const issue = await octokit.rest.issues.get({
       owner,
       repo,
@@ -62948,7 +62971,7 @@ ${lintSummary.map(
     });
     if (existingComment.data.length > 0) {
       const commentId = existingComment.data.find(
-        (comment) => (comment.body?.includes(commentHeadline) || comment.body?.includes(commentResolved)) && comment.user?.login === "github-actions[bot]"
+        (comment) => (comment.body?.includes(commentMergeline) || comment.body?.includes(commentResolved)) && comment.user?.login === "github-actions[bot]"
       )?.id;
       if (commentId) {
         core.debug("Updating existing comment");
@@ -62961,7 +62984,6 @@ ${lintSummary.map(
             body: commentResolved,
             as: "ninja-i18n"
           });
-          return;
         } else {
           core.debug("Reports have not been fixed, updating comment");
           await octokit.rest.issues.updateComment({
@@ -62972,30 +62994,40 @@ ${lintSummary.map(
             as: "ninja-i18n"
           });
         }
-        return;
       }
-    }
-    if (results.every((result) => result.commentContent.length === 0)) {
+    } else if (results.every((result) => result.commentContent.length === 0)) {
       core.debug("No lint reports found, skipping comment");
-      return;
+    } else {
+      core.debug("Creating a new comment");
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: prNumber,
+        body: commentContent,
+        as: "ninja-i18n"
+      });
     }
-    core.debug("Creating a new comment");
-    await octokit.rest.issues.createComment({
-      owner,
-      repo,
-      issue_number: prNumber,
-      body: commentContent,
-      as: "ninja-i18n"
-    });
+    if (projectWithNewSetupErrors || projectWithNewLintErrors) {
+      let error_message = "";
+      if (projectWithNewSetupErrors && projectWithNewLintErrors) {
+        error_message = "New errors found in project setup and new lint errors found in project";
+      } else if (projectWithNewSetupErrors) {
+        error_message = "New errors found in project setup";
+      } else if (projectWithNewLintErrors) {
+        error_message = "New lint errors found in project";
+      }
+      core.setFailed(error_message);
+    }
   } catch (error) {
-    if (error instanceof Error)
+    if (error instanceof Error) {
       core.setFailed(error);
+    }
   }
 }
-function createLintSummary(reportsHead, reportsBase, installedRules) {
+function createLintSummary(reportsMerge, reportsTarget, installedRules) {
   const summary = [];
-  const diffReports = reportsHead.filter(
-    (report) => !reportsBase.some(
+  const diffReports = reportsMerge.filter(
+    (report) => !reportsTarget.some(
       (baseReport) => baseReport.ruleId === report.ruleId && baseReport.languageTag === report.languageTag && baseReport.messageId === report.messageId
     )
   );
@@ -63003,73 +63035,13 @@ function createLintSummary(reportsHead, reportsBase, installedRules) {
     const id = installedRule.id;
     const name = typeof installedRule.displayName === "object" ? installedRule.displayName.en : installedRule.displayName;
     const count = diffReports.filter((report) => report.ruleId === id).length;
+    const level = installedRule.level;
     if (count > 0) {
-      summary.push({ id, name, count });
+      summary.push({ id, name, count, level });
     }
   }
   const changedIds = diffReports.map((report) => report.messageId).filter((value, index2, self2) => self2.indexOf(value) === index2);
   return { summary, changedIds };
-}
-async function checkoutBranch(branchName) {
-  return new Promise((resolve, reject) => {
-    (0, import_node_child_process.exec)(`git checkout ${branchName}`, { cwd: process.cwd() }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing command: ${error}`);
-        reject(error);
-        return;
-      }
-      core.debug(`stdout: ${stdout}`);
-      core.debug(`stderr: ${stderr}`);
-      resolve();
-    });
-  });
-}
-async function fetchBranch(branchName) {
-  return new Promise((resolve, reject) => {
-    (0, import_node_child_process.exec)(`git fetch origin ${branchName}`, { cwd: process.cwd() }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing command: ${error}`);
-        reject(error);
-        return;
-      }
-      core.debug(`stdout: ${stdout}`);
-      core.debug(`stderr: ${stderr}`);
-      resolve();
-    });
-  });
-}
-async function pull3() {
-  return new Promise((resolve, reject) => {
-    (0, import_node_child_process.exec)(`git pull`, { cwd: process.cwd() }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing command: ${error}`);
-        reject(error);
-        return;
-      }
-      core.debug(`stdout: ${stdout}`);
-      core.debug(`stderr: ${stderr}`);
-      resolve();
-    });
-  });
-}
-async function cloneRepository(repoData) {
-  return new Promise((resolve, reject) => {
-    (0, import_node_child_process.exec)(
-      `git clone -b ${repoData.branch} --single-branch --depth 1 ${repoData.link}`,
-      // Clone only the latest commit
-      { cwd: process.cwd() },
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing command: ${error}`);
-          reject(error);
-          return;
-        }
-        core.debug(`stdout: ${stdout}`);
-        core.debug(`stderr: ${stderr}`);
-        resolve();
-      }
-    );
-  });
 }
 
 // src/index.ts
