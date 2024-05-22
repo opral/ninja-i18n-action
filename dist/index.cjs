@@ -6687,34 +6687,34 @@ var require_constants3 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.SPECIAL_HEADERS = exports2.HEADER_STATE = exports2.MINOR = exports2.MAJOR = exports2.CONNECTION_TOKEN_CHARS = exports2.HEADER_CHARS = exports2.TOKEN = exports2.STRICT_TOKEN = exports2.HEX = exports2.URL_CHAR = exports2.STRICT_URL_CHAR = exports2.USERINFO_CHARS = exports2.MARK = exports2.ALPHANUM = exports2.NUM = exports2.HEX_MAP = exports2.NUM_MAP = exports2.ALPHA = exports2.FINISH = exports2.H_METHOD_MAP = exports2.METHOD_MAP = exports2.METHODS_RTSP = exports2.METHODS_ICE = exports2.METHODS_HTTP = exports2.METHODS = exports2.LENIENT_FLAGS = exports2.FLAGS = exports2.TYPE = exports2.ERROR = void 0;
     var utils_1 = require_utils2();
-    var ERROR3;
-    (function(ERROR4) {
-      ERROR4[ERROR4["OK"] = 0] = "OK";
-      ERROR4[ERROR4["INTERNAL"] = 1] = "INTERNAL";
-      ERROR4[ERROR4["STRICT"] = 2] = "STRICT";
-      ERROR4[ERROR4["LF_EXPECTED"] = 3] = "LF_EXPECTED";
-      ERROR4[ERROR4["UNEXPECTED_CONTENT_LENGTH"] = 4] = "UNEXPECTED_CONTENT_LENGTH";
-      ERROR4[ERROR4["CLOSED_CONNECTION"] = 5] = "CLOSED_CONNECTION";
-      ERROR4[ERROR4["INVALID_METHOD"] = 6] = "INVALID_METHOD";
-      ERROR4[ERROR4["INVALID_URL"] = 7] = "INVALID_URL";
-      ERROR4[ERROR4["INVALID_CONSTANT"] = 8] = "INVALID_CONSTANT";
-      ERROR4[ERROR4["INVALID_VERSION"] = 9] = "INVALID_VERSION";
-      ERROR4[ERROR4["INVALID_HEADER_TOKEN"] = 10] = "INVALID_HEADER_TOKEN";
-      ERROR4[ERROR4["INVALID_CONTENT_LENGTH"] = 11] = "INVALID_CONTENT_LENGTH";
-      ERROR4[ERROR4["INVALID_CHUNK_SIZE"] = 12] = "INVALID_CHUNK_SIZE";
-      ERROR4[ERROR4["INVALID_STATUS"] = 13] = "INVALID_STATUS";
-      ERROR4[ERROR4["INVALID_EOF_STATE"] = 14] = "INVALID_EOF_STATE";
-      ERROR4[ERROR4["INVALID_TRANSFER_ENCODING"] = 15] = "INVALID_TRANSFER_ENCODING";
-      ERROR4[ERROR4["CB_MESSAGE_BEGIN"] = 16] = "CB_MESSAGE_BEGIN";
-      ERROR4[ERROR4["CB_HEADERS_COMPLETE"] = 17] = "CB_HEADERS_COMPLETE";
-      ERROR4[ERROR4["CB_MESSAGE_COMPLETE"] = 18] = "CB_MESSAGE_COMPLETE";
-      ERROR4[ERROR4["CB_CHUNK_HEADER"] = 19] = "CB_CHUNK_HEADER";
-      ERROR4[ERROR4["CB_CHUNK_COMPLETE"] = 20] = "CB_CHUNK_COMPLETE";
-      ERROR4[ERROR4["PAUSED"] = 21] = "PAUSED";
-      ERROR4[ERROR4["PAUSED_UPGRADE"] = 22] = "PAUSED_UPGRADE";
-      ERROR4[ERROR4["PAUSED_H2_UPGRADE"] = 23] = "PAUSED_H2_UPGRADE";
-      ERROR4[ERROR4["USER"] = 24] = "USER";
-    })(ERROR3 = exports2.ERROR || (exports2.ERROR = {}));
+    var ERROR2;
+    (function(ERROR3) {
+      ERROR3[ERROR3["OK"] = 0] = "OK";
+      ERROR3[ERROR3["INTERNAL"] = 1] = "INTERNAL";
+      ERROR3[ERROR3["STRICT"] = 2] = "STRICT";
+      ERROR3[ERROR3["LF_EXPECTED"] = 3] = "LF_EXPECTED";
+      ERROR3[ERROR3["UNEXPECTED_CONTENT_LENGTH"] = 4] = "UNEXPECTED_CONTENT_LENGTH";
+      ERROR3[ERROR3["CLOSED_CONNECTION"] = 5] = "CLOSED_CONNECTION";
+      ERROR3[ERROR3["INVALID_METHOD"] = 6] = "INVALID_METHOD";
+      ERROR3[ERROR3["INVALID_URL"] = 7] = "INVALID_URL";
+      ERROR3[ERROR3["INVALID_CONSTANT"] = 8] = "INVALID_CONSTANT";
+      ERROR3[ERROR3["INVALID_VERSION"] = 9] = "INVALID_VERSION";
+      ERROR3[ERROR3["INVALID_HEADER_TOKEN"] = 10] = "INVALID_HEADER_TOKEN";
+      ERROR3[ERROR3["INVALID_CONTENT_LENGTH"] = 11] = "INVALID_CONTENT_LENGTH";
+      ERROR3[ERROR3["INVALID_CHUNK_SIZE"] = 12] = "INVALID_CHUNK_SIZE";
+      ERROR3[ERROR3["INVALID_STATUS"] = 13] = "INVALID_STATUS";
+      ERROR3[ERROR3["INVALID_EOF_STATE"] = 14] = "INVALID_EOF_STATE";
+      ERROR3[ERROR3["INVALID_TRANSFER_ENCODING"] = 15] = "INVALID_TRANSFER_ENCODING";
+      ERROR3[ERROR3["CB_MESSAGE_BEGIN"] = 16] = "CB_MESSAGE_BEGIN";
+      ERROR3[ERROR3["CB_HEADERS_COMPLETE"] = 17] = "CB_HEADERS_COMPLETE";
+      ERROR3[ERROR3["CB_MESSAGE_COMPLETE"] = 18] = "CB_MESSAGE_COMPLETE";
+      ERROR3[ERROR3["CB_CHUNK_HEADER"] = 19] = "CB_CHUNK_HEADER";
+      ERROR3[ERROR3["CB_CHUNK_COMPLETE"] = 20] = "CB_CHUNK_COMPLETE";
+      ERROR3[ERROR3["PAUSED"] = 21] = "PAUSED";
+      ERROR3[ERROR3["PAUSED_UPGRADE"] = 22] = "PAUSED_UPGRADE";
+      ERROR3[ERROR3["PAUSED_H2_UPGRADE"] = 23] = "PAUSED_H2_UPGRADE";
+      ERROR3[ERROR3["USER"] = 24] = "USER";
+    })(ERROR2 = exports2.ERROR || (exports2.ERROR = {}));
     var TYPE;
     (function(TYPE2) {
       TYPE2[TYPE2["BOTH"] = 0] = "BOTH";
@@ -50063,14 +50063,14 @@ async function _walk({
   // @ts-ignore
   map = async (_, entry) => entry,
   // The default reducer is a flatmap that filters out undefineds.
-  reduce = async (parent, children3) => {
-    const flatten = flat(children3);
+  reduce = async (parent, children2) => {
+    const flatten = flat(children2);
     if (parent !== void 0)
       flatten.unshift(parent);
     return flatten;
   },
   // The default iterate function walks all children concurrently
-  iterate = (walk3, children3) => Promise.all([...children3].map(walk3))
+  iterate = (walk3, children2) => Promise.all([...children2].map(walk3))
 }) {
   const walkers = trees.map(
     (proxy) => proxy[GitWalkSymbol]({ fs: fs2, dir, gitdir, cache })
@@ -50091,11 +50091,11 @@ async function _walk({
     };
   };
   const walk3 = async (root2) => {
-    const { entries, children: children3 } = await unionWalkerFromReaddir(root2);
+    const { entries, children: children2 } = await unionWalkerFromReaddir(root2);
     const fullpath = entries.find((entry) => entry && entry._fullpath)._fullpath;
     const parent = await map(fullpath, entries);
     if (parent !== null) {
-      let walkedChildren = await iterate(walk3, children3);
+      let walkedChildren = await iterate(walk3, children2);
       walkedChildren = walkedChildren.filter((x) => x !== void 0);
       return reduce(parent, walkedChildren);
     }
@@ -50611,9 +50611,9 @@ async function addToIndex({
     if (!stats)
       throw new NotFoundError(currentFilepath);
     if (stats.isDirectory()) {
-      const children3 = await fs2.readdir(join(dir, currentFilepath));
+      const children2 = await fs2.readdir(join(dir, currentFilepath));
       if (parallel) {
-        const promises2 = children3.map(
+        const promises2 = children2.map(
           (child) => addToIndex({
             dir,
             gitdir,
@@ -50626,7 +50626,7 @@ async function addToIndex({
         );
         await Promise.all(promises2);
       } else {
-        for (const child of children3) {
+        for (const child of children2) {
           await addToIndex({
             dir,
             gitdir,
@@ -50737,14 +50737,14 @@ async function _commit({
   );
 }
 async function constructTree({ fs: fs2, gitdir, inode, dryRun }) {
-  const children3 = inode.children;
-  for (const inode2 of children3) {
+  const children2 = inode.children;
+  for (const inode2 of children2) {
     if (inode2.type === "tree") {
       inode2.metadata.mode = "040000";
       inode2.metadata.oid = await constructTree({ fs: fs2, gitdir, inode: inode2, dryRun });
     }
   }
-  const entries = children3.map((inode2) => ({
+  const entries = children2.map((inode2) => ({
     mode: inode2.metadata.mode,
     path: inode2.basename,
     oid: inode2.metadata.oid,
@@ -51630,16 +51630,16 @@ async function analyze({
       }
     },
     // Modify the default flat mapping
-    reduce: async function(parent, children3) {
-      children3 = flat(children3);
+    reduce: async function(parent, children2) {
+      children2 = flat(children2);
       if (!parent) {
-        return children3;
+        return children2;
       } else if (parent && parent[0] === "rmdir") {
-        children3.push(parent);
-        return children3;
+        children2.push(parent);
+        return children2;
       } else {
-        children3.unshift(parent);
-        return children3;
+        children2.unshift(parent);
+        return children2;
       }
     }
   });
@@ -53346,8 +53346,8 @@ async function mergeTree({
      * @param {TreeEntry} [parent]
      * @param {Array<TreeEntry>} children
      */
-    reduce: unmergedFiles.length !== 0 && (!dir || abortOnConflict) ? void 0 : async (parent, children3) => {
-      const entries = children3.filter(Boolean);
+    reduce: unmergedFiles.length !== 0 && (!dir || abortOnConflict) ? void 0 : async (parent, children2) => {
+      const entries = children2.filter(Boolean);
       if (!parent)
         return;
       if (parent && parent.type === "tree" && entries.length === 0)
@@ -57696,16 +57696,16 @@ async function analyze2({ fs: fs2, cache, onProgress, dir, gitdir, ref, force, f
       }
     },
     // Modify the default flat mapping
-    reduce: async function(parent, children3) {
-      children3 = flat(children3);
+    reduce: async function(parent, children2) {
+      children2 = flat(children2);
       if (!parent) {
-        return children3;
+        return children2;
       } else if (parent && parent[0] === "rmdir") {
-        children3.push(parent);
-        return children3;
+        children2.push(parent);
+        return children2;
       } else {
-        children3.unshift(parent);
-        return children3;
+        children2.unshift(parent);
+        return children2;
       }
     }
   });
@@ -59141,7 +59141,7 @@ var resolveMessageLintRules = (args) => {
   return result;
 };
 
-// ../../../node_modules/.pnpm/dedent@1.5.1_babel-plugin-macros@2.8.0/node_modules/dedent/dist/dedent.mjs
+// ../../../node_modules/.pnpm/dedent@1.5.1/node_modules/dedent/dist/dedent.mjs
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
   if (Object.getOwnPropertySymbols) {
@@ -59946,8 +59946,8 @@ function createContext(defaultValue, options) {
   };
 }
 function children(fn) {
-  const children3 = createMemo(fn);
-  const memo2 = createMemo(() => resolveChildren(children3()));
+  const children2 = createMemo(fn);
+  const memo2 = createMemo(() => resolveChildren(children2()));
   memo2.toArray = () => {
     const c = memo2();
     return Array.isArray(c) ? c : c != null ? [c] : [];
@@ -60384,18 +60384,18 @@ function handleError(err) {
 function lookup2(owner, key) {
   return owner ? owner.context && owner.context[key] !== void 0 ? owner.context[key] : lookup2(owner.owner, key) : void 0;
 }
-function resolveChildren(children3) {
-  if (typeof children3 === "function" && !children3.length)
-    return resolveChildren(children3());
-  if (Array.isArray(children3)) {
+function resolveChildren(children2) {
+  if (typeof children2 === "function" && !children2.length)
+    return resolveChildren(children2());
+  if (Array.isArray(children2)) {
     const results = [];
-    for (let i = 0; i < children3.length; i++) {
-      const result = resolveChildren(children3[i]);
+    for (let i = 0; i < children2.length; i++) {
+      const result = resolveChildren(children2[i]);
       Array.isArray(result) ? results.push.apply(results, result) : results.push(result);
     }
     return results;
   }
-  return children3;
+  return children2;
 }
 function createProvider(id, options) {
   return function provider(props) {
@@ -60415,11 +60415,13 @@ var DEV;
 
 // ../sdk/dist/reactivity/solid.js
 var createSignal2 = createSignal;
+var createMemo2 = createMemo;
 var createRoot2 = createRoot;
 var createEffect2 = createEffect;
 var batch2 = batch;
 var getListener2 = getListener;
 var onCleanup2 = onCleanup;
+var untrack2 = untrack;
 
 // ../sdk/dist/reactivity/trigger.js
 var isServer = false;
@@ -60594,95 +60596,6 @@ var createNodeishFsWithWatcher = (args) => {
     stopWatching
   };
 };
-
-// ../../../node_modules/.pnpm/solid-js@1.6.12/node_modules/solid-js/dist/server.js
-var $PROXY2 = Symbol("solid-proxy");
-var $TRACK2 = Symbol("solid-track");
-var $DEVCOMP2 = Symbol("solid-dev-component");
-var ERROR2 = Symbol("error");
-var BRANCH = Symbol("branch");
-function castError2(err) {
-  if (err instanceof Error || typeof err === "string")
-    return err;
-  return new Error("Unknown error");
-}
-function handleError2(err) {
-  err = castError2(err);
-  const fns = lookup3(Owner2, ERROR2);
-  if (!fns)
-    throw err;
-  for (const f of fns)
-    f(err);
-}
-var Owner2 = null;
-function createMemo2(fn, value) {
-  Owner2 = {
-    owner: Owner2,
-    context: null
-  };
-  let v;
-  try {
-    v = fn(value);
-  } catch (err) {
-    handleError2(err);
-  } finally {
-    Owner2 = Owner2.owner;
-  }
-  return () => v;
-}
-function onCleanup3(fn) {
-  let node;
-  if (Owner2 && (node = lookup3(Owner2, BRANCH))) {
-    if (!node.cleanups)
-      node.cleanups = [fn];
-    else
-      node.cleanups.push(fn);
-  }
-  return fn;
-}
-function createContext2(defaultValue) {
-  const id = Symbol("context");
-  return {
-    id,
-    Provider: createProvider2(id),
-    defaultValue
-  };
-}
-function children2(fn) {
-  const memo2 = createMemo2(() => resolveChildren2(fn()));
-  memo2.toArray = () => {
-    const c = memo2();
-    return Array.isArray(c) ? c : c != null ? [c] : [];
-  };
-  return memo2;
-}
-function lookup3(owner, key) {
-  return owner ? owner.context && owner.context[key] !== void 0 ? owner.context[key] : lookup3(owner.owner, key) : void 0;
-}
-function resolveChildren2(children3) {
-  if (typeof children3 === "function" && !children3.length)
-    return resolveChildren2(children3());
-  if (Array.isArray(children3)) {
-    const results = [];
-    for (let i = 0; i < children3.length; i++) {
-      const result = resolveChildren2(children3[i]);
-      Array.isArray(result) ? results.push.apply(results, result) : results.push(result);
-    }
-    return results;
-  }
-  return children3;
-}
-function createProvider2(id) {
-  return function provider(props) {
-    return createMemo2(() => {
-      Owner2.context = {
-        [id]: props.value
-      };
-      return children2(() => props.children);
-    });
-  };
-}
-var SuspenseContext2 = createContext2();
 
 // ../sdk/dist/persistence/filelock/acquireFileLock.js
 init_dist();
@@ -61851,10 +61764,14 @@ function sleep2(ms) {
 }
 function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules, onInitialMessageLoadResult, onLoadMessageResult, onSaveMessageResult }) {
   const index2 = new ReactiveMap();
+  let loaded = false;
   const messageLockDirPath = projectPath + "/messagelock";
   let delegate = void 0;
-  const setDelegate = (newDelegate) => {
+  const setDelegate = (newDelegate, onLoad) => {
     delegate = newDelegate;
+    if (newDelegate && loaded && onLoad) {
+      newDelegate.onLoaded([...index2.values()]);
+    }
   };
   const defaultAliasIndex = new ReactiveMap();
   const messageStates = {
@@ -61869,6 +61786,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
   createEffect2(() => {
     index2.clear();
     defaultAliasIndex.clear();
+    loaded = false;
     const _settings = settings();
     if (!_settings)
       return;
@@ -61896,7 +61814,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         });
       }
     });
-    onCleanup3(() => {
+    onCleanup2(() => {
       fsWithWatcher.stopWatching();
       delegate?.onCleanup();
     });
@@ -61909,7 +61827,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       messageLockDirPath,
       messageStates,
       index2,
-      delegate,
+      void 0,
       _settings,
       // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
       resolvedPluginApi
@@ -61918,6 +61836,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
     }).then(() => {
       onInitialMessageLoadResult();
       delegate?.onLoaded([...index2.values()]);
+      loaded = true;
     });
   });
   const get = (args) => index2.get(args.where.id);
@@ -61957,7 +61876,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         defaultAliasIndex.set(data.alias.default, data);
       }
       messageStates.messageDirtyFlags[data.id] = true;
-      delegate?.onMessageCreate(data.id, index2.get(data.id));
+      delegate?.onMessageCreate(data.id, index2.get(data.id), [...index2.values()]);
       scheduleSave();
       return true;
     },
@@ -61979,7 +61898,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         return false;
       index2.set(where.id, { ...message, ...data });
       messageStates.messageDirtyFlags[where.id] = true;
-      delegate?.onMessageCreate(where.id, index2.get(data.id));
+      delegate?.onMessageUpdate(where.id, index2.get(data.id), [...index2.values()]);
       scheduleSave();
       return true;
     },
@@ -61991,11 +61910,11 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
           defaultAliasIndex.set(data.alias.default, data);
         }
         messageStates.messageDirtyFlags[where.id] = true;
-        delegate?.onMessageCreate(data.id, index2.get(data.id));
+        delegate?.onMessageCreate(data.id, index2.get(data.id), [...index2.values()]);
       } else {
         index2.set(where.id, { ...message, ...data });
         messageStates.messageDirtyFlags[where.id] = true;
-        delegate?.onMessageUpdate(data.id, index2.get(data.id));
+        delegate?.onMessageUpdate(data.id, index2.get(data.id), [...index2.values()]);
       }
       scheduleSave();
       return true;
@@ -62009,7 +61928,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       }
       index2.delete(where.id);
       messageStates.messageDirtyFlags[where.id] = true;
-      delegate?.onMessageDelete(where.id);
+      delegate?.onMessageDelete(where.id, [...index2.values()]);
       scheduleSave();
       return true;
     }
@@ -62033,12 +61952,14 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
       nodeishFs: fs2
     }));
     let loadedMessageCount = 0;
+    const deletedMessages = new Set(messages.keys());
     for (const loadedMessage of loadedMessages) {
       const loadedMessageClone = structuredClone(loadedMessage);
       const currentMessages = [...messages.values()].filter((message) => (experimentalAliases ? message.alias["default"] : message.id) === loadedMessage.id);
       if (currentMessages.length > 1) {
         throw new Error("more than one message with the same id or alias found ");
       } else if (currentMessages.length === 1) {
+        deletedMessages.delete(currentMessages[0].id);
         loadedMessageClone.alias = {};
         if (experimentalAliases) {
           loadedMessageClone.alias["default"] = loadedMessageClone.id;
@@ -62050,7 +61971,7 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
         }
         messages.set(loadedMessageClone.id, loadedMessageClone);
         messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
-        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone);
+        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [...messages.values()]);
         loadedMessageCount++;
       } else {
         loadedMessageClone.alias = {};
@@ -62070,9 +61991,19 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
         const importedEnecoded = stringifyMessage(loadedMessageClone);
         messages.set(loadedMessageClone.id, loadedMessageClone);
         messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
-        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone);
+        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [...messages.values()]);
         loadedMessageCount++;
       }
+      if (loadedMessageCount > maxMessagesPerTick) {
+        await sleep2(0);
+        loadedMessageCount = 0;
+      }
+    }
+    loadedMessageCount = 0;
+    for (const deletedMessageId of deletedMessages) {
+      messages.delete(deletedMessageId);
+      delegate?.onMessageDelete(deletedMessageId, [...messages.values()]);
+      loadedMessageCount++;
       if (loadedMessageCount > maxMessagesPerTick) {
         await sleep2(0);
         loadedMessageCount = 0;
@@ -62234,79 +62165,155 @@ var lintSingleMessage = async (args) => {
     }
   });
   await Promise.all(promises);
-  return { data: reports, errors };
+  const sortedReports = reports.sort((r1, r2) => r1.ruleId.localeCompare(r2.ruleId));
+  return { data: sortedReports, errors };
 };
 
 // ../sdk/dist/createMessageLintReportsQuery.js
 var import_debug6 = __toESM(require_src(), 1);
 var debug6 = (0, import_debug6.default)("sdk:lintReports");
-function sleep3(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 function createMessageLintReportsQuery(messagesQuery, settings, installedMessageLintRules, resolvedModules) {
-  const index2 = /* @__PURE__ */ new Map();
-  const modules = resolvedModules();
-  const rulesArray = modules?.messageLintRules;
-  const messageLintRuleLevels = Object.fromEntries(installedMessageLintRules().map((rule) => [rule.id, rule.level]));
-  const settingsObject = () => {
-    return {
-      ...settings(),
-      messageLintRuleLevels
-    };
-  };
-  const lintMessage = (message, messages2) => {
-    if (!rulesArray) {
-      return;
-    }
-    lintSingleMessage({
-      rules: rulesArray,
-      settings: settingsObject(),
-      messages: messages2,
-      message
-    }).then((report) => {
-      if (report.errors.length === 0 && index2.get(message.id) !== report.data) {
-        debug6("lintSingleMessage", message.id, report.data.length);
-        index2.set(message.id, report.data);
-      }
+  const index2 = new ReactiveMap();
+  debug6("resetting settledReports");
+  let settledReports = Promise.resolve();
+  let currentBatchEnd = void 0;
+  const updatedReports = {};
+  createMemo2(() => {
+    index2.clear();
+    onCleanup2(() => {
+      messagesQuery.setDelegate(void 0, false);
     });
-  };
-  const messages = messagesQuery.getAll();
-  for (const message of messages) {
-    lintMessage(message, messages);
-  }
-  const messageQueryChangeDelegate = {
-    onCleanup: () => {
-      index2.clear();
-    },
-    onLoaded: (messages2) => {
-      for (const message of messages2) {
-        lintMessage(message, messages2);
+    const _settings = settings();
+    if (!_settings)
+      return;
+    const _resolvedModules = resolvedModules();
+    if (!_resolvedModules)
+      return;
+    const rulesArray = _resolvedModules.messageLintRules;
+    const messageLintRuleLevels = Object.fromEntries(installedMessageLintRules().map((rule) => [rule.id, rule.level]));
+    const settingsObject = () => {
+      return {
+        ...settings(),
+        messageLintRuleLevels
+      };
+    };
+    const sheduleLintMessage = (message, messages) => {
+      debug6("shedule Lint for message:", message.id);
+      const updateOutstandingReportsOnLast = async () => {
+        if (currentBatchEnd !== updateOutstandingReportsOnLast) {
+          debug6("skip triggering reactivy", message.id);
+          return;
+        }
+        debug6("finished queue - trigger reactivity", message.id);
+        batch2(() => {
+          for (const [id, reports] of Object.entries(updatedReports)) {
+            const currentReports = index2.get(id);
+            if (!reportsEqual(currentReports, reports)) {
+              debug6("lint reports for message: ", id, " now n:", reports.length);
+              index2.set(id, reports);
+            }
+          }
+        });
+      };
+      currentBatchEnd = updateOutstandingReportsOnLast;
+      const scheduledLint = lintSingleMessage({
+        rules: rulesArray,
+        settings: settingsObject(),
+        messages,
+        message
+      }).then((reportsResult) => {
+        if (reportsResult.errors.length === 0) {
+          debug6("lint reports for message: ", message.id, "n:", reportsResult.data.length);
+          updatedReports[message.id] = reportsResult.data;
+        }
+        return updateOutstandingReportsOnLast();
+      });
+      settledReports = settledReports.then(() => scheduledLint);
+    };
+    const messageQueryChangeDelegate = {
+      onCleanup: () => {
+        index2.clear();
+      },
+      onLoaded: (messages) => {
+        debug6("sheduluing Lint for all messages - on load");
+        batch2(() => {
+          debug6("sheduluing Lint for all messages - subsquencial call?");
+          for (const message of messages) {
+            sheduleLintMessage(message, messages);
+          }
+        });
+      },
+      onMessageCreate: (messageId, message, messages) => {
+        debug6("shedule Lint for message - onMessageCreate", message.id);
+        sheduleLintMessage(message, messages);
+      },
+      onMessageUpdate: (messageId, message, messages) => {
+        debug6("shedule Lint for message - onMessageUpdate", message.id);
+        sheduleLintMessage(message, messages);
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TODO MESDK-105 we gonna need the mesage Property for evaluation
+      onMessageDelete: (messageId, _messages) => {
+        index2.delete(messageId);
       }
-    },
-    onMessageCreate: (messageId, message) => {
-      lintMessage(message, messages);
-    },
-    onMessageUpdate: (messageId, message) => {
-      lintMessage(message, messages);
-    },
-    onMessageDelete: (messageId) => {
-      index2.delete(messageId);
-    }
+    };
+    untrack2(() => {
+      messagesQuery.setDelegate(messageQueryChangeDelegate, true);
+    });
+  });
+  const get = (args) => {
+    debug6("get", args.where.messageId);
+    return structuredClone(index2.get(args.where.messageId));
   };
-  messagesQuery.setDelegate(messageQueryChangeDelegate);
+  const getAll = () => {
+    const flatValues = [...index2.values()].flat();
+    debug6("getAll", flatValues.length);
+    return structuredClone(flatValues.length === 0 ? [] : flatValues);
+  };
   return {
-    getAll: async () => {
-      await sleep3(0);
-      const flatValues = [...index2.values()].flat();
-      debug6("getAll", flatValues.length);
-      return structuredClone(flatValues.length === 0 ? [] : flatValues);
-    },
-    get: async (args) => {
-      await sleep3(0);
-      debug6("get", args.where.messageId);
-      return structuredClone(index2.get(args.where.messageId) ?? []);
-    }
+    getAll: Object.assign(createSubscribable(getAll), {
+      settled: async () => {
+        await settledReports;
+        return getAll();
+      }
+    }),
+    get: Object.assign(get, {
+      subscribe: (args, callback) => createSubscribable(() => get(args)).subscribe(callback)
+    })
   };
+}
+function reportsEqual(reportsA, reportsB) {
+  if (reportsA === void 0 && reportsB === void 0) {
+    return true;
+  } else if (reportsA === void 0 || reportsB === void 0) {
+    return false;
+  }
+  if (reportsA.length !== reportsB.length) {
+    return false;
+  }
+  for (const [i, element] of reportsA.entries()) {
+    if (element?.languageTag !== reportsB[i]?.languageTag) {
+      return false;
+    }
+    if (element?.level !== reportsB[i]?.level) {
+      return false;
+    }
+    if (element?.ruleId !== reportsB[i]?.ruleId) {
+      return false;
+    }
+    if (typeof element?.body !== typeof reportsB[i]?.body) {
+      return false;
+    }
+    if (typeof element?.body === "string") {
+      if (reportsB[i]?.body !== reportsB[i]?.body) {
+        return false;
+      }
+    } else {
+      if (JSON.stringify(element?.body) !== JSON.stringify(element?.body)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 // ../versioned-interfaces/project-settings/dist/migration/1-to-2.js
@@ -62530,7 +62537,10 @@ async function loadProject(args) {
             pathPattern: projectPath + "/messages.json"
           };
         }
-        _setSettings(validatedSettings);
+        batch2(() => {
+          setResolvedModules(void 0);
+          _setSettings(validatedSettings);
+        });
         writeSettingsToDisk(validatedSettings);
         return { data: void 0 };
       } catch (error) {
@@ -62818,7 +62828,7 @@ async function run() {
         continue;
       }
       result.installedRules.push(...projectTarget.installed.messageLintRules());
-      const messageLintReports = await projectTarget.query.messageLintReports.getAll();
+      const messageLintReports = await projectTarget.query.messageLintReports.getAll.settled();
       core.debug(`message: ${messageLintReports.length}`);
       result.reportsTarget.push(...messageLintReports);
       core.debug(`detected lint reports: ${messageLintReports.length}`);
@@ -62883,7 +62893,7 @@ async function run() {
           result.installedRules.push(newRule);
         }
       }
-      const messageLintReports = await projectMerge.query.messageLintReports.getAll();
+      const messageLintReports = await projectMerge.query.messageLintReports.getAll.settled();
       core.debug(`message: ${messageLintReports.length}`);
       result?.reportsMerge.push(...messageLintReports);
       core.debug(`detected lint reports: ${messageLintReports.length}`);
