@@ -1,7 +1,7 @@
 {
   "name": "i18n-action",
   "description": "This action checks for translation issues within your PRs.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "",
   "homepage": "https://inlang.com",
   "repository": {
