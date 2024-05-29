@@ -62243,9 +62243,6 @@ function humanIdHash(value, offset = 0) {
 
 // ../sdk/dist/createMessagesQuery.js
 var debug5 = (0, import_debug5.default)("sdk:messages");
-function sleep2(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules, onInitialMessageLoadResult, onLoadMessageResult, onSaveMessageResult }) {
   const index2 = new ReactiveMap();
   let loaded = false;
@@ -62418,7 +62415,6 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
     }
   };
 }
-var maxMessagesPerTick = 500;
 async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi) {
   const experimentalAliases = !!settingsValue.experimental?.aliases;
   if (messageState.isLoading) {
@@ -62435,64 +62431,57 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
       settings: settingsValue,
       nodeishFs: fs2
     }));
-    let loadedMessageCount = 0;
     const deletedMessages = new Set(messages.keys());
-    for (const loadedMessage of loadedMessages) {
-      const loadedMessageClone = structuredClone(loadedMessage);
-      const currentMessages = [...messages.values()].filter((message) => (experimentalAliases ? message.alias["default"] : message.id) === loadedMessage.id);
-      if (currentMessages.length > 1) {
-        throw new Error("more than one message with the same id or alias found ");
-      } else if (currentMessages.length === 1) {
-        deletedMessages.delete(currentMessages[0].id);
-        loadedMessageClone.alias = {};
-        if (experimentalAliases) {
-          loadedMessageClone.alias["default"] = loadedMessageClone.id;
-          loadedMessageClone.id = currentMessages[0].id;
+    batch2(() => {
+      for (const loadedMessage of loadedMessages) {
+        const loadedMessageClone = structuredClone(loadedMessage);
+        const currentMessages = [...messages.values()].filter((message) => (experimentalAliases ? message.alias["default"] : message.id) === loadedMessage.id);
+        if (currentMessages.length > 1) {
+          throw new Error("more than one message with the same id or alias found ");
+        } else if (currentMessages.length === 1) {
+          deletedMessages.delete(currentMessages[0].id);
+          loadedMessageClone.alias = {};
+          if (experimentalAliases) {
+            loadedMessageClone.alias["default"] = loadedMessageClone.id;
+            loadedMessageClone.id = currentMessages[0].id;
+          }
+          const importedEnecoded = stringifyMessage(loadedMessageClone);
+          if (messageState.messageLoadHash[loadedMessageClone.id] === importedEnecoded) {
+            continue;
+          }
+          messages.set(loadedMessageClone.id, loadedMessageClone);
+          messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
+          delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [
+            ...messages.values()
+          ]);
+        } else {
+          loadedMessageClone.alias = {};
+          if (experimentalAliases) {
+            loadedMessageClone.alias["default"] = loadedMessageClone.id;
+            let currentOffset = 0;
+            let messsageId;
+            do {
+              messsageId = humanIdHash(loadedMessageClone.id, currentOffset);
+              if (messages.get(messsageId)) {
+                currentOffset += 1;
+                messsageId = void 0;
+              }
+            } while (messsageId === void 0);
+            loadedMessageClone.id = messsageId;
+          }
+          const importedEnecoded = stringifyMessage(loadedMessageClone);
+          messages.set(loadedMessageClone.id, loadedMessageClone);
+          messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
+          delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [
+            ...messages.values()
+          ]);
         }
-        const importedEnecoded = stringifyMessage(loadedMessageClone);
-        if (messageState.messageLoadHash[loadedMessageClone.id] === importedEnecoded) {
-          continue;
-        }
-        messages.set(loadedMessageClone.id, loadedMessageClone);
-        messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
-        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [...messages.values()]);
-        loadedMessageCount++;
-      } else {
-        loadedMessageClone.alias = {};
-        if (experimentalAliases) {
-          loadedMessageClone.alias["default"] = loadedMessageClone.id;
-          let currentOffset = 0;
-          let messsageId;
-          do {
-            messsageId = humanIdHash(loadedMessageClone.id, currentOffset);
-            if (messages.get(messsageId)) {
-              currentOffset += 1;
-              messsageId = void 0;
-            }
-          } while (messsageId === void 0);
-          loadedMessageClone.id = messsageId;
-        }
-        const importedEnecoded = stringifyMessage(loadedMessageClone);
-        messages.set(loadedMessageClone.id, loadedMessageClone);
-        messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
-        delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [...messages.values()]);
-        loadedMessageCount++;
       }
-      if (loadedMessageCount > maxMessagesPerTick) {
-        await sleep2(0);
-        loadedMessageCount = 0;
+      for (const deletedMessageId of deletedMessages) {
+        messages.delete(deletedMessageId);
+        delegate?.onMessageDelete(deletedMessageId, [...messages.values()]);
       }
-    }
-    loadedMessageCount = 0;
-    for (const deletedMessageId of deletedMessages) {
-      messages.delete(deletedMessageId);
-      delegate?.onMessageDelete(deletedMessageId, [...messages.values()]);
-      loadedMessageCount++;
-      if (loadedMessageCount > maxMessagesPerTick) {
-        await sleep2(0);
-        loadedMessageCount = 0;
-      }
-    }
+    });
     await releaseLock(fs2, lockDirPath, "loadMessage", lockTime);
     lockTime = void 0;
     debug5("loadMessagesViaPlugin: " + loadedMessages.length + " Messages processed ");
