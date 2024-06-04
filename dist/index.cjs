@@ -57380,12 +57380,12 @@ async function collect2(iterable) {
 }
 var cache = /* @__PURE__ */ new Map();
 var cacheDisabler;
-function makeHttpClient({ debug: debug10, description, onReq, onRes }) {
+function makeHttpClient({ noCache, debug: debug10, description, onReq, onRes }) {
   async function request({ url, method = "GET", headers = {}, body: rawBody }) {
     let body = rawBody ? await collect2(rawBody) : void 0;
     const origUrl = url;
     const origMethod = method;
-    if (cache && origMethod === "GET" && cache.has(origUrl)) {
+    if (!noCache && cache && origMethod === "GET" && cache.has(origUrl)) {
       const { resHeaders: resHeaders2, resBody: resBody2 } = cache.get(origUrl);
       return {
         url: origUrl,
@@ -57414,7 +57414,7 @@ function makeHttpClient({ debug: debug10, description, onReq, onRes }) {
     const statusCode = res.status;
     let resBody;
     const uint8Array = res.body && new Uint8Array(await res.arrayBuffer());
-    if (debug10 && uint8Array) {
+    if (debug10 && statusCode === 200 && uint8Array) {
       const { inflatePackResponse: inflatePackResponse2 } = await Promise.resolve().then(() => (init_packfile(), packfile_exports));
       console.info(await inflatePackResponse2(uint8Array).catch((err) => err));
     }
@@ -57432,7 +57432,7 @@ function makeHttpClient({ debug: debug10, description, onReq, onRes }) {
     if (!resBody) {
       resBody = [uint8Array];
     }
-    if (cache && statusCode === 200 && origMethod === "GET") {
+    if (!noCache && cache && statusCode === 200 && origMethod === "GET") {
       if (!cacheDisabler) {
         cacheDisabler = setTimeout(() => {
           cache?.clear();
@@ -58516,7 +58516,7 @@ async function getBranches(ctx) {
       url: ctx.gitUrl,
       corsProxy: ctx.gitProxyUrl,
       prefix: "refs/heads",
-      http: makeHttpClient({ debug: ctx.debug, description: "getBranches" })
+      http: makeHttpClient({ debug: ctx.debug, noCache: true, description: "getBranches" })
     });
   } catch (_error) {
     return void 0;
@@ -62963,8 +62963,7 @@ function subscribable(fn) {
 }
 function settleable(fn) {
   return Object.assign(fn, {
-    settled: async () => {
-    }
+    settled: async () => []
   });
 }
 
