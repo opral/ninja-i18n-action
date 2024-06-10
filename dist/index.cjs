@@ -58540,19 +58540,35 @@ async function getMeta(ctx) {
     throw new Error("Could not find repo url, only github supported for getMeta at the moment");
   }
   const res = await githubClient.getRepo({ repoName, owner });
+  let isInstalled = false;
+  const installResult = await githubClient.getInstallations();
+  if (!("error" in installResult)) {
+    const found = installResult.installations.find((i) => i.account.login === owner);
+    if (found?.repository_selection === "all") {
+      isInstalled = true;
+    } else if (found) {
+      const repoResult = await githubClient.getAvailableRepos(found.id);
+      if (!("error" in repoResult) && repoResult.repositories.find((r) => r.full_name === `${owner}/${repoName}`)) {
+        isInstalled = true;
+      }
+    }
+  }
   if ("error" in res) {
     return { error: res.error };
   } else {
     return {
+      allowForking: res.data.allow_forking,
       name: res.data.name,
       isPrivate: res.data.private,
       isFork: res.data.fork,
+      isInstalled,
       permissions: {
         admin: res.data.permissions?.admin || false,
         push: res.data.permissions?.push || false,
         pull: res.data.permissions?.pull || false
       },
       owner: {
+        type: res.data.owner.type.toLowerCase(),
         name: res.data.owner.name || void 0,
         email: res.data.owner.email || void 0,
         login: res.data.owner.login
@@ -58809,6 +58825,14 @@ function makeGithubClient({ gitHubProxyUrl } = {}) {
   }).catch((newError) => {
     return { error: newError };
   });
+  const getAvailableRepos = async (installation_id) => await githubClient.request(`GET /user/installations/{installation_id}/repositories`, {
+    installation_id
+  }).then(({ data }) => data).catch((newError) => {
+    return { error: newError };
+  });
+  const getInstallations = async () => await githubClient.request("GET /user/installations").then(({ data }) => data).catch((newError) => {
+    return { error: newError };
+  });
   const createFork2 = githubClient.rest.repos.createFork;
   const mergeUpstream2 = async ({ branch: branch2, owner, repoName }) => await githubClient.request("POST /repos/{owner}/{repo}/merge-upstream", {
     branch: branch2,
@@ -58824,6 +58848,8 @@ function makeGithubClient({ gitHubProxyUrl } = {}) {
     });
   };
   return {
+    getInstallations,
+    getAvailableRepos,
     getRepo,
     createFork: createFork2,
     mergeUpstream: mergeUpstream2,
@@ -59625,7 +59651,7 @@ var resolveMessageLintRules = (args) => {
   return result;
 };
 
-// ../../../node_modules/.pnpm/dedent@1.5.1_babel-plugin-macros@2.8.0/node_modules/dedent/dist/dedent.mjs
+// ../../../node_modules/.pnpm/dedent@1.5.1/node_modules/dedent/dist/dedent.mjs
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
   if (Object.getOwnPropertySymbols) {
@@ -62237,6 +62263,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
           messageLockDirPath,
           messageStates,
           index2,
+          defaultAliasIndex,
           delegate,
           _settings,
           // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
@@ -62261,6 +62288,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       messageLockDirPath,
       messageStates,
       index2,
+      defaultAliasIndex,
       void 0,
       _settings,
       // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
@@ -62287,6 +62315,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       messageLockDirPath,
       messageStates,
       index2,
+      defaultAliasIndex,
       delegate,
       _settings,
       // NOTE we bang here - we don't expect the settings to become null during the livetime of a project
@@ -62331,6 +62360,9 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       if (message === void 0)
         return false;
       index2.set(where.id, { ...message, ...data });
+      if (data.alias && "default" in data.alias) {
+        defaultAliasIndex.set(data.alias.default, data);
+      }
       messageStates.messageDirtyFlags[where.id] = true;
       delegate?.onMessageUpdate(where.id, index2.get(data.id), [...index2.values()]);
       scheduleSave();
@@ -62347,6 +62379,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
         delegate?.onMessageCreate(data.id, index2.get(data.id), [...index2.values()]);
       } else {
         index2.set(where.id, { ...message, ...data });
+        defaultAliasIndex.set(data.alias.default, { ...message, ...data });
         messageStates.messageDirtyFlags[where.id] = true;
         delegate?.onMessageUpdate(data.id, index2.get(data.id), [...index2.values()]);
       }
@@ -62368,7 +62401,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
     }
   };
 }
-async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi) {
+async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, aliaseToMessageMap, delegate, settingsValue, resolvedPluginApi) {
   const experimentalAliases = !!settingsValue.experimental?.aliases;
   if (messageState.isLoading) {
     if (!messageState.sheduledLoadMessagesViaPlugin) {
@@ -62403,6 +62436,9 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
             continue;
           }
           messages.set(loadedMessageClone.id, loadedMessageClone);
+          if (loadedMessageClone.alias["default"]) {
+            aliaseToMessageMap.set(loadedMessageClone.alias["default"], loadedMessageClone);
+          }
           messageState.messageLoadHash[loadedMessageClone.id] = importedEnecoded;
           delegate?.onMessageUpdate(loadedMessageClone.id, loadedMessageClone, [
             ...messages.values()
@@ -62421,6 +62457,7 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
               }
             } while (messsageId === void 0);
             loadedMessageClone.id = messsageId;
+            aliaseToMessageMap.set(loadedMessageClone.alias["default"], loadedMessageClone);
           }
           const importedEnecoded = stringifyMessage(loadedMessageClone);
           messages.set(loadedMessageClone.id, loadedMessageClone);
@@ -62448,14 +62485,14 @@ async function loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
   const executingScheduledMessages = messageState.sheduledLoadMessagesViaPlugin;
   if (executingScheduledMessages) {
     messageState.sheduledLoadMessagesViaPlugin = void 0;
-    loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi).then(() => {
+    loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, aliaseToMessageMap, delegate, settingsValue, resolvedPluginApi).then(() => {
       executingScheduledMessages.resolve();
     }).catch((e) => {
       executingScheduledMessages.reject(e);
     });
   }
 }
-async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi) {
+async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, aliaseToMessageMap, delegate, settingsValue, resolvedPluginApi) {
   if (messageState.isSaving) {
     if (!messageState.sheduledSaveMessages) {
       messageState.sheduledSaveMessages = createAwaitable();
@@ -62508,7 +62545,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
       }
       if (messageState.sheduledLoadMessagesViaPlugin) {
         debug4("saveMessagesViaPlugin calling queued loadMessagesViaPlugin to share lock");
-        await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi);
+        await loadMessagesViaPlugin(fs2, lockDirPath, messageState, messages, aliaseToMessageMap, delegate, settingsValue, resolvedPluginApi);
       }
       messageState.isSaving = false;
     } catch (err) {
@@ -62537,7 +62574,7 @@ async function saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, d
   if (messageState.sheduledSaveMessages) {
     const executingSheduledSaveMessages = messageState.sheduledSaveMessages;
     messageState.sheduledSaveMessages = void 0;
-    saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, delegate, settingsValue, resolvedPluginApi).then(() => {
+    saveMessagesViaPlugin(fs2, lockDirPath, messageState, messages, aliaseToMessageMap, delegate, settingsValue, resolvedPluginApi).then(() => {
       executingSheduledSaveMessages.resolve();
     }).catch((e) => {
       executingSheduledSaveMessages.reject(e);
