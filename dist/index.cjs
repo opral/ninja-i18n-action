@@ -5638,7 +5638,7 @@ var require_body = __commonJS({
         const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, "0")}`;
         const prefix = `--${boundary}\r
 Content-Disposition: form-data`;
-        const escape = (str) => str.replace(/\n/g, "%0A").replace(/\r/g, "%0D").replace(/"/g, "%22");
+        const escape2 = (str) => str.replace(/\n/g, "%0A").replace(/\r/g, "%0D").replace(/"/g, "%22");
         const normalizeLinefeeds = (value) => value.replace(/\r?\n|\r/g, "\r\n");
         const blobParts = [];
         const rn = new Uint8Array([13, 10]);
@@ -5646,14 +5646,14 @@ Content-Disposition: form-data`;
         let hasUnknownSizeValue = false;
         for (const [name, value] of object) {
           if (typeof value === "string") {
-            const chunk2 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name))}"\r
+            const chunk2 = textEncoder.encode(prefix + `; name="${escape2(normalizeLinefeeds(name))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
             blobParts.push(chunk2);
             length += chunk2.byteLength;
           } else {
-            const chunk2 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
+            const chunk2 = textEncoder.encode(`${prefix}; name="${escape2(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape2(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
@@ -59739,19 +59739,46 @@ function createDedent(options) {
   }
 }
 
-// ../sdk/dist/resolve-modules/import.js
-function createImport(args) {
-  return (uri) => $import(uri, args);
+// ../sdk/dist/resolve-modules/cache.js
+function escape(url) {
+  const bytes = new TextEncoder().encode(url);
+  const hash2 = bytes.reduce((hash3, byte) => BigInt.asUintN(64, (hash3 ^ BigInt(byte)) * 1099511628211n), 14695981039346656037n);
+  return hash2.toString(36);
 }
-async function $import(uri, options) {
-  let moduleAsText;
-  if (uri.startsWith("http")) {
-    moduleAsText = await (await fetch(uri)).text();
-  } else {
-    moduleAsText = await options.readFile(uri, {
-      encoding: "utf-8"
-    });
-  }
+async function readModuleFromCache(moduleURI, projectPath, readFile) {
+  const moduleHash = escape(moduleURI);
+  const filePath = projectPath + `/cache/modules/${moduleHash}`;
+  return await tryCatch(async () => await readFile(filePath, { encoding: "utf-8" }));
+}
+async function writeModuleToCache(moduleURI, moduleContent, projectPath, writeFile) {
+  const moduleHash = escape(moduleURI);
+  const filePath = projectPath + `/cache/modules/${moduleHash}`;
+  await writeFile(filePath, moduleContent);
+}
+function withCache(moduleLoader, projectPath, nodeishFs) {
+  return async (uri) => {
+    const cachePromise = readModuleFromCache(uri, projectPath, nodeishFs.readFile);
+    const networkResult = await tryCatch(async () => await moduleLoader(uri));
+    if (networkResult.error) {
+      const cacheResult = await cachePromise;
+      if (!cacheResult.error)
+        return cacheResult.data;
+      else
+        throw networkResult.error;
+    } else {
+      const moduleAsText = networkResult.data;
+      await writeModuleToCache(uri, moduleAsText, projectPath, nodeishFs.writeFile);
+      return moduleAsText;
+    }
+  };
+}
+
+// ../sdk/dist/resolve-modules/import.js
+function createImport(projectPath, nodeishFs) {
+  return (uri) => $import(uri, projectPath, nodeishFs);
+}
+async function $import(uri, projectPath, nodeishFs) {
+  const moduleAsText = uri.startsWith("http") ? await withCache(readModuleFromCDN, projectPath, nodeishFs)(uri) : await readModulefromDisk(uri, nodeishFs.readFile);
   const moduleWithMimeType = "data:application/javascript," + encodeURIComponent(moduleAsText);
   try {
     return await import(
@@ -59761,12 +59788,63 @@ async function $import(uri, options) {
   } catch (error) {
     if (error instanceof SyntaxError && uri.includes("jsdelivr")) {
       error.message += dedent_default`\n\n
-Are you sure that the file exists on JSDelivr?
+				Are you sure that the file exists on JSDelivr?
 
-The error indicates that the imported file does not exist on JSDelivr. For non-existent files, JSDelivr returns a 404 text that JS cannot parse as a module and throws a SyntaxError.
-			`;
+				The error indicates that the imported file does not exist on JSDelivr. For non-existent files, JSDelivr returns a 404 text that JS cannot parse as a module and throws a SyntaxError.`;
     }
     throw new ModuleImportError({ module: uri, cause: error });
+  }
+}
+async function readModulefromDisk(uri, readFile) {
+  try {
+    return await readFile(uri, { encoding: "utf-8" });
+  } catch (error) {
+    throw new ModuleImportError({ module: uri, cause: error });
+  }
+}
+async function readModuleFromCDN(uri) {
+  if (!isValidUrl(uri))
+    throw new ModuleImportError({ module: uri, cause: new Error("Malformed URL") });
+  const result = await tryCatch(async () => await fetch(uri));
+  if (result.error) {
+    throw new ModuleImportError({
+      module: uri,
+      cause: result.error
+    });
+  }
+  const response = result.data;
+  if (!response.ok) {
+    throw new ModuleImportError({
+      module: uri,
+      cause: new Error(`Failed to fetch module. HTTP status: ${response.status}, Message: ${response.statusText}`)
+    });
+  }
+  const JS_CONTENT_TYPES = [
+    "application/javascript",
+    "text/javascript",
+    "application/x-javascript",
+    "text/x-javascript"
+  ];
+  const contentType = response.headers.get("content-type")?.toLowerCase();
+  if (contentType && !JS_CONTENT_TYPES.some((knownType) => contentType.includes(knownType))) {
+    throw new ModuleImportError({
+      module: uri,
+      cause: new Error(`Server responded with ${contentType} insetad of a JavaScript module`)
+    });
+  }
+  return await response.text();
+}
+function isValidUrl(url) {
+  const URLConstructor = URL;
+  if ("canParse" in URL) {
+    return URL.canParse(url);
+  }
+  try {
+    new URLConstructor(url);
+    return true;
+  } catch (e) {
+    console.warn(`Invalid URL: ${url}`);
+    return false;
   }
 }
 
@@ -60085,25 +60163,25 @@ var validatedModuleSettings = (args) => {
 // ../sdk/dist/resolve-modules/resolveModules.js
 var ModuleCompiler = import_compiler2.TypeCompiler.Compile(InlangModule);
 var resolveModules = async (args) => {
-  const _import = args._import ?? createImport({ readFile: args.nodeishFs.readFile });
-  const moduleErrors = [];
+  const _import = args._import ?? createImport(args.projectPath, args.nodeishFs);
   const allPlugins = [];
   const allMessageLintRules = [];
   const meta = [];
-  for (const module2 of args.settings.modules) {
+  const moduleErrors = [];
+  async function resolveModule(module2) {
     const importedModule = await tryCatch(() => _import(module2));
     if (importedModule.error) {
       moduleErrors.push(new ModuleImportError({
         module: module2,
         cause: importedModule.error
       }));
-      continue;
+      return;
     }
     if (importedModule.data?.default === void 0) {
       moduleErrors.push(new ModuleHasNoExportsError({
         module: module2
       }));
-      continue;
+      return;
     }
     const isValidModule = ModuleCompiler.Check(importedModule.data);
     if (isValidModule === false) {
@@ -60112,7 +60190,7 @@ var resolveModules = async (args) => {
         module: module2,
         errors
       }));
-      continue;
+      return;
     }
     const result = validatedModuleSettings({
       settingsSchema: importedModule.data.default.settingsSchema,
@@ -60120,7 +60198,7 @@ var resolveModules = async (args) => {
     });
     if (result !== "isValid") {
       moduleErrors.push(new ModuleSettingsAreInvalidError({ module: module2, errors: result }));
-      continue;
+      return;
     }
     meta.push({
       module: module2,
@@ -60134,6 +60212,7 @@ var resolveModules = async (args) => {
       moduleErrors.push(new ModuleError(`Unimplemented module type ${importedModule.data.default.id}.The module has not been installed.`, { module: module2 }));
     }
   }
+  await Promise.all(args.settings.modules.map(resolveModule));
   const resolvedPlugins = await resolvePlugins({
     plugins: allPlugins,
     settings: args.settings,
@@ -62914,6 +62993,48 @@ async function generateProjectId(args) {
   return void 0;
 }
 
+// ../sdk/dist/migrations/maybeAddModuleCache.js
+var EXPECTED_IGNORES = ["cache"];
+async function maybeAddModuleCache(args) {
+  if (args.repo === void 0)
+    return;
+  const projectExists = await directoryExists(args.projectPath, args.repo.nodeishFs);
+  if (!projectExists)
+    return;
+  const gitignorePath = args.projectPath + "/.gitignore";
+  const moduleCache = args.projectPath + "/cache/modules/";
+  const gitignoreExists = await fileExists(gitignorePath, args.repo.nodeishFs);
+  const moduleCacheExists = await directoryExists(moduleCache, args.repo.nodeishFs);
+  if (gitignoreExists) {
+    const gitignore = await args.repo.nodeishFs.readFile(gitignorePath, { encoding: "utf-8" });
+    const missingIgnores = EXPECTED_IGNORES.filter((ignore2) => !gitignore.includes(ignore2));
+    if (missingIgnores.length > 0) {
+      await args.repo.nodeishFs.appendFile(gitignorePath, "\n" + missingIgnores.join("\n"));
+    }
+  } else {
+    await args.repo.nodeishFs.writeFile(gitignorePath, EXPECTED_IGNORES.join("\n"));
+  }
+  if (!moduleCacheExists) {
+    await args.repo.nodeishFs.mkdir(moduleCache, { recursive: true });
+  }
+}
+async function fileExists(path, nodeishFs) {
+  try {
+    const stat = await nodeishFs.stat(path);
+    return stat.isFile();
+  } catch {
+    return false;
+  }
+}
+async function directoryExists(path, nodeishFs) {
+  try {
+    const stat = await nodeishFs.stat(path);
+    return stat.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 // ../sdk/dist/env-variables/index.js
 var ENV_VARIABLES = {
   PUBLIC_POSTHOG_TOKEN: "phc_m5yJZCxjOGxF8CJvP5sQ3H0d76xpnLrsmiZHduT4jDz"
@@ -63243,6 +63364,7 @@ async function loadProject(args) {
   });
   await maybeMigrateToDirectory({ nodeishFs, projectPath });
   await maybeCreateFirstProjectId({ projectPath, repo: args.repo });
+  await maybeAddModuleCache({ projectPath, repo: args.repo });
   return await createRoot2(async () => {
     const { data: projectId } = await tryCatch(() => nodeishFs.readFile(args.projectPath + "/project_id", { encoding: "utf-8" }));
     const [initialized, markInitAsComplete, markInitAsFailed] = createAwaitable2();
@@ -63283,7 +63405,12 @@ async function loadProject(args) {
       const _settings = settings();
       if (!_settings)
         return;
-      resolveModules({ settings: _settings, nodeishFs, _import: args._import }).then((resolvedModules2) => {
+      resolveModules({
+        settings: _settings,
+        nodeishFs,
+        _import: args._import,
+        projectPath
+      }).then((resolvedModules2) => {
         setResolvedModules(resolvedModules2);
       }).catch((err) => markInitAsFailed(err));
     });
