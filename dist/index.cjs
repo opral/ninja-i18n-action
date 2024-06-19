@@ -59750,10 +59750,17 @@ async function readModuleFromCache(moduleURI, projectPath, readFile) {
   const filePath = projectPath + `/cache/modules/${moduleHash}`;
   return await tryCatch(async () => await readFile(filePath, { encoding: "utf-8" }));
 }
-async function writeModuleToCache(moduleURI, moduleContent, projectPath, writeFile) {
+async function writeModuleToCache(moduleURI, moduleContent, projectPath, writeFile, mkdir) {
   const moduleHash = escape(moduleURI);
   const filePath = projectPath + `/cache/modules/${moduleHash}`;
-  await writeFile(filePath, moduleContent);
+  try {
+    await writeFile(filePath, moduleContent);
+  } catch (e) {
+    if (!(e instanceof Error) || !e.message.includes("ENONET"))
+      return;
+    await mkdir(projectPath + `/cache/modules`, { recursive: true });
+    await writeFile(filePath, moduleContent);
+  }
 }
 function withCache(moduleLoader, projectPath, nodeishFs) {
   return async (uri) => {
@@ -59767,7 +59774,7 @@ function withCache(moduleLoader, projectPath, nodeishFs) {
         throw networkResult.error;
     } else {
       const moduleAsText = networkResult.data;
-      await writeModuleToCache(uri, moduleAsText, projectPath, nodeishFs.writeFile);
+      await writeModuleToCache(uri, moduleAsText, projectPath, nodeishFs.writeFile, nodeishFs.mkdir);
       return moduleAsText;
     }
   };
