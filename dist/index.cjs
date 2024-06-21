@@ -59640,6 +59640,7 @@ var resolveMessageLintRules = (args) => {
     if (import_value.Value.Check(MessageLintRule, rule) === false) {
       const errors = [...import_value.Value.Errors(MessageLintRule, rule)];
       result.errors.push(new MessageLintRuleIsInvalidError({
+        // @ts-ignore
         id: rule.id,
         errors
       }));
@@ -59753,28 +59754,37 @@ async function readModuleFromCache(moduleURI, projectPath, readFile) {
 async function writeModuleToCache(moduleURI, moduleContent, projectPath, writeFile, mkdir) {
   const moduleHash = escape(moduleURI);
   const filePath = projectPath + `/cache/modules/${moduleHash}`;
-  try {
-    await writeFile(filePath, moduleContent);
-  } catch (e) {
-    if (!(e instanceof Error) || !e.message.includes("ENONET"))
-      return;
-    await mkdir(projectPath + `/cache/modules`, { recursive: true });
-    await writeFile(filePath, moduleContent);
+  const writeFileResult = await tryCatch(() => writeFile(filePath, moduleContent));
+  if (writeFileResult.error) {
+    const dirPath = projectPath + `/cache/modules`;
+    const createDirResult = await tryCatch(() => mkdir(dirPath, { recursive: true }));
+    if (createDirResult.error && createDirResult.error.code !== "EEXIST")
+      throw new Error("[sdk:module-cacke] failed to create cache-directory. Path: " + dirPath, {
+        cause: createDirResult.error
+      });
+    const writeFileResult2 = await tryCatch(() => writeFile(filePath, moduleContent));
+    if (writeFileResult2.error)
+      throw new Error("[sdk:module-cacke] failed to write cache-file. Path: " + filePath, {
+        cause: writeFileResult2.error
+      });
   }
 }
 function withCache(moduleLoader, projectPath, nodeishFs) {
   return async (uri) => {
     const cachePromise = readModuleFromCache(uri, projectPath, nodeishFs.readFile);
-    const networkResult = await tryCatch(async () => await moduleLoader(uri));
-    if (networkResult.error) {
+    const loaderResult = await tryCatch(async () => await moduleLoader(uri));
+    if (loaderResult.error) {
       const cacheResult = await cachePromise;
       if (!cacheResult.error)
         return cacheResult.data;
       else
-        throw networkResult.error;
+        throw loaderResult.error;
     } else {
-      const moduleAsText = networkResult.data;
-      await writeModuleToCache(uri, moduleAsText, projectPath, nodeishFs.writeFile, nodeishFs.mkdir);
+      const moduleAsText = loaderResult.data;
+      try {
+        await writeModuleToCache(uri, moduleAsText, projectPath, nodeishFs.writeFile, nodeishFs.mkdir);
+      } catch (error) {
+      }
       return moduleAsText;
     }
   };
@@ -61058,55 +61068,58 @@ var ReactiveMap = class extends Map {
 
 // ../sdk/dist/createNodeishFsWithWatcher.js
 var createNodeishFsWithWatcher = (args) => {
-  const pathList = [];
-  let abortControllers = [];
+  const pathList = /* @__PURE__ */ new Set();
+  const abortControllers = /* @__PURE__ */ new Set();
   const stopWatching = () => {
     for (const ac of abortControllers) {
       ac.abort();
+      abortControllers.delete(ac);
     }
-    abortControllers = [];
   };
-  const makeWatcher = (path) => {
-    ;
-    (async () => {
-      try {
-        const ac = new AbortController();
-        abortControllers.push(ac);
-        const watcher = args.nodeishFs.watch(path, {
-          signal: ac.signal,
-          persistent: false
-        });
-        if (watcher) {
-          for await (const event of watcher) {
-            args.updateMessages();
-          }
+  const makeWatcher = async (path) => {
+    try {
+      const ac = new AbortController();
+      abortControllers.add(ac);
+      const watcher = args.nodeishFs.watch(path, {
+        signal: ac.signal,
+        recursive: true,
+        persistent: false
+      });
+      if (watcher) {
+        for await (const event of watcher) {
+          args.onChange();
         }
-      } catch (err) {
-        if (err.name === "AbortError")
-          return;
-        else if (err.code === "ENOENT")
-          return;
-        throw err;
       }
-    })();
-  };
-  const readFileAndExtractPath = (path, options) => {
-    if (!pathList.includes(path)) {
-      makeWatcher(path);
-      pathList.push(path);
+    } catch (err) {
+      if (err.name === "AbortError")
+        return;
+      else if (err.code === "ENOENT")
+        return;
+      throw err;
     }
-    return args.nodeishFs.readFile(path, options);
+  };
+  const watched = (fn) => {
+    return (path, ...rest) => {
+      if (!pathList.has(path)) {
+        makeWatcher(path);
+        pathList.add(path);
+      }
+      return fn(path, ...rest);
+    };
   };
   return {
+    ...args.nodeishFs,
+    /**
+     * Reads the file and automatically adds it to the list of watched files.
+     * Any changes to the file will trigger a message update.
+     */
     // @ts-expect-error
-    readFile: (path, options) => readFileAndExtractPath(path, options),
-    rm: args.nodeishFs.rm,
-    readdir: args.nodeishFs.readdir,
-    mkdir: args.nodeishFs.mkdir,
-    rmdir: args.nodeishFs.rmdir,
-    writeFile: args.nodeishFs.writeFile,
-    watch: args.nodeishFs.watch,
-    stat: args.nodeishFs.stat,
+    readFile: watched(args.nodeishFs.readFile),
+    /**
+     * Reads the directory and automatically adds it to the list of watched files.
+     * Any changes to the directory will trigger a message update.
+     */
+    readdir: watched(args.nodeishFs.readdir),
     stopWatching
   };
 };
@@ -62343,7 +62356,7 @@ function createMessagesQuery({ projectPath, nodeishFs, settings, resolvedModules
       nodeishFs,
       // this message is called whenever a file changes that was read earlier by this filesystem
       // - the plugin loads messages -> reads the file messages.json -> start watching on messages.json -> updateMessages
-      updateMessages: () => {
+      onChange: () => {
         loadMessagesViaPlugin(
           fsWithWatcher,
           messageLockDirPath,
@@ -63013,16 +63026,30 @@ async function maybeAddModuleCache(args) {
   const gitignoreExists = await fileExists(gitignorePath, args.repo.nodeishFs);
   const moduleCacheExists = await directoryExists(moduleCache, args.repo.nodeishFs);
   if (gitignoreExists) {
-    const gitignore = await args.repo.nodeishFs.readFile(gitignorePath, { encoding: "utf-8" });
-    const missingIgnores = EXPECTED_IGNORES.filter((ignore2) => !gitignore.includes(ignore2));
-    if (missingIgnores.length > 0) {
-      await args.repo.nodeishFs.appendFile(gitignorePath, "\n" + missingIgnores.join("\n"));
+    try {
+      const gitignore = await args.repo.nodeishFs.readFile(gitignorePath, { encoding: "utf-8" });
+      const missingIgnores = EXPECTED_IGNORES.filter((ignore2) => !gitignore.includes(ignore2));
+      if (missingIgnores.length > 0) {
+        await args.repo.nodeishFs.appendFile(gitignorePath, "\n" + missingIgnores.join("\n"));
+      }
+    } catch (error) {
+      throw new Error("[migrate:module-cache] Failed to update .gitignore", { cause: error });
     }
   } else {
-    await args.repo.nodeishFs.writeFile(gitignorePath, EXPECTED_IGNORES.join("\n"));
+    try {
+      await args.repo.nodeishFs.writeFile(gitignorePath, EXPECTED_IGNORES.join("\n"));
+    } catch (e) {
+      if (e.code && e.code !== "EISDIR" && e.code !== "EEXIST") {
+        throw new Error("[migrate:module-cache] Failed to create .gitignore", { cause: e });
+      }
+    }
   }
   if (!moduleCacheExists) {
-    await args.repo.nodeishFs.mkdir(moduleCache, { recursive: true });
+    try {
+      await args.repo.nodeishFs.mkdir(moduleCache, { recursive: true });
+    } catch (e) {
+      throw new Error("[migrate:module-cache] Failed to create cache directory", { cause: e });
+    }
   }
 }
 async function fileExists(path, nodeishFs) {
@@ -63376,38 +63403,53 @@ async function loadProject(args) {
     const { data: projectId } = await tryCatch(() => nodeishFs.readFile(args.projectPath + "/project_id", { encoding: "utf-8" }));
     const [initialized, markInitAsComplete, markInitAsFailed] = createAwaitable2();
     const [loadedSettings, markSettingsAsLoaded, markSettingsAsFailed] = createAwaitable2();
+    const [resolvedModules, setResolvedModules] = createSignal2();
     const [settings, _setSettings] = createSignal2();
     let v2Persistence = false;
     let locales = [];
-    createEffect2(() => {
-      loadSettings({ settingsFilePath: projectPath + "/settings.json", nodeishFs }).then((settings2) => {
-        setSettings(settings2);
-        markSettingsAsLoaded();
-      }).catch((err) => {
-        markInitAsFailed(err);
-        markSettingsAsFailed(err);
-      });
-    });
-    const writeSettingsToDisk = skipFirst((settings2) => _writeSettingsToDisk({ nodeishFs, settings: settings2, projectPath }));
-    const setSettings = (settings2) => {
+    const setSettings = (newSettings) => {
       try {
-        const validatedSettings = parseSettings(settings2);
+        const validatedSettings = parseSettings(newSettings);
         v2Persistence = !!validatedSettings.experimental?.persistence;
         locales = validatedSettings.languageTags;
         batch2(() => {
           setResolvedModules(void 0);
           _setSettings(validatedSettings);
         });
-        writeSettingsToDisk(validatedSettings);
-        return { data: void 0 };
+        return { data: validatedSettings };
       } catch (error) {
         if (error instanceof ProjectSettingsInvalidError) {
           return { error };
         }
-        throw new Error("Unhandled error in setSettings. This is an internal bug. Please file an issue.");
+        throw new Error("Unhandled error in setSettings. This is an internal bug. Please file an issue.", { cause: error });
       }
     };
-    const [resolvedModules, setResolvedModules] = createSignal2();
+    const nodeishFsWithWatchersForSettings = createNodeishFsWithWatcher({
+      nodeishFs,
+      onChange: async () => {
+        const readSettingsResult = await tryCatch(async () => await loadSettings({
+          settingsFilePath: projectPath + "/settings.json",
+          nodeishFs
+        }));
+        if (readSettingsResult.error)
+          return;
+        const newSettings = readSettingsResult.data;
+        if (JSON.stringify(newSettings) !== JSON.stringify(settings())) {
+          setSettings(newSettings);
+        }
+      }
+    });
+    const settingsResult = await tryCatch(async () => await loadSettings({
+      settingsFilePath: projectPath + "/settings.json",
+      nodeishFs: nodeishFsWithWatchersForSettings
+    }));
+    if (settingsResult.error) {
+      markInitAsFailed(settingsResult.error);
+      markSettingsAsFailed(settingsResult.error);
+    } else {
+      setSettings(settingsResult.data);
+      markSettingsAsLoaded();
+    }
     createEffect2(() => {
       const _settings = settings();
       if (!_settings)
@@ -63526,7 +63568,12 @@ async function loadProject(args) {
         //...(lintErrors() ?? []),
       ]),
       settings: createSubscribable(() => settings()),
-      setSettings,
+      setSettings: (newSettings) => {
+        const result = setSettings(newSettings);
+        if (!result.error)
+          writeSettingsToDisk({ nodeishFs, settings: result.data, projectPath });
+        return result.error ? result : { data: void 0 };
+      },
       customApi: createSubscribable(() => resolvedModules()?.resolvedPluginApi.customApi || {}),
       query: {
         messages: messagesQuery,
@@ -63578,18 +63625,17 @@ var parseSettings = (settings) => {
   }
   return withMigration;
 };
-var _writeSettingsToDisk = async (args) => {
-  const { data: serializedSettings, error: serializeSettingsError } = tryCatch(() => (
+var writeSettingsToDisk = async (args) => {
+  const serializeResult = tryCatch(() => (
     // TODO: this will probably not match the original formatting
     JSON.stringify(args.settings, void 0, 2)
   ));
-  if (serializeSettingsError) {
-    throw serializeSettingsError;
-  }
-  const { error: writeSettingsError } = await tryCatch(async () => args.nodeishFs.writeFile(args.projectPath + "/settings.json", serializedSettings));
-  if (writeSettingsError) {
-    throw writeSettingsError;
-  }
+  if (serializeResult.error)
+    throw serializeResult.error;
+  const serializedSettings = serializeResult.data;
+  const writeResult = await tryCatch(async () => await args.nodeishFs.writeFile(args.projectPath + "/settings.json", serializedSettings));
+  if (writeResult.error)
+    throw writeResult.error;
 };
 var createAwaitable2 = () => {
   let resolve;
@@ -63600,15 +63646,6 @@ var createAwaitable2 = () => {
   });
   return [promise, resolve, reject];
 };
-function skipFirst(func) {
-  let initial = false;
-  return function(...args) {
-    if (initial) {
-      return func.apply(this, args);
-    }
-    initial = true;
-  };
-}
 function createSubscribable(signal) {
   return Object.assign(signal, {
     subscribe: (callback) => {
