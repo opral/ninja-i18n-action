@@ -28015,9 +28015,9 @@ var require_ignore = __commonJS({
       REGEX_REGEXP_RANGE,
       (match, from2, to) => from2.charCodeAt(0) <= to.charCodeAt(0) ? match : EMPTY
     );
-    var cleanRangeBackSlash = (slashes2) => {
-      const { length } = slashes2;
-      return slashes2.slice(0, length - length % 2);
+    var cleanRangeBackSlash = (slashes) => {
+      const { length } = slashes;
+      return slashes.slice(0, length - length % 2);
     };
     var REPLACERS = [
       [
@@ -38776,57 +38776,40 @@ function assertIsAbsolutePath(path) {
     }
   }
 }
-function normalizePath2(path, stripTrailing) {
-  if (path === "\\" || path === "/")
+function normalizePath2(path, { trailingSlash, leadingSlash } = {}) {
+  path = path.replace(/^\.\//, "/");
+  if (path === "\\" || path === "" || path === "/" || path === "." || path === "//.") {
     return "/";
-  const len = path.length;
-  if (len <= 1)
-    return path;
-  let prefix = "";
-  if (len > 4 && path[3] === "\\") {
-    const ch = path[2];
-    if ((ch === "?" || ch === ".") && path.slice(0, 2) === "\\\\") {
-      path = path.slice(2);
-      prefix = "//";
-    }
   }
+  if (path.length <= 1) {
+    return path;
+  }
+  const hadTrailingSlash = path[path.length - 1] === "/" || path[path.length - 1] === "\\";
+  const addleadingSlash = leadingSlash === "always" || path[0] === "/" || path[0] === "\\";
   const segs = path.split(/[/\\]+/);
   const stack = [];
   for (const seg of segs) {
     if (seg === "..") {
       stack.pop();
-    } else if (seg !== ".") {
+    } else if (seg && seg !== ".") {
       stack.push(seg);
     }
   }
-  if (stripTrailing !== false && stack.at(-1) === "") {
-    stack.pop();
+  if (trailingSlash !== "strip" && (hadTrailingSlash || trailingSlash === "always")) {
+    stack.push("");
   }
-  return prefix + stack.join("/");
-}
-function normalPath(path) {
-  path = `/${path}/`;
-  path = path.replace(/^\/\.\./, "");
-  path = path.replace(dots, "/").replace(slashes, "/");
-  let match;
-  while (match = path.match(upreference)?.[0]) {
-    path = path.replace(match, "");
-  }
-  return path;
+  return addleadingSlash ? "/" + stack.join("/") : stack.join("/");
 }
 function getDirname(path) {
-  return normalPath(path.split("/").filter((x) => x).slice(0, -1).join("/") ?? path);
+  const dirname2 = path.split("/").filter((x) => x).slice(0, -1).join("/");
+  return normalizePath2(dirname2, { leadingSlash: "always", trailingSlash: "always" }) ?? path;
 }
 function getBasename(path) {
-  return path.split("/").filter((x) => x).at(-1) ?? path;
+  return path.split("/").filter((x) => x).at(-1) ?? "";
 }
-var dots, slashes, upreference;
 var init_helpers = __esm({
   "../../../lix/packages/fs/dist/utilities/helpers.js"() {
     "use strict";
-    dots = /(\/|^)(\.\/)+/g;
-    slashes = /\/+/g;
-    upreference = /(?<!\.\.)[^/]+\/\.\.\//;
   }
 });
 
@@ -38919,27 +38902,31 @@ function createNodeishMemoryFs() {
   });
   const listeners = /* @__PURE__ */ new Set();
   async function stat(path) {
-    path = normalPath(path);
+    path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
     const stats = state.fsStats.get(path);
-    if (stats === void 0)
+    if (stats === void 0) {
       throw new FilesystemError("ENOENT", path, "stat");
-    if (stats.symlinkTarget)
+    }
+    if (stats.symlinkTarget) {
       return stat(stats.symlinkTarget);
+    }
     return Object.assign({}, stats);
   }
   async function lstat(path) {
-    path = normalPath(path);
+    path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
     const stats = state.fsStats.get(path);
-    if (stats === void 0)
+    if (stats === void 0) {
       throw new FilesystemError("ENOENT", path, "lstat");
-    if (!stats.symlinkTarget)
+    }
+    if (!stats.symlinkTarget) {
       return stat(path);
+    }
     return Object.assign({}, stats);
   }
   return {
     _state: state,
     _createPlaceholder: async function(path, options) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const dirName = getDirname(path);
       const baseName = getBasename(path);
       let parentDir = state.fsMap.get(dirName);
@@ -38963,7 +38950,7 @@ function createNodeishMemoryFs() {
       state.fsMap.set(path, { placeholder: true });
     },
     _isPlaceholder: function(path) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const entry = state.fsMap.get(path);
       if (entry && "placeholder" in entry) {
         return true;
@@ -38971,18 +38958,21 @@ function createNodeishMemoryFs() {
       return false;
     },
     writeFile: async function(path, data, options) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const dirName = getDirname(path);
       const baseName = getBasename(path);
       const parentDir = state.fsMap.get(dirName);
       if (!(parentDir instanceof Set))
         throw new FilesystemError("ENOENT", path, "writeFile");
+      let inodeData;
       if (typeof data === "string") {
-        data = Buffer.from(new TextEncoder().encode(data));
+        inodeData = Buffer.from(new TextEncoder().encode(data));
       } else if (!(data instanceof Uint8Array)) {
         throw new FilesystemError('The "data" argument must be of type string/Uint8Array', data, "readFile");
       } else if (!Buffer.isBuffer(data)) {
-        data = Buffer.from(data);
+        inodeData = Buffer.from(data);
+      } else {
+        inodeData = data;
       }
       parentDir.add(baseName);
       newStatEntry({
@@ -38991,7 +38981,7 @@ function createNodeishMemoryFs() {
         kind: 0,
         modeBits: options?.mode ?? 420
       });
-      state.fsMap.set(path, data);
+      state.fsMap.set(path, inodeData);
       for (const listener of listeners) {
         listener({ eventType: "rename", filename: dirName + baseName });
       }
@@ -39001,7 +38991,7 @@ function createNodeishMemoryFs() {
     //   a string or a Uint8Array based on the options.
     readFile: async function(path, options) {
       const decoder = new TextDecoder();
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const file = state.fsMap.get(path);
       if (file instanceof Set)
         throw new FilesystemError("EISDIR", path, "readFile");
@@ -39014,7 +39004,7 @@ function createNodeishMemoryFs() {
       return decoder.decode(file);
     },
     readdir: async function(path) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const dir = state.fsMap.get(path);
       if (dir instanceof Set)
         return [...dir.keys()];
@@ -39023,7 +39013,7 @@ function createNodeishMemoryFs() {
       throw new FilesystemError("ENOTDIR", path, "readdir");
     },
     mkdir: async function mkdir(path, options) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const dirName = getDirname(path);
       const baseName = getBasename(path);
       const parentDir = state.fsMap.get(dirName);
@@ -39053,13 +39043,14 @@ function createNodeishMemoryFs() {
       } else if (options?.recursive) {
         const parent = getDirname(path);
         const parentRes = await mkdir(parent, options);
-        await mkdir(path, options);
+        await mkdir(path, { recursive: false }).catch(() => {
+        });
         return parentRes;
       }
       throw new FilesystemError("ENOENT", path, "mkdir");
     },
     rm: async function rm(path, options) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const dirName = getDirname(path);
       const baseName = getBasename(path);
       const target = state.fsMap.get(path);
@@ -39098,7 +39089,7 @@ function createNodeishMemoryFs() {
      * @throws {"ENOENT" | WatchAbortedError} // TODO: move to lix error classes FileDoesNotExistError
      */
     watch: function(path, options) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const watchName = getBasename(path);
       const watchDir = getDirname(path);
       const watchPath = watchName === "/" ? watchDir : watchDir + watchName;
@@ -39163,7 +39154,7 @@ function createNodeishMemoryFs() {
       return asyncIterator();
     },
     rmdir: async function(path) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const dirName = getDirname(path);
       const baseName = getBasename(path);
       const target = state.fsMap.get(path);
@@ -39185,9 +39176,13 @@ function createNodeishMemoryFs() {
       }
     },
     symlink: async function(target, path) {
-      path = normalPath(path);
-      target = target.startsWith("/") ? target : `${path}/../${target}`;
-      const targetInode = state.fsMap.get(normalPath(target));
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
+      const rawTarget = target.startsWith("/") ? target : `${path}/../${target}`;
+      const targetWithTrailing = normalizePath2(rawTarget, {
+        trailingSlash: "always",
+        leadingSlash: "always"
+      });
+      const targetInode = state.fsMap.get(targetWithTrailing);
       const parentDir = state.fsMap.get(getDirname(path));
       if (state.fsMap.get(path)) {
         throw new FilesystemError("EEXIST", path, "symlink", target);
@@ -39207,11 +39202,11 @@ function createNodeishMemoryFs() {
         stats: state.fsStats,
         kind: 2,
         modeBits: 511,
-        target
+        target: rawTarget
       });
     },
     unlink: async function(path) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const targetStats = state.fsStats.get(path);
       const target = state.fsMap.get(path);
       const parentDir = state.fsMap.get(getDirname(path));
@@ -39228,7 +39223,7 @@ function createNodeishMemoryFs() {
       state.fsMap.delete(path);
     },
     readlink: async function(path) {
-      path = normalPath(path);
+      path = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
       const linkStats = await lstat(path);
       if (linkStats === void 0) {
         throw new FilesystemError("ENOENT", path, "readlink");
@@ -39244,9 +39239,10 @@ function createNodeishMemoryFs() {
   function newStatEntry({ path, stats, kind, modeBits, target, oid, rootHash }) {
     const currentTime = Date.now();
     const _kind = kind;
-    const oldStats = stats.get(normalPath(path));
+    const targetPath = normalizePath2(path, { trailingSlash: "always", leadingSlash: "always" });
+    const oldStats = stats.get(targetPath);
     const mtimeMs = Math.floor(currentTime / 1e3) === (oldStats?.mtimeMs && Math.floor(oldStats?.mtimeMs / 1e3)) ? currentTime + 1e3 : currentTime;
-    stats.set(normalPath(path), {
+    stats.set(targetPath, {
       ctimeMs: oldStats?.ctimeMs || currentTime,
       mtimeMs,
       dev: 0,
@@ -39282,7 +39278,6 @@ __export(dist_exports, {
   fromSnapshot: () => fromSnapshot,
   getBasename: () => getBasename,
   getDirname: () => getDirname,
-  normalPath: () => normalPath,
   normalizePath: () => normalizePath2,
   toSnapshot: () => toSnapshot
 });
@@ -43068,9 +43063,9 @@ var require_timespan = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/constants.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/constants.js
 var require_constants7 = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/constants.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/constants.js"(exports2, module2) {
     var SEMVER_SPEC_VERSION = "2.0.0";
     var MAX_LENGTH = 256;
     var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
@@ -43099,18 +43094,18 @@ var require_constants7 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/debug.js
 var require_debug = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/debug.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/debug.js"(exports2, module2) {
     var debug10 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
     };
     module2.exports = debug10;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/re.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/re.js
 var require_re = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/re.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/re.js"(exports2, module2) {
     var {
       MAX_SAFE_COMPONENT_LENGTH,
       MAX_SAFE_BUILD_LENGTH,
@@ -43193,9 +43188,9 @@ var require_re = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/parse-options.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/parse-options.js
 var require_parse_options = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/parse-options.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/parse-options.js"(exports2, module2) {
     var looseOption = Object.freeze({ loose: true });
     var emptyOpts = Object.freeze({});
     var parseOptions = (options) => {
@@ -43211,9 +43206,9 @@ var require_parse_options = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/identifiers.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/identifiers.js
 var require_identifiers = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/internal/identifiers.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/identifiers.js"(exports2, module2) {
     var numeric = /^[0-9]+$/;
     var compareIdentifiers = (a, b) => {
       const anum = numeric.test(a);
@@ -43232,9 +43227,9 @@ var require_identifiers = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/classes/semver.js
 var require_semver = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/semver.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/classes/semver.js"(exports2, module2) {
     var debug10 = require_debug();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants7();
     var { safeRe: re, t } = require_re();
@@ -43360,7 +43355,7 @@ var require_semver = __commonJS({
         do {
           const a = this.build[i];
           const b = other.build[i];
-          debug10("prerelease compare", i, a, b);
+          debug10("build compare", i, a, b);
           if (a === void 0 && b === void 0) {
             return 0;
           } else if (b === void 0) {
@@ -43474,9 +43469,9 @@ var require_semver = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/parse.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/parse.js
 var require_parse2 = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/parse.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/parse.js"(exports2, module2) {
     var SemVer = require_semver();
     var parse2 = (version3, options, throwErrors = false) => {
       if (version3 instanceof SemVer) {
@@ -43495,9 +43490,9 @@ var require_parse2 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/valid.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/valid.js
 var require_valid = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/valid.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/valid.js"(exports2, module2) {
     var parse2 = require_parse2();
     var valid = (version3, options) => {
       const v = parse2(version3, options);
@@ -43507,9 +43502,9 @@ var require_valid = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/clean.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/clean.js
 var require_clean = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/clean.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/clean.js"(exports2, module2) {
     var parse2 = require_parse2();
     var clean = (version3, options) => {
       const s = parse2(version3.trim().replace(/^[=v]+/, ""), options);
@@ -43519,9 +43514,9 @@ var require_clean = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/inc.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/inc.js
 var require_inc = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/inc.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/inc.js"(exports2, module2) {
     var SemVer = require_semver();
     var inc = (version3, release, options, identifier, identifierBase) => {
       if (typeof options === "string") {
@@ -43542,9 +43537,9 @@ var require_inc = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/diff.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/diff.js
 var require_diff = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/diff.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/diff.js"(exports2, module2) {
     var parse2 = require_parse2();
     var diff = (version1, version22) => {
       const v12 = parse2(version1, null, true);
@@ -43586,36 +43581,36 @@ var require_diff = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/major.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/major.js
 var require_major = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/major.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/major.js"(exports2, module2) {
     var SemVer = require_semver();
     var major = (a, loose) => new SemVer(a, loose).major;
     module2.exports = major;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/minor.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/minor.js
 var require_minor = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/minor.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/minor.js"(exports2, module2) {
     var SemVer = require_semver();
     var minor = (a, loose) => new SemVer(a, loose).minor;
     module2.exports = minor;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/patch.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/patch.js
 var require_patch = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/patch.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/patch.js"(exports2, module2) {
     var SemVer = require_semver();
     var patch = (a, loose) => new SemVer(a, loose).patch;
     module2.exports = patch;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/prerelease.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/prerelease.js
 var require_prerelease = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/prerelease.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/prerelease.js"(exports2, module2) {
     var parse2 = require_parse2();
     var prerelease = (version3, options) => {
       const parsed = parse2(version3, options);
@@ -43625,36 +43620,36 @@ var require_prerelease = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/compare.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/compare.js
 var require_compare = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/compare.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/compare.js"(exports2, module2) {
     var SemVer = require_semver();
     var compare = (a, b, loose) => new SemVer(a, loose).compare(new SemVer(b, loose));
     module2.exports = compare;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/rcompare.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/rcompare.js
 var require_rcompare = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/rcompare.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/rcompare.js"(exports2, module2) {
     var compare = require_compare();
     var rcompare = (a, b, loose) => compare(b, a, loose);
     module2.exports = rcompare;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/compare-loose.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/compare-loose.js
 var require_compare_loose = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/compare-loose.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/compare-loose.js"(exports2, module2) {
     var compare = require_compare();
     var compareLoose = (a, b) => compare(a, b, true);
     module2.exports = compareLoose;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/compare-build.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/compare-build.js
 var require_compare_build = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/compare-build.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/compare-build.js"(exports2, module2) {
     var SemVer = require_semver();
     var compareBuild = (a, b, loose) => {
       const versionA = new SemVer(a, loose);
@@ -43665,81 +43660,81 @@ var require_compare_build = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/sort.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/sort.js
 var require_sort = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/sort.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/sort.js"(exports2, module2) {
     var compareBuild = require_compare_build();
     var sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose));
     module2.exports = sort;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/rsort.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/rsort.js
 var require_rsort = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/rsort.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/rsort.js"(exports2, module2) {
     var compareBuild = require_compare_build();
     var rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
     module2.exports = rsort;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/gt.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/gt.js
 var require_gt = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/gt.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/gt.js"(exports2, module2) {
     var compare = require_compare();
     var gt = (a, b, loose) => compare(a, b, loose) > 0;
     module2.exports = gt;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/lt.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/lt.js
 var require_lt = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/lt.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/lt.js"(exports2, module2) {
     var compare = require_compare();
     var lt = (a, b, loose) => compare(a, b, loose) < 0;
     module2.exports = lt;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/eq.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/eq.js
 var require_eq = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/eq.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/eq.js"(exports2, module2) {
     var compare = require_compare();
     var eq = (a, b, loose) => compare(a, b, loose) === 0;
     module2.exports = eq;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/neq.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/neq.js
 var require_neq = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/neq.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/neq.js"(exports2, module2) {
     var compare = require_compare();
     var neq = (a, b, loose) => compare(a, b, loose) !== 0;
     module2.exports = neq;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/gte.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/gte.js
 var require_gte = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/gte.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/gte.js"(exports2, module2) {
     var compare = require_compare();
     var gte = (a, b, loose) => compare(a, b, loose) >= 0;
     module2.exports = gte;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/lte.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/lte.js
 var require_lte = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/lte.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/lte.js"(exports2, module2) {
     var compare = require_compare();
     var lte = (a, b, loose) => compare(a, b, loose) <= 0;
     module2.exports = lte;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/cmp.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/cmp.js
 var require_cmp = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/cmp.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/cmp.js"(exports2, module2) {
     var eq = require_eq();
     var neq = require_neq();
     var gt = require_gt();
@@ -43786,9 +43781,9 @@ var require_cmp = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/coerce.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/coerce.js
 var require_coerce = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/coerce.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/coerce.js"(exports2, module2) {
     var SemVer = require_semver();
     var parse2 = require_parse2();
     var { safeRe: re, t } = require_re();
@@ -43831,662 +43826,46 @@ var require_coerce = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/yallist@4.0.0/node_modules/yallist/iterator.js
-var require_iterator = __commonJS({
-  "../../../node_modules/.pnpm/yallist@4.0.0/node_modules/yallist/iterator.js"(exports2, module2) {
-    "use strict";
-    module2.exports = function(Yallist) {
-      Yallist.prototype[Symbol.iterator] = function* () {
-        for (let walker = this.head; walker; walker = walker.next) {
-          yield walker.value;
-        }
-      };
-    };
-  }
-});
-
-// ../../../node_modules/.pnpm/yallist@4.0.0/node_modules/yallist/yallist.js
-var require_yallist = __commonJS({
-  "../../../node_modules/.pnpm/yallist@4.0.0/node_modules/yallist/yallist.js"(exports2, module2) {
-    "use strict";
-    module2.exports = Yallist;
-    Yallist.Node = Node;
-    Yallist.create = Yallist;
-    function Yallist(list) {
-      var self2 = this;
-      if (!(self2 instanceof Yallist)) {
-        self2 = new Yallist();
-      }
-      self2.tail = null;
-      self2.head = null;
-      self2.length = 0;
-      if (list && typeof list.forEach === "function") {
-        list.forEach(function(item) {
-          self2.push(item);
-        });
-      } else if (arguments.length > 0) {
-        for (var i = 0, l = arguments.length; i < l; i++) {
-          self2.push(arguments[i]);
-        }
-      }
-      return self2;
-    }
-    Yallist.prototype.removeNode = function(node) {
-      if (node.list !== this) {
-        throw new Error("removing node which does not belong to this list");
-      }
-      var next = node.next;
-      var prev = node.prev;
-      if (next) {
-        next.prev = prev;
-      }
-      if (prev) {
-        prev.next = next;
-      }
-      if (node === this.head) {
-        this.head = next;
-      }
-      if (node === this.tail) {
-        this.tail = prev;
-      }
-      node.list.length--;
-      node.next = null;
-      node.prev = null;
-      node.list = null;
-      return next;
-    };
-    Yallist.prototype.unshiftNode = function(node) {
-      if (node === this.head) {
-        return;
-      }
-      if (node.list) {
-        node.list.removeNode(node);
-      }
-      var head = this.head;
-      node.list = this;
-      node.next = head;
-      if (head) {
-        head.prev = node;
-      }
-      this.head = node;
-      if (!this.tail) {
-        this.tail = node;
-      }
-      this.length++;
-    };
-    Yallist.prototype.pushNode = function(node) {
-      if (node === this.tail) {
-        return;
-      }
-      if (node.list) {
-        node.list.removeNode(node);
-      }
-      var tail = this.tail;
-      node.list = this;
-      node.prev = tail;
-      if (tail) {
-        tail.next = node;
-      }
-      this.tail = node;
-      if (!this.head) {
-        this.head = node;
-      }
-      this.length++;
-    };
-    Yallist.prototype.push = function() {
-      for (var i = 0, l = arguments.length; i < l; i++) {
-        push3(this, arguments[i]);
-      }
-      return this.length;
-    };
-    Yallist.prototype.unshift = function() {
-      for (var i = 0, l = arguments.length; i < l; i++) {
-        unshift(this, arguments[i]);
-      }
-      return this.length;
-    };
-    Yallist.prototype.pop = function() {
-      if (!this.tail) {
-        return void 0;
-      }
-      var res = this.tail.value;
-      this.tail = this.tail.prev;
-      if (this.tail) {
-        this.tail.next = null;
-      } else {
-        this.head = null;
-      }
-      this.length--;
-      return res;
-    };
-    Yallist.prototype.shift = function() {
-      if (!this.head) {
-        return void 0;
-      }
-      var res = this.head.value;
-      this.head = this.head.next;
-      if (this.head) {
-        this.head.prev = null;
-      } else {
-        this.tail = null;
-      }
-      this.length--;
-      return res;
-    };
-    Yallist.prototype.forEach = function(fn, thisp) {
-      thisp = thisp || this;
-      for (var walker = this.head, i = 0; walker !== null; i++) {
-        fn.call(thisp, walker.value, i, this);
-        walker = walker.next;
-      }
-    };
-    Yallist.prototype.forEachReverse = function(fn, thisp) {
-      thisp = thisp || this;
-      for (var walker = this.tail, i = this.length - 1; walker !== null; i--) {
-        fn.call(thisp, walker.value, i, this);
-        walker = walker.prev;
-      }
-    };
-    Yallist.prototype.get = function(n) {
-      for (var i = 0, walker = this.head; walker !== null && i < n; i++) {
-        walker = walker.next;
-      }
-      if (i === n && walker !== null) {
-        return walker.value;
-      }
-    };
-    Yallist.prototype.getReverse = function(n) {
-      for (var i = 0, walker = this.tail; walker !== null && i < n; i++) {
-        walker = walker.prev;
-      }
-      if (i === n && walker !== null) {
-        return walker.value;
-      }
-    };
-    Yallist.prototype.map = function(fn, thisp) {
-      thisp = thisp || this;
-      var res = new Yallist();
-      for (var walker = this.head; walker !== null; ) {
-        res.push(fn.call(thisp, walker.value, this));
-        walker = walker.next;
-      }
-      return res;
-    };
-    Yallist.prototype.mapReverse = function(fn, thisp) {
-      thisp = thisp || this;
-      var res = new Yallist();
-      for (var walker = this.tail; walker !== null; ) {
-        res.push(fn.call(thisp, walker.value, this));
-        walker = walker.prev;
-      }
-      return res;
-    };
-    Yallist.prototype.reduce = function(fn, initial) {
-      var acc;
-      var walker = this.head;
-      if (arguments.length > 1) {
-        acc = initial;
-      } else if (this.head) {
-        walker = this.head.next;
-        acc = this.head.value;
-      } else {
-        throw new TypeError("Reduce of empty list with no initial value");
-      }
-      for (var i = 0; walker !== null; i++) {
-        acc = fn(acc, walker.value, i);
-        walker = walker.next;
-      }
-      return acc;
-    };
-    Yallist.prototype.reduceReverse = function(fn, initial) {
-      var acc;
-      var walker = this.tail;
-      if (arguments.length > 1) {
-        acc = initial;
-      } else if (this.tail) {
-        walker = this.tail.prev;
-        acc = this.tail.value;
-      } else {
-        throw new TypeError("Reduce of empty list with no initial value");
-      }
-      for (var i = this.length - 1; walker !== null; i--) {
-        acc = fn(acc, walker.value, i);
-        walker = walker.prev;
-      }
-      return acc;
-    };
-    Yallist.prototype.toArray = function() {
-      var arr = new Array(this.length);
-      for (var i = 0, walker = this.head; walker !== null; i++) {
-        arr[i] = walker.value;
-        walker = walker.next;
-      }
-      return arr;
-    };
-    Yallist.prototype.toArrayReverse = function() {
-      var arr = new Array(this.length);
-      for (var i = 0, walker = this.tail; walker !== null; i++) {
-        arr[i] = walker.value;
-        walker = walker.prev;
-      }
-      return arr;
-    };
-    Yallist.prototype.slice = function(from2, to) {
-      to = to || this.length;
-      if (to < 0) {
-        to += this.length;
-      }
-      from2 = from2 || 0;
-      if (from2 < 0) {
-        from2 += this.length;
-      }
-      var ret = new Yallist();
-      if (to < from2 || to < 0) {
-        return ret;
-      }
-      if (from2 < 0) {
-        from2 = 0;
-      }
-      if (to > this.length) {
-        to = this.length;
-      }
-      for (var i = 0, walker = this.head; walker !== null && i < from2; i++) {
-        walker = walker.next;
-      }
-      for (; walker !== null && i < to; i++, walker = walker.next) {
-        ret.push(walker.value);
-      }
-      return ret;
-    };
-    Yallist.prototype.sliceReverse = function(from2, to) {
-      to = to || this.length;
-      if (to < 0) {
-        to += this.length;
-      }
-      from2 = from2 || 0;
-      if (from2 < 0) {
-        from2 += this.length;
-      }
-      var ret = new Yallist();
-      if (to < from2 || to < 0) {
-        return ret;
-      }
-      if (from2 < 0) {
-        from2 = 0;
-      }
-      if (to > this.length) {
-        to = this.length;
-      }
-      for (var i = this.length, walker = this.tail; walker !== null && i > to; i--) {
-        walker = walker.prev;
-      }
-      for (; walker !== null && i > from2; i--, walker = walker.prev) {
-        ret.push(walker.value);
-      }
-      return ret;
-    };
-    Yallist.prototype.splice = function(start, deleteCount, ...nodes) {
-      if (start > this.length) {
-        start = this.length - 1;
-      }
-      if (start < 0) {
-        start = this.length + start;
-      }
-      for (var i = 0, walker = this.head; walker !== null && i < start; i++) {
-        walker = walker.next;
-      }
-      var ret = [];
-      for (var i = 0; walker && i < deleteCount; i++) {
-        ret.push(walker.value);
-        walker = this.removeNode(walker);
-      }
-      if (walker === null) {
-        walker = this.tail;
-      }
-      if (walker !== this.head && walker !== this.tail) {
-        walker = walker.prev;
-      }
-      for (var i = 0; i < nodes.length; i++) {
-        walker = insert(this, walker, nodes[i]);
-      }
-      return ret;
-    };
-    Yallist.prototype.reverse = function() {
-      var head = this.head;
-      var tail = this.tail;
-      for (var walker = head; walker !== null; walker = walker.prev) {
-        var p = walker.prev;
-        walker.prev = walker.next;
-        walker.next = p;
-      }
-      this.head = tail;
-      this.tail = head;
-      return this;
-    };
-    function insert(self2, node, value) {
-      var inserted = node === self2.head ? new Node(value, null, node, self2) : new Node(value, node, node.next, self2);
-      if (inserted.next === null) {
-        self2.tail = inserted;
-      }
-      if (inserted.prev === null) {
-        self2.head = inserted;
-      }
-      self2.length++;
-      return inserted;
-    }
-    function push3(self2, item) {
-      self2.tail = new Node(item, self2.tail, null, self2);
-      if (!self2.head) {
-        self2.head = self2.tail;
-      }
-      self2.length++;
-    }
-    function unshift(self2, item) {
-      self2.head = new Node(item, null, self2.head, self2);
-      if (!self2.tail) {
-        self2.tail = self2.head;
-      }
-      self2.length++;
-    }
-    function Node(value, prev, next, list) {
-      if (!(this instanceof Node)) {
-        return new Node(value, prev, next, list);
-      }
-      this.list = list;
-      this.value = value;
-      if (prev) {
-        prev.next = this;
-        this.prev = prev;
-      } else {
-        this.prev = null;
-      }
-      if (next) {
-        next.prev = this;
-        this.next = next;
-      } else {
-        this.next = null;
-      }
-    }
-    try {
-      require_iterator()(Yallist);
-    } catch (er) {
-    }
-  }
-});
-
-// ../../../node_modules/.pnpm/lru-cache@6.0.0/node_modules/lru-cache/index.js
-var require_lru_cache = __commonJS({
-  "../../../node_modules/.pnpm/lru-cache@6.0.0/node_modules/lru-cache/index.js"(exports2, module2) {
-    "use strict";
-    var Yallist = require_yallist();
-    var MAX = Symbol("max");
-    var LENGTH = Symbol("length");
-    var LENGTH_CALCULATOR = Symbol("lengthCalculator");
-    var ALLOW_STALE = Symbol("allowStale");
-    var MAX_AGE = Symbol("maxAge");
-    var DISPOSE = Symbol("dispose");
-    var NO_DISPOSE_ON_SET = Symbol("noDisposeOnSet");
-    var LRU_LIST = Symbol("lruList");
-    var CACHE = Symbol("cache");
-    var UPDATE_AGE_ON_GET = Symbol("updateAgeOnGet");
-    var naiveLength = () => 1;
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/lrucache.js
+var require_lrucache = __commonJS({
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/internal/lrucache.js"(exports2, module2) {
     var LRUCache = class {
-      constructor(options) {
-        if (typeof options === "number")
-          options = { max: options };
-        if (!options)
-          options = {};
-        if (options.max && (typeof options.max !== "number" || options.max < 0))
-          throw new TypeError("max must be a non-negative number");
-        const max = this[MAX] = options.max || Infinity;
-        const lc = options.length || naiveLength;
-        this[LENGTH_CALCULATOR] = typeof lc !== "function" ? naiveLength : lc;
-        this[ALLOW_STALE] = options.stale || false;
-        if (options.maxAge && typeof options.maxAge !== "number")
-          throw new TypeError("maxAge must be a number");
-        this[MAX_AGE] = options.maxAge || 0;
-        this[DISPOSE] = options.dispose;
-        this[NO_DISPOSE_ON_SET] = options.noDisposeOnSet || false;
-        this[UPDATE_AGE_ON_GET] = options.updateAgeOnGet || false;
-        this.reset();
-      }
-      // resize the cache when the max changes.
-      set max(mL) {
-        if (typeof mL !== "number" || mL < 0)
-          throw new TypeError("max must be a non-negative number");
-        this[MAX] = mL || Infinity;
-        trim(this);
-      }
-      get max() {
-        return this[MAX];
-      }
-      set allowStale(allowStale) {
-        this[ALLOW_STALE] = !!allowStale;
-      }
-      get allowStale() {
-        return this[ALLOW_STALE];
-      }
-      set maxAge(mA) {
-        if (typeof mA !== "number")
-          throw new TypeError("maxAge must be a non-negative number");
-        this[MAX_AGE] = mA;
-        trim(this);
-      }
-      get maxAge() {
-        return this[MAX_AGE];
-      }
-      // resize the cache when the lengthCalculator changes.
-      set lengthCalculator(lC) {
-        if (typeof lC !== "function")
-          lC = naiveLength;
-        if (lC !== this[LENGTH_CALCULATOR]) {
-          this[LENGTH_CALCULATOR] = lC;
-          this[LENGTH] = 0;
-          this[LRU_LIST].forEach((hit) => {
-            hit.length = this[LENGTH_CALCULATOR](hit.value, hit.key);
-            this[LENGTH] += hit.length;
-          });
-        }
-        trim(this);
-      }
-      get lengthCalculator() {
-        return this[LENGTH_CALCULATOR];
-      }
-      get length() {
-        return this[LENGTH];
-      }
-      get itemCount() {
-        return this[LRU_LIST].length;
-      }
-      rforEach(fn, thisp) {
-        thisp = thisp || this;
-        for (let walker = this[LRU_LIST].tail; walker !== null; ) {
-          const prev = walker.prev;
-          forEachStep(this, fn, walker, thisp);
-          walker = prev;
-        }
-      }
-      forEach(fn, thisp) {
-        thisp = thisp || this;
-        for (let walker = this[LRU_LIST].head; walker !== null; ) {
-          const next = walker.next;
-          forEachStep(this, fn, walker, thisp);
-          walker = next;
-        }
-      }
-      keys() {
-        return this[LRU_LIST].toArray().map((k) => k.key);
-      }
-      values() {
-        return this[LRU_LIST].toArray().map((k) => k.value);
-      }
-      reset() {
-        if (this[DISPOSE] && this[LRU_LIST] && this[LRU_LIST].length) {
-          this[LRU_LIST].forEach((hit) => this[DISPOSE](hit.key, hit.value));
-        }
-        this[CACHE] = /* @__PURE__ */ new Map();
-        this[LRU_LIST] = new Yallist();
-        this[LENGTH] = 0;
-      }
-      dump() {
-        return this[LRU_LIST].map((hit) => isStale(this, hit) ? false : {
-          k: hit.key,
-          v: hit.value,
-          e: hit.now + (hit.maxAge || 0)
-        }).toArray().filter((h) => h);
-      }
-      dumpLru() {
-        return this[LRU_LIST];
-      }
-      set(key, value, maxAge) {
-        maxAge = maxAge || this[MAX_AGE];
-        if (maxAge && typeof maxAge !== "number")
-          throw new TypeError("maxAge must be a number");
-        const now = maxAge ? Date.now() : 0;
-        const len = this[LENGTH_CALCULATOR](value, key);
-        if (this[CACHE].has(key)) {
-          if (len > this[MAX]) {
-            del(this, this[CACHE].get(key));
-            return false;
-          }
-          const node = this[CACHE].get(key);
-          const item = node.value;
-          if (this[DISPOSE]) {
-            if (!this[NO_DISPOSE_ON_SET])
-              this[DISPOSE](key, item.value);
-          }
-          item.now = now;
-          item.maxAge = maxAge;
-          item.value = value;
-          this[LENGTH] += len - item.length;
-          item.length = len;
-          this.get(key);
-          trim(this);
-          return true;
-        }
-        const hit = new Entry(key, value, len, now, maxAge);
-        if (hit.length > this[MAX]) {
-          if (this[DISPOSE])
-            this[DISPOSE](key, value);
-          return false;
-        }
-        this[LENGTH] += hit.length;
-        this[LRU_LIST].unshift(hit);
-        this[CACHE].set(key, this[LRU_LIST].head);
-        trim(this);
-        return true;
-      }
-      has(key) {
-        if (!this[CACHE].has(key))
-          return false;
-        const hit = this[CACHE].get(key).value;
-        return !isStale(this, hit);
+      constructor() {
+        this.max = 1e3;
+        this.map = /* @__PURE__ */ new Map();
       }
       get(key) {
-        return get(this, key, true);
-      }
-      peek(key) {
-        return get(this, key, false);
-      }
-      pop() {
-        const node = this[LRU_LIST].tail;
-        if (!node)
-          return null;
-        del(this, node);
-        return node.value;
-      }
-      del(key) {
-        del(this, this[CACHE].get(key));
-      }
-      load(arr) {
-        this.reset();
-        const now = Date.now();
-        for (let l = arr.length - 1; l >= 0; l--) {
-          const hit = arr[l];
-          const expiresAt = hit.e || 0;
-          if (expiresAt === 0)
-            this.set(hit.k, hit.v);
-          else {
-            const maxAge = expiresAt - now;
-            if (maxAge > 0) {
-              this.set(hit.k, hit.v, maxAge);
-            }
-          }
-        }
-      }
-      prune() {
-        this[CACHE].forEach((value, key) => get(this, key, false));
-      }
-    };
-    var get = (self2, key, doUse) => {
-      const node = self2[CACHE].get(key);
-      if (node) {
-        const hit = node.value;
-        if (isStale(self2, hit)) {
-          del(self2, node);
-          if (!self2[ALLOW_STALE])
-            return void 0;
+        const value = this.map.get(key);
+        if (value === void 0) {
+          return void 0;
         } else {
-          if (doUse) {
-            if (self2[UPDATE_AGE_ON_GET])
-              node.value.now = Date.now();
-            self2[LRU_LIST].unshiftNode(node);
+          this.map.delete(key);
+          this.map.set(key, value);
+          return value;
+        }
+      }
+      delete(key) {
+        return this.map.delete(key);
+      }
+      set(key, value) {
+        const deleted = this.delete(key);
+        if (!deleted && value !== void 0) {
+          if (this.map.size >= this.max) {
+            const firstKey = this.map.keys().next().value;
+            this.delete(firstKey);
           }
+          this.map.set(key, value);
         }
-        return hit.value;
+        return this;
       }
-    };
-    var isStale = (self2, hit) => {
-      if (!hit || !hit.maxAge && !self2[MAX_AGE])
-        return false;
-      const diff = Date.now() - hit.now;
-      return hit.maxAge ? diff > hit.maxAge : self2[MAX_AGE] && diff > self2[MAX_AGE];
-    };
-    var trim = (self2) => {
-      if (self2[LENGTH] > self2[MAX]) {
-        for (let walker = self2[LRU_LIST].tail; self2[LENGTH] > self2[MAX] && walker !== null; ) {
-          const prev = walker.prev;
-          del(self2, walker);
-          walker = prev;
-        }
-      }
-    };
-    var del = (self2, node) => {
-      if (node) {
-        const hit = node.value;
-        if (self2[DISPOSE])
-          self2[DISPOSE](hit.key, hit.value);
-        self2[LENGTH] -= hit.length;
-        self2[CACHE].delete(hit.key);
-        self2[LRU_LIST].removeNode(node);
-      }
-    };
-    var Entry = class {
-      constructor(key, value, length, now, maxAge) {
-        this.key = key;
-        this.value = value;
-        this.length = length;
-        this.now = now;
-        this.maxAge = maxAge || 0;
-      }
-    };
-    var forEachStep = (self2, fn, node, thisp) => {
-      let hit = node.value;
-      if (isStale(self2, hit)) {
-        del(self2, node);
-        if (!self2[ALLOW_STALE])
-          hit = void 0;
-      }
-      if (hit)
-        fn.call(thisp, hit.value, hit.key, self2);
     };
     module2.exports = LRUCache;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/range.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/classes/range.js
 var require_range = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/range.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/classes/range.js"(exports2, module2) {
     var Range = class _Range {
       constructor(range, options) {
         options = parseOptions(options);
@@ -44609,8 +43988,8 @@ var require_range = __commonJS({
       }
     };
     module2.exports = Range;
-    var LRU = require_lru_cache();
-    var cache2 = new LRU({ max: 1e3 });
+    var LRU = require_lrucache();
+    var cache2 = new LRU();
     var parseOptions = require_parse_options();
     var Comparator = require_comparator();
     var debug10 = require_debug();
@@ -44788,7 +44167,7 @@ var require_range = __commonJS({
       debug10("replaceGTE0", comp, options);
       return comp.trim().replace(re[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
     };
-    var hyphenReplace = (incPr) => ($0, from2, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) => {
+    var hyphenReplace = (incPr) => ($0, from2, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr) => {
       if (isX(fM)) {
         from2 = "";
       } else if (isX(fm)) {
@@ -44841,9 +44220,9 @@ var require_range = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/comparator.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/classes/comparator.js
 var require_comparator = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/classes/comparator.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/classes/comparator.js"(exports2, module2) {
     var ANY = Symbol("SemVer ANY");
     var Comparator = class _Comparator {
       static get ANY() {
@@ -44953,9 +44332,9 @@ var require_comparator = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/satisfies.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/satisfies.js
 var require_satisfies = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/functions/satisfies.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/functions/satisfies.js"(exports2, module2) {
     var Range = require_range();
     var satisfies = (version3, range, options) => {
       try {
@@ -44969,18 +44348,18 @@ var require_satisfies = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/to-comparators.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/to-comparators.js
 var require_to_comparators = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/to-comparators.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/to-comparators.js"(exports2, module2) {
     var Range = require_range();
     var toComparators = (range, options) => new Range(range, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
     module2.exports = toComparators;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/max-satisfying.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/max-satisfying.js
 var require_max_satisfying = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/max-satisfying.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/max-satisfying.js"(exports2, module2) {
     var SemVer = require_semver();
     var Range = require_range();
     var maxSatisfying = (versions, range, options) => {
@@ -45006,9 +44385,9 @@ var require_max_satisfying = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/min-satisfying.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/min-satisfying.js
 var require_min_satisfying = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/min-satisfying.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/min-satisfying.js"(exports2, module2) {
     var SemVer = require_semver();
     var Range = require_range();
     var minSatisfying = (versions, range, options) => {
@@ -45034,9 +44413,9 @@ var require_min_satisfying = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/min-version.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/min-version.js
 var require_min_version = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/min-version.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/min-version.js"(exports2, module2) {
     var SemVer = require_semver();
     var Range = require_range();
     var gt = require_gt();
@@ -45090,9 +44469,9 @@ var require_min_version = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/valid.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/valid.js
 var require_valid2 = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/valid.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/valid.js"(exports2, module2) {
     var Range = require_range();
     var validRange = (range, options) => {
       try {
@@ -45105,9 +44484,9 @@ var require_valid2 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/outside.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/outside.js
 var require_outside = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/outside.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/outside.js"(exports2, module2) {
     var SemVer = require_semver();
     var Comparator = require_comparator();
     var { ANY } = Comparator;
@@ -45173,27 +44552,27 @@ var require_outside = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/gtr.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/gtr.js
 var require_gtr = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/gtr.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/gtr.js"(exports2, module2) {
     var outside = require_outside();
     var gtr = (version3, range, options) => outside(version3, range, ">", options);
     module2.exports = gtr;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/ltr.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/ltr.js
 var require_ltr = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/ltr.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/ltr.js"(exports2, module2) {
     var outside = require_outside();
     var ltr = (version3, range, options) => outside(version3, range, "<", options);
     module2.exports = ltr;
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/intersects.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/intersects.js
 var require_intersects = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/intersects.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/intersects.js"(exports2, module2) {
     var Range = require_range();
     var intersects = (r1, r2, options) => {
       r1 = new Range(r1, options);
@@ -45204,9 +44583,9 @@ var require_intersects = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/simplify.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/simplify.js
 var require_simplify = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/simplify.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/simplify.js"(exports2, module2) {
     var satisfies = require_satisfies();
     var compare = require_compare();
     module2.exports = (versions, range, options) => {
@@ -45253,9 +44632,9 @@ var require_simplify = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/subset.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/subset.js
 var require_subset = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/ranges/subset.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/ranges/subset.js"(exports2, module2) {
     var Range = require_range();
     var Comparator = require_comparator();
     var { ANY } = Comparator;
@@ -45415,9 +44794,9 @@ var require_subset = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/index.js
+// ../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/index.js
 var require_semver2 = __commonJS({
-  "../../../node_modules/.pnpm/semver@7.6.0/node_modules/semver/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/semver@7.6.2/node_modules/semver/index.js"(exports2, module2) {
     var internalRe = require_re();
     var constants = require_constants7();
     var SemVer = require_semver();
@@ -55915,9 +55294,9 @@ var require_ms2 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/common.js
+// ../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/common.js
 var require_common2 = __commonJS({
-  "../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/common.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/common.js"(exports2, module2) {
     function setup(env) {
       createDebug.debug = createDebug;
       createDebug.default = createDebug;
@@ -56078,9 +55457,9 @@ var require_common2 = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/browser.js
+// ../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/browser.js
 var require_browser = __commonJS({
-  "../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/browser.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/browser.js"(exports2, module2) {
     exports2.formatArgs = formatArgs;
     exports2.save = save;
     exports2.load = load;
@@ -56374,9 +55753,9 @@ var require_supports_color = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/node.js
+// ../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/node.js
 var require_node = __commonJS({
-  "../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/node.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
     var util = require("util");
     exports2.init = init2;
@@ -56516,7 +55895,7 @@ var require_node = __commonJS({
       return (/* @__PURE__ */ new Date()).toISOString() + " ";
     }
     function log3(...args) {
-      return process.stderr.write(util.format(...args) + "\n");
+      return process.stderr.write(util.formatWithOptions(exports2.inspectOpts, ...args) + "\n");
     }
     function save(namespaces) {
       if (namespaces) {
@@ -56548,9 +55927,9 @@ var require_node = __commonJS({
   }
 });
 
-// ../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/index.js
+// ../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/index.js
 var require_src = __commonJS({
-  "../../../node_modules/.pnpm/debug@4.3.4_supports-color@8.1.1/node_modules/debug/src/index.js"(exports2, module2) {
+  "../../../node_modules/.pnpm/debug@4.3.5/node_modules/debug/src/index.js"(exports2, module2) {
     if (typeof process === "undefined" || process.type === "renderer" || process.browser === true || process.__nwjs) {
       module2.exports = require_browser();
     } else {
@@ -57126,11 +56505,11 @@ var {
   STAGE: STAGE2,
   isIgnored: isIgnored2
 } = isomorphic_git_default;
-function normalizePath3(path) {
+function isoNormalizePath(path) {
   return path.replace(/\/\.\//g, "/").replace(/\/{2,}/g, "/").replace(/^\/\.$/, "/").replace(/^\.\/$/, ".").replace(/^\.\//, "").replace(/\/\.$/, "").replace(/(.+)\/$/, "$1").replace(/^$/, ".");
 }
 function join2(...parts) {
-  return normalizePath3(parts.map(normalizePath3).join("/"));
+  return isoNormalizePath(parts.map(isoNormalizePath).join("/"));
 }
 async function statusList(ctx, state, statusArg) {
   return await _statusList({
@@ -59652,7 +59031,7 @@ var resolveMessageLintRules = (args) => {
   return result;
 };
 
-// ../../../node_modules/.pnpm/dedent@1.5.1/node_modules/dedent/dist/dedent.mjs
+// ../../../node_modules/.pnpm/dedent@1.5.1_babel-plugin-macros@2.8.0/node_modules/dedent/dist/dedent.mjs
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
   if (Object.getOwnPropertySymbols) {
