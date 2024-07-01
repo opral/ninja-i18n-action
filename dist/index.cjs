@@ -63278,41 +63278,39 @@ ${lintSummary.map(
     });
     if (issue.data.locked)
       return console.debug("PR is locked, comment is skipped");
-    const existingComment = await octokit.rest.issues.listComments({
+    const existingComments = await octokit.rest.issues.listComments({
       owner,
       repo,
       issue_number: prNumber
     });
-    if (existingComment.data.length > 0) {
-      const commentId = existingComment.data.find(
-        (comment) => (comment.body?.includes(commentMergeline) || comment.body?.includes(commentResolved)) && comment.user?.login === "github-actions[bot]"
-      )?.id;
-      if (commentId) {
-        console.debug("Updating existing comment");
-        if (results.every((result) => result.commentContent.length === 0)) {
-          console.debug("Reports have been fixed, updating comment");
-          const comment = await octokit.rest.issues.updateComment({
-            owner,
-            repo,
-            comment_id: commentId,
-            body: commentResolved,
-            as: "ninja-i18n"
-          });
-          if (comment) {
-            console.debug("Comment updated:\n", comment?.data?.body);
-          }
-        } else {
-          console.debug("Reports have not been fixed, updating comment");
-          const comment = await octokit.rest.issues.updateComment({
-            owner,
-            repo,
-            comment_id: commentId,
-            body: commentContent,
-            as: "ninja-i18n"
-          });
-          if (comment) {
-            console.debug("Comment updated:\n", comment?.data?.body);
-          }
+    const ninjaCommentId = existingComments.data.find(
+      (comment) => (comment.body?.includes(commentMergeline) || comment.body?.includes(commentResolved)) && comment.user?.login === "github-actions[bot]"
+    )?.id;
+    if (ninjaCommentId) {
+      console.debug("Updating existing comment");
+      if (results.every((result) => result.commentContent.length === 0)) {
+        console.debug("Reports have been fixed, updating comment");
+        const comment = await octokit.rest.issues.updateComment({
+          owner,
+          repo,
+          comment_id: ninjaCommentId,
+          body: commentResolved,
+          as: "ninja-i18n"
+        });
+        if (comment) {
+          console.debug("Comment updated:\n", comment?.data?.body);
+        }
+      } else {
+        console.debug("Reports have not been fixed, updating comment");
+        const comment = await octokit.rest.issues.updateComment({
+          owner,
+          repo,
+          comment_id: ninjaCommentId,
+          body: commentContent,
+          as: "ninja-i18n"
+        });
+        if (comment) {
+          console.debug("Comment updated:\n", comment?.data?.body);
         }
       }
     } else if (results.every((result) => result.commentContent.length === 0)) {
